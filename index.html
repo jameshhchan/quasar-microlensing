@@ -69,6 +69,31 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .fieldrow{border-top:1px solid var(--line);padding-top:10px;margin-top:-2px}
 .fieldrow .zoombtns{margin-left:auto;display:inline-flex;gap:6px}
 .fieldrow .zoombtns button{font-size:12px;padding:4px 9px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.optrow{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start}
+.optrow .lab{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.optrow .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px 12px;font-size:12px;color:var(--muted)}
+.optrow .items .zoombtns{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.optrow .items .zoombtns button{font-size:12px;padding:4px 9px}
+.scalebox{min-width:0}
+.scalebox .cbnote{flex-direction:row;justify-content:space-between;margin-top:0}
+.panel .params{margin-top:auto}
+.opts.stack .optrow{grid-template-columns:minmax(0,1fr);gap:6px}
+.opts.stack .items{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,auto);grid-auto-flow:column;gap:7px 18px}
+.opts.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px}
+.opts.cols .optrow{grid-template-columns:minmax(0,1fr);gap:6px;align-content:start}
+.opts.cols .items{grid-template-columns:minmax(0,1fr);gap:7px}
+.opts.cols .items .zoombtns{margin-top:2px}
+@media (max-width:380px){.opts.cols{grid-template-columns:minmax(0,1fr)}}
+.mtog .sq,.mtog .ring{flex:none}
+.mtog .sq{display:inline-block;width:10px;height:10px;border:1px solid #9ea6b8}
+.mtog .ring{display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid #f2b86b}
+.mtog .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff2d6;flex:none}
+.mtog .sw{display:inline-block;width:14px;height:2px;flex:none}
+.legendrow .sq{display:inline-block;width:10px;height:10px;border:1px solid #9ea6b8;margin-left:2px}
+.params{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:2px 0 0;padding-top:10px;border-top:1px solid var(--line);font-size:12px}
+.params dt{color:var(--muted)}
+.params dd{margin:0;font-family:var(--mono);font-size:11.5px;color:var(--fg);font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
 .legendrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff2d6;vertical-align:middle;margin-right:6px}
 #cbar{width:100%;height:32px;display:block}
 #mfCv{width:100%;height:96px;display:block;margin-top:6px}
@@ -107,6 +132,16 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .eq{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.6;overflow-x:auto}
 .eq p{margin:0 0 6px}
 .eq a{color:var(--cyan)}
+.lcnote{margin:0;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.seedrow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.seedrow button{white-space:nowrap;padding:6px 9px}
+#seedBox{display:inline-flex;flex:none}
+.seedrow label{font-size:13px}
+.seedrow input[type=number]{width:72px;padding-inline:6px!important;font:inherit;font-family:var(--mono);font-size:12.5px;background:var(--raise);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+.seedrow button{flex:1;min-width:0}
+.seedrow button.seedbtn{flex:none}
+.seedrow button.seedbtn[aria-expanded="true"]{border-color:var(--amber);color:var(--amber)}
+.seedrow .upmsg{flex:1 1 140px}
 .upmsg{margin:0;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 .upmsg.bad{color:var(--rose)}
 .cbnote{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);margin-top:-4px}
@@ -138,29 +173,51 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
     <section class="stage">
       <div class="panels">
         <figure class="panel">
-          <div class="ph"><h2>Source plane <i>β</i></h2><div class="side"><span class="meta" id="srcMeta">magnification map</span><label class="mtog"><input type="checkbox" id="starsSrc"> Show stars</label></div></div>
+          <div class="ph"><h2>Source plane <i>β</i></h2></div>
           <div class="cv"><canvas id="srcCv" aria-label="Source plane magnification map with the source overlaid. Drag to move the source."></canvas>
             <div class="scalebar" id="sbSrc"><span class="bar"></span><span class="t"></span></div>
             <div class="hint">Drag to move the source</div>
           </div>
-          <canvas id="cbar" aria-label="Magnification color scale"></canvas>
-          <div class="cbnote"><span><span class="tri"></span>macro μ = <b id="macroNote">–</b></span></div>
+          <div class="opts stack">
+            <div class="optrow"><span class="lab">Scale</span>
+              <div class="scalebox"><canvas id="cbar" aria-label="Magnification color scale"></canvas>
+                <div class="cbnote"><span><span class="tri" title="Macro magnification: the value if all the mass were smooth"></span>μ₀ = 1 / |(1−κ)² − γ²| = <b id="macroNote">–</b></span><span>magnification μ</span></div></div>
+            </div>
+            <div class="optrow"><span class="lab">Show</span>
+              <div class="items">
+                <label class="mtog"><input type="checkbox" id="showSrc" checked><span class="sw" style="background:linear-gradient(90deg,#ff8a3d,#fff4dc)"></span>Source</label>
+                <label class="mtog"><input type="checkbox" id="starsSrc"><span class="dot"></span>Stars</label>
+                <label class="mtog"><input type="checkbox" id="caust"><span class="sw" style="background:var(--cyan)"></span>Caustics</label>
+                <label class="mtog"><input type="checkbox" id="showMap" checked><span class="sw" style="background:linear-gradient(90deg,#10386a,#a8e6ea)"></span>Map</label>
+              </div>
+            </div>
+          </div>
+          <dl class="params" id="params"></dl>
         </figure>
         <figure class="panel">
-          <div class="ph"><h2>Lens plane <i>θ</i></h2><div class="side"><span class="meta" id="lensMeta"></span><label class="mtog"><input type="checkbox" id="starsLens" checked> Show stars</label></div></div>
+          <div class="ph"><h2>Lens plane <i>θ</i></h2></div>
           <div class="cv"><canvas id="lensCv" aria-label="Lens plane with moving stars, critical curves and lensed images"></canvas>
             <div class="scalebar" id="sbLens"><span class="bar"></span><span class="t"></span></div>
           </div>
-          <div class="legendrow">
-            <label class="mtog"><input type="checkbox" id="crit" checked><span class="sw" style="background:var(--cyan)"></span>Critical curves</label>
-            <label class="mtog"><input type="checkbox" id="rings"><span class="ring"></span>Einstein radii of stars</label>
-            <span class="lim"><span class="sw" style="background:linear-gradient(90deg,#ff8a3d,#fff4dc)"></span>lensed images</span>
+          <div class="opts cols">
+            <div class="optrow"><span class="lab">Show</span>
+              <div class="items">
+                <label class="mtog"><input type="checkbox" id="showImgs" checked><span class="sw" style="background:linear-gradient(90deg,#ff8a3d,#fff4dc)"></span>Lensed images</label>
+                <label class="mtog"><input type="checkbox" id="starsLens" checked><span class="dot"></span>Stars</label>
+                <label class="mtog"><input type="checkbox" id="crit" checked><span class="sw" style="background:var(--cyan)"></span>Critical curves</label>
+                <label class="mtog"><input type="checkbox" id="rings"><span class="ring"></span>Einstein radii</label>
+                <label class="mtog"><input type="checkbox" id="showOrig"><span class="sq"></span>Source field</label>
+              </div>
+            </div>
+            <div class="optrow"><span class="lab">Field</span>
+              <div class="items">
+                <label class="mtog"><input type="checkbox" id="showField"><span class="sw" style="background:#9ea6b8"></span>Star field</label>
+                <label class="mtog"><input type="checkbox" id="showShoot"><span class="sw" style="background:repeating-linear-gradient(90deg,var(--violet) 0 4px,transparent 4px 7px)"></span>Ray-shooting region</label>
+                <span class="zoombtns"><button id="fitField">Whole star field</button><button id="zoomBack">Zoom back</button></span>
+              </div>
+            </div>
           </div>
-          <div class="legendrow fieldrow">
-            <label class="mtog"><input type="checkbox" id="showField"><span class="sw" style="background:#9ea6b8"></span>Star field</label>
-            <label class="mtog"><input type="checkbox" id="showShoot"><span class="sw" style="background:repeating-linear-gradient(90deg,var(--violet) 0 4px,transparent 4px 7px)"></span>Ray-shooting region</label>
-            <span class="zoombtns"><button id="fitField">Show whole star field</button><button id="zoomBack">Zoom back</button></span>
-          </div>
+          <dl class="params" id="lensParams"></dl>
         </figure>
       </div>
 
@@ -220,11 +277,11 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <div class="row"><label for="massFn">Stellar masses</label>
           <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select>
           <canvas id="mfCv" aria-label="Histogram of stellar masses in the current star field"></canvas></div>
-        <button id="regen">New star field</button>
+        <div class="seedrow"><button id="regen">Random star field</button><button id="showSeed" class="seedbtn" aria-expanded="false" aria-controls="seedBox" title="Show the random seed. The same seed and settings give the same star field.">Seed</button><span id="seedBox" hidden><input type="number" id="seed" min="0" max="999999" step="1" inputmode="numeric" aria-label="Random seed"></span></div>
         <dl class="readouts">
           <dt>Stars</dt><dd id="readN">–</dd>
           <dt>κ⋆ / κ<sub>s</sub></dt><dd id="readK">–</dd>
-          <dt>Macro μ</dt><dd id="readMac">–</dd>
+          <dt>Macro μ₀</dt><dd id="readMac">–</dd>
           <dt>Image type</dt><dd id="readType">–</dd>
         </dl>
       </div>
@@ -281,8 +338,8 @@ const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: r
 const S = {
   kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
   vdisp:0.3, drift:0.4, driftAng:90, rate:1,
-  srcMode:'gauss', srcScale:0.1, isco:0.035, blr:0.26, sx:0, sy:0, img:null,
-  Ls:1.5, Lv:5, quality:1, edge:'bounce', showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:true, yMode:'mu',
+  seed:2026, srcMode:'gauss', srcScale:0.1, isco:0.035, blr:0.26, sx:0, sy:0, img:null,
+  Ls:1.5, Lv:5, quality:1, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:true, yMode:'mu',
   playing:!reduceMotion, t:0,
 };
 
@@ -321,6 +378,23 @@ void main(){
   gl_Position=vec4(y/uLs,0.0,1.0); gl_PointSize=1.0;
 }`;
 const RAY_FS = HEAD + `out vec4 o; void main(){ o=vec4(1.0); }`;
+// caustics: rays whose lens-plane point lies on a critical curve (|det A| small), deposited where they land
+const CAU_VS = HEAD + `
+uniform sampler2D uStars; uniform int uN; uniform float uKs; uniform float uGam;
+uniform vec2 uShoot; uniform int uG; uniform uint uSeed; uniform float uLs; uniform float uEps;
+uint hsh(uint x){ x^=x>>16; x*=0x7feb352du; x^=x>>15; x*=0x846ca68bu; x^=x>>16; return x; }
+void main(){
+  int i=gl_VertexID; int ix=i%uG; int iy=i/uG;
+  uint a=hsh(uint(i)^uSeed); uint b=hsh(a+0x9e3779b9u);
+  vec2 j=vec2(float(a>>8),float(b>>8))/16777216.0;
+  vec2 x=((vec2(float(ix),float(iy))+j)/float(uG)*2.0-1.0)*uShoot;
+  vec2 al=vec2(0.0); float Sx=0.0, Tx=0.0;
+  for(int k=0;k<uN;k++){ vec4 s=texelFetch(uStars,ivec2(k,0),0); vec2 r=x-s.xy; float r2=dot(r,r)+1e-9; float inv=s.z/r2; al+=r*inv; float i2=inv/r2; Sx+=(r.x*r.x-r.y*r.y)*i2; Tx+=2.0*r.x*r.y*i2; }
+  float det=(1.0-uKs)*(1.0-uKs)-(uGam-Sx)*(uGam-Sx)-Tx*Tx;
+  vec2 y=vec2((1.0-uKs-uGam)*x.x,(1.0-uKs+uGam)*x.y)-al;
+  gl_Position = abs(det)<uEps ? vec4(y/uLs,0.0,1.0) : vec4(2.0,2.0,2.0,1.0);
+  gl_PointSize=1.0;
+}`;
 
 const ACC_FS = HEAD + `uniform sampler2D uPrev; uniform sampler2D uNew; uniform float uW; out vec4 o;
 void main(){ ivec2 p=ivec2(gl_FragCoord.xy); float a=texelFetch(uPrev,p,0).r; float b=texelFetch(uNew,p,0).r; o=vec4(mix(a,b,uW),0.0,0.0,1.0); }`;
@@ -340,7 +414,7 @@ const SRC_FS = HEAD + CMAP_GLSL + `
 in vec2 vUv; out vec4 o;
 uniform sampler2D uMap; uniform int uRes; uniform float uNorm; uniform float uLs; uniform vec2 uLog;
 uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH; uniform int uSrcMode;
-uniform sampler2D uStars; uniform int uN; uniform float uKt; uniform float uGam; uniform float uDots; uniform float uPx;
+uniform sampler2D uStars; uniform int uN; uniform float uDots; uniform float uPx; uniform float uSrcOn; uniform float uMapOn; uniform sampler2D uCau; uniform float uCauOn;
 float tf(ivec2 p){ p=clamp(p,ivec2(0),ivec2(uRes-1)); return texelFetch(uMap,p,0).r; }
 void main(){
   vec2 beta=(vUv*2.0-1.0)*uLs;
@@ -348,11 +422,11 @@ void main(){
   float c=mix(mix(tf(i),tf(i+ivec2(1,0)),f.x), mix(tf(i+ivec2(0,1)),tf(i+ivec2(1,1)),f.x), f.y);
   float mu=c*uNorm;
   float l=log(max(mu,1e-3))/log(10.0);
-  vec3 col=cmap(clamp((l-uLog.x)/(uLog.y-uLog.x),0.0,1.0));
+  vec3 col=mix(vec3(0.027,0.035,0.058),cmap(clamp((l-uLog.x)/(uLog.y-uLog.x),0.0,1.0)),uMapOn);
   vec2 suv=(beta-uSrcC)/(2.0*uSrcH)+0.5;
   float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0);
   vec4 s=textureGrad(uSrc,clamp(suv,0.0,1.0),dFdx(suv),dFdy(suv));
-  float A=s.a*inside;
+  float A=s.a*inside*uSrcOn; inside*=uSrcOn;
   float fw=fwidth(A)+1e-5;
   if(uSrcMode==2){
     col=mix(col,s.rgb,0.6*inside);
@@ -362,12 +436,16 @@ void main(){
   } else {
     col=col*(1.0-A)+s.rgb*inside;
   }
+  if(uCauOn>0.5){
+    float cc=texture(uCau,vUv).r;
+    col=mix(col,vec3(0.576,0.886,0.941),smoothstep(0.0,0.6,cc)*0.9);
+  }
   if(uDots>0.5){
+    // stars at their lens-plane coordinates, no mapping
     float dotA=0.0;
     for(int k=0;k<uN;k++){
       vec4 st=texelFetch(uStars,ivec2(k,0),0);
-      vec2 b=vec2((1.0-uKt-uGam)*st.x,(1.0-uKt+uGam)*st.y);
-      float d=length(beta-b); float rad=(1.3+1.9*sqrt(st.z))*uPx;
+      float d=length(beta-st.xy); float rad=(1.3+1.9*sqrt(st.z))*uPx;
       dotA=max(dotA,1.0-smoothstep(rad-uPx,rad+0.5*uPx,d));
     }
     col=mix(col,vec3(1.0,0.95,0.84),dotA);
@@ -379,7 +457,7 @@ const LENSVIEW_FS = HEAD + `
 in vec2 vUv; out vec4 o;
 uniform sampler2D uStars; uniform int uN; uniform float uKs; uniform float uGam;
 uniform float uLv; uniform float uPx; uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH;
-uniform float uCrit; uniform float uRings; uniform float uDots; uniform float uFieldR; uniform vec2 uShootR; uniform float uFieldOn; uniform float uShootOn;
+uniform float uCrit; uniform float uRings; uniform float uDots; uniform float uImgs; uniform float uOrig; uniform float uSrcLs; uniform float uFieldR; uniform vec2 uShootR; uniform float uFieldOn; uniform float uShootOn;
 float frame(vec2 x, vec2 h, float px, float dash){
   vec2 d=abs(abs(x)-h)/px;
   float vx=(1.0-smoothstep(0.4,1.2,d.x))*step(abs(x.y),h.y+px);
@@ -406,7 +484,16 @@ void main(){
   col+=vec3(0.045,0.055,0.08)*(1.0-smoothstep(0.0,1.2,min(g.x,g.y)))*(1.0-smoothstep(0.03,0.07,uPx));
   vec2 suv=(y-uSrcC)/(2.0*uSrcH)+0.5;
   float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0);
-  col+=textureGrad(uSrc,clamp(suv,0.0,1.0),dFdx(suv),dFdy(suv)).rgb*inside;
+  col+=textureGrad(uSrc,clamp(suv,0.0,1.0),dFdx(suv),dFdy(suv)).rgb*inside*uImgs;
+  if(uOrig>0.5){
+    vec2 ouv=(x-uSrcC)/(2.0*uSrcH)+0.5;
+    float oin=step(0.0,ouv.x)*step(ouv.x,1.0)*step(0.0,ouv.y)*step(ouv.y,1.0);
+    vec4 os=textureGrad(uSrc,clamp(ouv,0.0,1.0),dFdx(ouv),dFdy(ouv));
+    col=col*(1.0-os.a*oin)+os.rgb*oin;
+    vec2 sd=abs(abs(x)-vec2(uSrcLs))/uPx;
+    float sq=max((1.0-smoothstep(0.15,0.65,sd.x))*step(abs(x.y),uSrcLs+uPx),(1.0-smoothstep(0.15,0.65,sd.y))*step(abs(x.x),uSrcLs+uPx));
+    col=mix(col,vec3(0.62,0.65,0.72),sq*0.75);
+  }
   float cl=1.0-smoothstep(0.6,1.6,abs(det)/(fwidth(det)+1e-6));
   col=mix(col,vec3(0.576,0.886,0.941),cl*uCrit*0.85);
   col=mix(col,vec3(0.95,0.72,0.42),ringA*uRings*0.4);
@@ -444,7 +531,7 @@ function program(vs, fs){
 }
 let P;
 try{
-  P = { ray:program(RAY_VS, RAY_FS), acc:program(FULL_VS, ACC_FS), src:program(FULL_VS, SRC_FS), lens:program(FULL_VS, LENSVIEW_FS), flux:program(FULL_VS, FLUX_FS) };
+  P = { ray:program(RAY_VS, RAY_FS), cau:program(CAU_VS, RAY_FS), acc:program(FULL_VS, ACC_FS), src:program(FULL_VS, SRC_FS), lens:program(FULL_VS, LENSVIEW_FS), flux:program(FULL_VS, FLUX_FS) };
 }catch(e){ err('Shader compile failed: ' + e.message); return; }
 const U = (pr, name) => pr.u[name] ?? null;
 
@@ -472,14 +559,16 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
 const T = {};
 function allocTargets(){
-  for(const k of ['passTex','acc0','acc1','fluxTex']) if(T[k]) gl.deleteTexture(T[k]);
-  for(const k of ['passFB','accFB0','accFB1','fluxFB','readFB']) if(T[k]) gl.deleteFramebuffer(T[k]);
+  for(const k of ['passTex','acc0','acc1','fluxTex','cauTex']) if(T[k]) gl.deleteTexture(T[k]);
+  for(const k of ['passFB','accFB0','accFB1','fluxFB','readFB','cauFB']) if(T[k]) gl.deleteFramebuffer(T[k]);
   const q = QUAL[S.quality];
   T.R = q.R; T.F = q.F;
   T.passTex = floatBlend ? makeTex(T.R,T.R,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST) : makeTex(T.R,T.R,gl.R16F,gl.RED,gl.HALF_FLOAT,gl.NEAREST);
   T.acc0 = makeTex(T.R,T.R,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST);
   T.acc1 = makeTex(T.R,T.R,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST);
   T.passFB = makeFB(T.passTex); T.accFB0 = makeFB(T.acc0); T.accFB1 = makeFB(T.acc1);
+  T.cauTex = makeTex(T.R,T.R,gl.R16F,gl.RED,gl.HALF_FLOAT,gl.LINEAR); T.cauFB = makeFB(T.cauTex);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, T.cauFB); gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); cau.k = 0;
   T.fluxTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, T.fluxTex);
   const levels = Math.log2(T.F) + 1;
   gl.texStorage2D(gl.TEXTURE_2D, levels, floatLinear ? gl.RGBA32F : gl.RGBA16F, T.F, T.F);
@@ -490,28 +579,31 @@ function allocTargets(){
   acc.cur = 0; acc.k = 0;
 }
 const acc = {cur:0, k:0};
+const cau = {k:0};
 const readBuf = new Float32Array(16*16*4);
 
 // ---------- Geometry & stars ----------
 const G = {};
 let N = 0, ux = new Float32Array(NMAX), uy = new Float32Array(NMAX);
 const bx = new Float32Array(NMAX).fill(1), by = new Float32Array(NMAX).fill(1);
-function salpeterSample(m1=1){ const a=-1.35, m0=0.1; const u=Math.random(); return Math.pow(Math.pow(m0,a)+u*(Math.pow(m1,a)-Math.pow(m0,a)), 1/a); }
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let rnd = Math.random;
+function salpeterSample(m1=1){ const a=-1.35, m0=0.1; const u=rnd(); return Math.pow(Math.pow(m0,a)+u*(Math.pow(m1,a)-Math.pow(m0,a)), 1/a); }
 const MASS_FN = {
   equal: () => 1,
   salpeter: () => salpeterSample(1),
   salpeter10: () => salpeterSample(10),
-  log10: () => 10**(Math.random()*2 - 1),
+  log10: () => 10**(rnd()*2 - 1),
 };
 const MASS_MEAN = Object.fromEntries(Object.entries(MASS_FN).map(([k,f]) => { let s=0; for(let i=0;i<40000;i++) s+=f(); return [k, s/40000]; }));
-function gauss(){ let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function gauss(){ let u=0,v=0; while(!u) u=rnd(); while(!v) v=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
 
 function computeGeometry(){
   const k = S.kappa, g = S.gamma;
   G.ks = (1 - S.fstar) * k; G.kstarTarget = S.fstar * k;
   const lx = Math.abs(1-k-g), ly = Math.abs(1-k+g);
-  G.Lx = Math.min(30, 1.1*S.Ls/Math.max(lx,1e-3) + 2.5);
-  G.Ly = Math.min(30, 1.1*S.Ls/Math.max(ly,1e-3) + 2.5);
+  G.Lx = Math.min(30, 1.25*S.Ls/Math.max(lx,1e-3) + 3.5);
+  G.Ly = Math.min(30, 1.25*S.Ls/Math.max(ly,1e-3) + 3.5);
   // circular star field enclosing the ray-shooting region and the largest lens view
   G.FR = Math.max(1.2*Math.hypot(G.Lx, G.Ly), Math.SQRT2*LV_MAX) + 3;
   const d = (1-k)*(1-k) - g*g;
@@ -520,18 +612,20 @@ function computeGeometry(){
 }
 function genStars(){
   computeGeometry();
+  rnd = mulberry32(S.seed*2654435761 >>> 0);
   const area = Math.PI*G.FR*G.FR;
   const mMean = MASS_MEAN[S.massFn];
   N = Math.min(NMAX, Math.round(G.kstarTarget*area/(Math.PI*mMean)));
   let msum = 0;
   for(let i=0;i<N;i++){
     const m = MASS_FN[S.massFn]();
-    const rr = G.FR*Math.sqrt(Math.random()), ph = 2*Math.PI*Math.random();
+    const rr = G.FR*Math.sqrt(rnd()), ph = 2*Math.PI*rnd();
     starData[i*4] = rr*Math.cos(ph);
     starData[i*4+1] = rr*Math.sin(ph);
     starData[i*4+2] = m; starData[i*4+3] = 0;
     ux[i] = gauss(); uy[i] = gauss(); bx[i] = 1; by[i] = 1; msum += m;
   }
+  rnd = Math.random;
   G.kstar = Math.PI*msum/area;
   { const el = $('Lv'), mx = Math.ceil(G.FR*1.08); el.max = Math.max(8, mx); if(S.Lv > +el.max){ S.Lv = +el.max; } el.value = S.Lv; $('LvOut').textContent = fmt(S.Lv,2)+' θE'; updateScalebars(); }
   uploadStars(); resetMap(); clearLC(); fluxDirty = true; updateReadouts();
@@ -555,7 +649,7 @@ function stepStars(dt){
   }
   uploadStars();
 }
-function resetMap(){ acc.k = 0; viewDirty = true; }
+function resetMap(){ acc.k = 0; cau.k = 0; viewDirty = true; }
 
 // ---------- Source texture ----------
 const srcPix = new Uint8Array(SRC_RES*SRC_RES*4);
@@ -643,6 +737,19 @@ function rayPass(){
   acc.cur = dst;
   G.norm = (4*G.Lx*G.Ly) / (G.rays * (2*S.Ls/T.R)**2);
 }
+function causticPass(){
+  const Gn = rayG();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, T.cauFB); gl.viewport(0,0,T.R,T.R);
+  if(S.playing || cau.k === 0){ gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); }
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
+  const pr = P.cau; gl.useProgram(pr.p); lensUniforms(pr);
+  gl.uniform2f(U(pr,'uShoot'), G.Lx, G.Ly); gl.uniform1i(U(pr,'uG'), Gn);
+  gl.uniform1ui(U(pr,'uSeed'), S.playing ? 0x6a09e667 : (Math.random()*4294967295)>>>0); gl.uniform1f(U(pr,'uLs'), S.Ls);
+  gl.uniform1f(U(pr,'uEps'), 0.03);
+  gl.drawArrays(gl.POINTS, 0, Gn*Gn);
+  gl.disable(gl.BLEND);
+  cau.k++;
+}
 function srcModeId(){ return S.srcMode === 'image' && S.img ? 2 : (S.srcMode === 'disk' ? 1 : 0); }
 function setSrcUniforms(pr, unit){
   gl.uniform1i(U(pr,'uSrc'), unit); bindTex(unit, srcTex);
@@ -663,8 +770,9 @@ function renderSource(){
   gl.uniform1f(U(pr,'uLs'), S.Ls); gl.uniform2f(U(pr,'uLog'), LOGR[0], LOGR[1]);
   setSrcUniforms(pr, 1); gl.uniform1i(U(pr,'uSrcMode'), srcModeId());
   gl.uniform1i(U(pr,'uStars'), 2); bindTex(2, starTex); gl.uniform1i(U(pr,'uN'), N);
-  gl.uniform1f(U(pr,'uKt'), G.ks + G.kstar); gl.uniform1f(U(pr,'uGam'), S.gamma);
-  gl.uniform1f(U(pr,'uDots'), S.starsSrc ? 1 : 0); gl.uniform1f(U(pr,'uPx'), 2*S.Ls/w);
+  gl.uniform1f(U(pr,'uDots'), S.starsSrc ? 1 : 0); gl.uniform1f(U(pr,'uPx'), 2*S.Ls/w); gl.uniform1f(U(pr,'uSrcOn'), S.showSrc ? 1 : 0);
+  gl.uniform1f(U(pr,'uMapOn'), S.showMap ? 1 : 0); gl.uniform1f(U(pr,'uCauOn'), S.caust ? 1 : 0);
+  gl.uniform1i(U(pr,'uCau'), 3); bindTex(3, T.cauTex);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   sctx.drawImage(glc, 0, glc.height - w, w, w, 0, 0, w, w);
 }
@@ -675,6 +783,7 @@ function renderLens(){
   setSrcUniforms(pr, 1);
   gl.uniform1f(U(pr,'uDots'), S.starsLens ? 1 : 0);
   gl.uniform1f(U(pr,'uFieldR'), G.FR); gl.uniform2f(U(pr,'uShootR'), G.Lx, G.Ly);
+  gl.uniform1f(U(pr,'uImgs'), S.showImgs ? 1 : 0); gl.uniform1f(U(pr,'uOrig'), S.showOrig ? 1 : 0); gl.uniform1f(U(pr,'uSrcLs'), S.Ls);
   gl.uniform1f(U(pr,'uFieldOn'), S.showField ? 1 : 0); gl.uniform1f(U(pr,'uShootOn'), S.showShoot ? 1 : 0);
   gl.uniform1f(U(pr,'uCrit'), S.crit ? 1 : 0); gl.uniform1f(U(pr,'uRings'), S.rings ? 1 : 0);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -743,10 +852,10 @@ function drawLC(){
   // macro line
   c.setLineDash([4,4]); c.strokeStyle = '#5b6680'; c.beginPath(); c.moveTo(pl, Y(base)); c.lineTo(pl+w, Y(base)); c.stroke(); c.setLineDash([]);
   c.fillStyle = '#8790a6'; c.textAlign = 'right'; c.textBaseline = 'bottom';
-  c.fillText(mag ? 'macro' : `macro μ = ${G.muMac.toFixed(2)}`, pl+w-4, Y(base)-3);
+  c.fillText(mag ? 'μ₀' : `μ₀ = ${G.muMac.toFixed(2)}`, pl+w-4, Y(base)-3);
   // axis titles
   c.save(); c.translate(13, pt+h/2); c.rotate(-Math.PI/2); c.textAlign='center'; c.textBaseline='middle';
-  c.fillText(mag ? 'Δm (mag, brighter ↑)' : 'magnification μ', 0, 0); c.restore();
+  c.fillText(mag ? 'Δm = −2.5 log(μ/μ₀)' : 'magnification μ', 0, 0); c.restore();
   // series (draw comparison first, main last)
   c.save(); c.beginPath(); c.rect(pl, pt, w, h); c.clip();
   for(const s of series.slice(1).concat(series[0])){
@@ -831,6 +940,25 @@ function drawMF(){
   x.fillStyle = '#8790a6'; x.fillText(dl, dx, 1);
   x.fillStyle = 'rgba(242,180,90,0.8)'; x.fillRect(dx - dw - 13, 3, 8, 8);
 }
+const MASS_LABEL = {equal:'equal, 1 M☉', salpeter:'Salpeter 0.1–1 M☉', salpeter10:'Salpeter 0.1–10 M☉', log10:'log-uniform 0.1–10 M☉'};
+function srcSummary(){
+  if(S.srcMode === 'image' && S.img) return `${S.imgName || 'image'}, ${fmt(2*G.srcH, 2)} θE wide`;
+  if(S.srcMode === 'disk') return `disk ${fmt(S.srcScale, 2)}, ISCO ${fmt(S.isco, 3)}, BLR ${fmt(S.blr, 2)} θE`;
+  return `Gaussian σ = ${fmt(S.srcScale, S.srcScale < 0.1 ? 3 : 2)} θE`;
+}
+function updateParams(){
+  const el = $('params'); if(!el) return;
+  const html = rows => rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+  el.innerHTML = html([
+    ['Source', `${srcSummary()} at (${fmt(S.sx)}, ${fmt(S.sy)})`],
+    ['Map', `${fmt(2*S.Ls, 1)} θE across · ${G.rays ? (G.rays/1e6).toFixed(1) : '–'}M rays per frame`],
+  ]);
+  const le = $('lensParams');
+  if(le) le.innerHTML = html([
+    ['Lens', `κ ${fmt(S.kappa)} · γ ${fmt(S.gamma)} · ${Math.round(S.fstar*100)}% in stars`],
+    ['Stars', `${N} · ${MASS_LABEL[S.massFn]}${$('showSeed').getAttribute('aria-expanded') === 'true' ? ' · seed ' + S.seed : ''}`],
+  ]);
+}
 function updateReadouts(){
   drawMF();
   $('readN').textContent = N >= NMAX ? `${N} (capped)` : String(N);
@@ -838,7 +966,7 @@ function updateReadouts(){
   $('readMac').textContent = fmt(G.muMac, 2);
   $('macroNote').textContent = fmt(G.muMac, 2);
   $('readType').textContent = G.type;
-  $('lensMeta').textContent = `${N} stars · κ⋆ ${fmt(G.kstar,2)}`;
+  updateParams();
   $('srcPos').textContent = `(${fmt(S.sx)}, ${fmt(S.sy)})`;
   drawColorbar();
 }
@@ -889,9 +1017,13 @@ $('fitField').addEventListener('click', () => { const el = $('Lv'); S.Lv = +el.m
 $('zoomBack').addEventListener('click', () => { const el = $('Lv'); S.Lv = 5; el.value = 5; $('LvOut').textContent = fmt(5,2)+' θE'; updateScalebars(); viewDirty = true; });
 $('edge').addEventListener('change', e => { S.edge = e.target.value; $('edgeNote').textContent = S.edge === 'bounce' ? 'A star reaching the edge turns back inward.' : 'A star leaving the edge reappears on the opposite side.'; });
 $('massFn').addEventListener('change', e => { S.massFn = e.target.value; genStars(); });
-$('regen').addEventListener('click', genStars);
+$('showSeed').addEventListener('click', e => { const open = $('seedBox').hidden; $('seedBox').hidden = !open; e.currentTarget.setAttribute('aria-expanded', open); updateParams(); });
+const seedEl = $('seed');
+seedEl.value = S.seed;
+$('regen').addEventListener('click', () => { S.seed = Math.floor(Math.random()*1000000); seedEl.value = S.seed; genStars(); });
+seedEl.addEventListener('change', () => { const v = Math.max(0, Math.min(999999, Math.round(+seedEl.value || 0))); S.seed = v; seedEl.value = v; genStars(); });
 $('quality').addEventListener('change', e => { S.quality = +e.target.value; allocTargets(); fluxDirty = true; });
-for(const id of ['starsSrc','starsLens','crit','rings','compare','showField','showShoot']) $(id).addEventListener('change', e => { S[id] = e.target.checked; viewDirty = true; lcDirty = true; });
+for(const id of ['showMap','caust','showSrc','showImgs','starsSrc','starsLens','crit','rings','compare','showOrig','showField','showShoot']) $(id).addEventListener('change', e => { S[id] = e.target.checked; if(id === 'caust') cau.k = 0; viewDirty = true; lcDirty = true; });
 function setMode(m){
   if(m === 'image' && !S.img){ upMsg('Choose a picture with the Upload image button, or drag one onto the source plane.'); try{ $('fileIn').click(); }catch(e){} return; }
   S.srcMode = m;
@@ -919,7 +1051,7 @@ document.querySelectorAll('[data-y]').forEach(b => b.addEventListener('click', (
 }));
 $('clearBtn').addEventListener('click', clearLC);
 const playBtn = $('playBtn');
-function setPlaying(p){ S.playing = p; playBtn.textContent = p ? 'Pause' : 'Play'; acc.k = 0; viewDirty = true; }
+function setPlaying(p){ S.playing = p; playBtn.textContent = p ? 'Pause' : 'Play'; acc.k = 0; cau.k = 0; viewDirty = true; }
 playBtn.addEventListener('click', () => setPlaying(!S.playing));
 setPlaying(S.playing);
 const PRESETS = {
@@ -954,13 +1086,14 @@ function frame(now){
   if(S.playing){ const d = dt*S.rate; stepStars(d); S.t += d; viewDirty = true; }
   const needRays = S.playing || acc.k < MAX_STILL;
   if(needRays) rayPass();
+  if(S.caust && (S.playing || cau.k < 30)){ causticPass(); viewDirty = true; }
   if(needRays || viewDirty){ renderSource(); renderLens(); viewDirty = false; }
   if(S.playing || fluxDirty){
     computeFlux(); fluxDirty = false;
     if(S.playing) pushLC(); else lcDirty = true;
     $('muNow').textContent = isFinite(cur.mu) ? cur.mu.toFixed(2) : '–';
     $('tNow').textContent = S.t.toFixed(1);
-    $('srcMeta').textContent = `${(G.rays/1e6).toFixed(1)}M rays/pass`;
+    updateParams();
   }
   if(lcDirty){ drawLC(); lcDirty = false; }
   requestAnimationFrame(frame);
