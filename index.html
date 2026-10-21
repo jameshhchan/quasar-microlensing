@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+<title>Quasar Microlensing Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: an observatory console. Two square plane panels (source β, lens θ) side by side above a full-width light curve; a narrow instrument column of controls on the right. Deliberately dark-only. */
+:root{
+  --ink:#06080e;
+  --panel:#0d111a;
+  --raise:#141a27;
+  --line:#222a3b;
+  --fg:#e6e9f2;
+  --muted:#8790a6;
+  --amber:#f2b45a;
+  --cyan:#93e2f0;
+  --violet:#b8a2ff;
+  --rose:#ff93a6;
+  --display:'Spectral', 'Iowan Old Style', Georgia, serif;
+  --body:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ink);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 32px}
+.wrap{max-width:1380px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(26px,3.2vw,36px);line-height:1.1;margin:0;letter-spacing:-0.01em;text-wrap:balance}
+h1 em{font-style:italic;font-weight:400;color:var(--amber)}
+.lede{color:var(--muted);margin:6px 0 0;max-width:68ch}
+.presets{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.presets .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+button,.btn{font:inherit;font-size:13px;color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:6px 11px;cursor:pointer;line-height:1.2}
+button:hover,.btn:hover{border-color:#3a4560}
+button:focus-visible,.btn:focus-within,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);font-weight:600}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.stage{display:flex;flex-direction:column;gap:18px;min-width:0}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ph h2{font-family:var(--display);font-weight:500;font-size:19px;margin:0}
+.ph h2 i{font-family:var(--display);color:var(--muted);font-weight:400;margin-left:4px}
+.ph .side{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mtog{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+.mtog input{appearance:none;-webkit-appearance:none;width:28px;height:16px;border-radius:8px;background:var(--line);position:relative;cursor:pointer;margin:0;transition:background .15s}
+.mtog input::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#c9d0e0;transition:left .15s}
+.mtog input:checked{background:var(--amber)}
+.mtog input:checked::after{left:14px;background:#1a1205}
+.ph .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cv{position:relative;aspect-ratio:1;width:100%;max-width:100%;background:#000;border-radius:6px;overflow:hidden}
+.cv canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#srcCv{cursor:crosshair;touch-action:none}
+.scalebar{position:absolute;left:12px;bottom:10px;display:flex;flex-direction:column;gap:3px;font-family:var(--mono);font-size:11px;color:#dfe5f2;pointer-events:none;text-shadow:0 0 4px #000}
+.scalebar span.bar{height:2px;background:#dfe5f2;box-shadow:0 0 3px #000}
+.hint{position:absolute;right:10px;top:8px;font-size:11px;color:#c9d0e0;background:rgba(6,8,14,.6);padding:2px 7px;border-radius:4px;pointer-events:none}
+.legendrow{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.legendrow .sw{display:inline-block;width:14px;height:2px;vertical-align:middle;margin-right:6px}
+.legendrow{align-items:center;gap:6px 18px}
+.legendrow .mtog .sw{margin:0 0 0 2px}
+.legendrow .ring{display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid #f2b86b;margin-left:2px}
+.legendrow .lim{margin-left:auto}
+.fieldrow{border-top:1px solid var(--line);padding-top:10px;margin-top:-2px}
+.fieldrow .zoombtns{margin-left:auto;display:inline-flex;gap:6px}
+.fieldrow .zoombtns button{font-size:12px;padding:4px 9px}
+.legendrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff2d6;vertical-align:middle;margin-right:6px}
+#cbar{width:100%;height:32px;display:block}
+.lc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.lchead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.lchead .left{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.lchead h2{font-family:var(--display);font-weight:500;font-size:19px;margin:0}
+.big{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.big b{color:var(--amber);font-weight:500;font-size:15px}
+.lchead .right .mtog{margin-right:8px}
+.lchead .right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#lcCv{width:100%;height:230px;display:block}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent;color:var(--muted);padding:5px 10px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--raise);color:var(--fg)}
+aside.controls{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 14px 14px;display:flex;flex-direction:column}
+.group{display:flex;flex-direction:column;gap:10px;padding-block:14px;border-bottom:1px solid var(--line)}
+.group:last-child{border-bottom:0}
+.group h3{margin:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.row{display:flex;flex-direction:column;gap:3px}
+.row .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.row label{font-size:13px}
+.row label .sym{font-family:var(--display);font-style:italic;color:var(--muted);margin-left:4px}
+.row output{font-family:var(--mono);font-size:12px;color:var(--amber);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--amber);margin:2px 0}
+select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;width:100%}
+.inline{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.check input{accent-color:var(--amber);width:15px;height:15px}
+.readouts{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:12.5px}
+.readouts dt{color:var(--muted)}
+.readouts dd{margin:0;font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.btn input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.btn{position:relative;display:inline-block}
+.eq{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.6;overflow-x:auto}
+.eq p{margin:0 0 6px}
+.eq a{color:var(--cyan)}
+.upmsg{margin:0;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.upmsg.bad{color:var(--rose)}
+.cbnote{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);margin-top:-4px}
+.cbnote b{font-family:var(--mono);font-weight:500;color:var(--amber)}
+.cbnote .tri{display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--amber);margin-right:7px;vertical-align:1px}
+.credit{border-top:1px solid var(--line);padding-top:14px;line-height:1.9;font-size:12.5px;color:var(--muted);text-align:center}
+.credit .sep{margin:0 6px}
+.credit .mail{font-family:var(--mono);color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(147,226,240,.35)}
+.credit .mail:hover{border-bottom-color:var(--cyan)}
+#err{display:none;background:#2a1216;border:1px solid #5a2630;color:#ffd0d6;padding:12px 14px;border-radius:8px}
+@media (max-width:1040px){.layout{grid-template-columns:minmax(0,1fr)}aside.controls{display:block;columns:250px;column-gap:24px}.group{break-inside:avoid;border-bottom:0}}
+@media (max-width:640px){.panels{grid-template-columns:1fr}#lcCv{height:190px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Quasar Microlensing <em>Lab</em></h1>
+      <p class="lede">Visualizing microlensing light curves of lensed quasars</p>
+    </div>
+  </header>
+
+  <div id="err"></div>
+
+  <div class="layout">
+    <section class="stage">
+      <div class="panels">
+        <figure class="panel">
+          <div class="ph"><h2>Source plane <i>β</i></h2><div class="side"><span class="meta" id="srcMeta">magnification map</span><label class="mtog"><input type="checkbox" id="starsSrc"> Show stars</label></div></div>
+          <div class="cv"><canvas id="srcCv" aria-label="Source plane magnification map with the source overlaid. Drag to move the source."></canvas>
+            <div class="scalebar" id="sbSrc"><span class="bar"></span><span class="t"></span></div>
+            <div class="hint">Drag to move the source</div>
+          </div>
+          <canvas id="cbar" aria-label="Magnification color scale"></canvas>
+          <div class="cbnote"><span><span class="tri"></span>macro μ = <b id="macroNote">–</b></span></div>
+        </figure>
+        <figure class="panel">
+          <div class="ph"><h2>Lens plane <i>θ</i></h2><div class="side"><span class="meta" id="lensMeta"></span><label class="mtog"><input type="checkbox" id="starsLens" checked> Show stars</label></div></div>
+          <div class="cv"><canvas id="lensCv" aria-label="Lens plane with moving stars, critical curves and lensed images"></canvas>
+            <div class="scalebar" id="sbLens"><span class="bar"></span><span class="t"></span></div>
+          </div>
+          <div class="legendrow">
+            <label class="mtog"><input type="checkbox" id="crit" checked><span class="sw" style="background:var(--cyan)"></span>Critical curves</label>
+            <label class="mtog"><input type="checkbox" id="rings"><span class="ring"></span>Einstein radii of stars</label>
+            <span class="lim"><span class="sw" style="background:linear-gradient(90deg,#ff8a3d,#fff4dc)"></span>lensed images</span>
+          </div>
+          <div class="legendrow fieldrow">
+            <label class="mtog"><input type="checkbox" id="showField" checked><span class="sw" style="background:#9ea6b8"></span>Star field</label>
+            <label class="mtog"><input type="checkbox" id="showShoot" checked><span class="sw" style="background:repeating-linear-gradient(90deg,var(--violet) 0 4px,transparent 4px 7px)"></span>Ray-shooting region</label>
+            <span class="zoombtns"><button id="fitField">Show whole star field</button><button id="zoomBack">Zoom back</button></span>
+          </div>
+        </figure>
+      </div>
+
+      <section class="lc">
+        <div class="lchead">
+          <div class="left">
+            <h2>Light curve</h2>
+            <span class="big">μ now <b id="muNow">–</b></span>
+            <span class="big">t <span id="tNow">0.0</span></span>
+          </div>
+          <div class="right">
+            <label class="mtog" title="Adds light curves for Gaussian sources with σ = 0.02, 0.1 and 0.4 θE at the same position"><input type="checkbox" id="compare" checked> Compare Gaussian sizes</label>
+            <div class="seg" role="group" aria-label="Y axis">
+              <button data-y="mu" aria-pressed="true">μ</button>
+              <button data-y="mag" aria-pressed="false">Δmag</button>
+            </div>
+            <button id="clearBtn">Clear</button>
+            <button id="playBtn" class="primary">Pause</button>
+          </div>
+        </div>
+        <canvas id="lcCv" aria-label="Magnification versus time"></canvas>
+      </section>
+    </section>
+
+    <aside class="controls">
+      <div class="group">
+        <h3>Source</h3>
+        <div class="seg" role="group" aria-label="Source type">
+          <button data-mode="gauss" aria-pressed="true">Gaussian</button>
+          <button data-mode="disk" aria-pressed="false">Disk + BLR</button>
+          <button data-mode="image" aria-pressed="false">Image</button>
+        </div>
+        <div class="inline">
+          <label class="btn">Upload image<input type="file" id="fileIn" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.bmp,.svg"></label>
+          <button id="centerBtn">Center source</button>
+        </div>
+        <p id="upMsg" class="upmsg" hidden role="status"></p>
+        <div class="row"><div class="top"><label for="srcSize" id="srcSizeLbl">Size σ</label><output id="srcSizeOut"></output></div>
+          <input type="range" id="srcSize" min="0" max="100" step="1" value="50"></div>
+        <div id="diskCtl" hidden style="display:flex;flex-direction:column;gap:10px">
+          <div class="row"><div class="top"><label for="isco">ISCO radius</label><output id="iscoOut"></output></div>
+            <input type="range" id="isco" min="0" max="100" step="1"></div>
+          <div class="row"><div class="top"><label for="blr">BLR radius</label><output id="blrOut"></output></div>
+            <input type="range" id="blr" min="0" max="100" step="1"></div>
+        </div>
+        <dl class="readouts"><dt>Position β</dt><dd id="srcPos">(0.00, 0.00)</dd></dl>
+      </div>
+
+      <div class="group">
+        <h3>Lens model</h3>
+        <div class="row"><div class="top"><label for="kappa">Convergence<span class="sym">κ</span></label><output id="kappaOut"></output></div>
+          <input type="range" id="kappa" min="0" max="0.95" step="0.01" value="0.45"></div>
+        <div class="row"><div class="top"><label for="gamma">Shear<span class="sym">γ</span></label><output id="gammaOut"></output></div>
+          <input type="range" id="gamma" min="0" max="0.95" step="0.01" value="0.4"></div>
+        <div class="row"><div class="top"><label for="fstar">Fraction in stars<span class="sym">κ⋆/κ</span></label><output id="fstarOut"></output></div>
+          <input type="range" id="fstar" min="0" max="1" step="0.01" value="0.3"></div>
+        <div class="row"><label for="massFn">Stellar masses</label>
+          <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select></div>
+        <button id="regen">New star field</button>
+        <dl class="readouts">
+          <dt>Stars</dt><dd id="readN">–</dd>
+          <dt>κ⋆ / κ<sub>s</sub></dt><dd id="readK">–</dd>
+          <dt>Macro μ</dt><dd id="readMac">–</dd>
+          <dt>Image type</dt><dd id="readType">–</dd>
+        </dl>
+      </div>
+
+      <div class="group">
+        <h3>Motion</h3>
+        <div class="row"><div class="top"><label for="vdisp">Random velocities<span class="sym">σ<sub>v</sub></span></label><output id="vdispOut"></output></div>
+          <input type="range" id="vdisp" min="0" max="1.5" step="0.05" value="0.3"></div>
+        <div class="row"><div class="top"><label for="drift">Bulk drift<span class="sym">v</span></label><output id="driftOut"></output></div>
+          <input type="range" id="drift" min="0" max="1.5" step="0.05" value="0.4"></div>
+        <div class="row"><div class="top"><label for="driftAng">Drift direction</label><output id="driftAngOut"></output></div>
+          <input type="range" id="driftAng" min="0" max="180" step="5" value="90"></div>
+        <div class="row"><div class="top"><label for="rate">Time per second</label><output id="rateOut"></output></div>
+          <input type="range" id="rate" min="0.1" max="4" step="0.1" value="1"></div>
+        <div class="row"><label for="edge">At the edge of the star field</label>
+          <select id="edge"><option value="bounce" selected>Stars bounce back</option><option value="wrap">Stars wrap around</option></select>
+          <p class="upmsg" id="edgeNote">A star reaching the edge turns back inward.</p></div>
+      </div>
+
+      <div class="group">
+        <h3>View</h3>
+        <div class="row"><div class="top"><label for="Ls">Source field half-width</label><output id="LsOut"></output></div>
+          <input type="range" id="Ls" min="0.3" max="4" step="0.1" value="1.5"></div>
+        <div class="row"><div class="top"><label for="Lv">Lens field half-width</label><output id="LvOut"></output></div>
+          <input type="range" id="Lv" min="1" max="8" step="0.25" value="5"></div>
+        <div class="row"><label for="quality">Ray shooting</label>
+          <select id="quality"><option value="0">Fast · 1M rays</option><option value="1" selected>Standard · 4M rays</option><option value="2">Fine · 16M rays</option></select></div>
+      </div>
+
+      <div class="group eq">
+        <p>β₁ = (1−κ<sub>s</sub>−γ) θ₁ − Σ mᵢ (θ−θᵢ)₁ / |θ−θᵢ|²<br>β₂ = (1−κ<sub>s</sub>+γ) θ₂ − Σ mᵢ (θ−θᵢ)₂ / |θ−θᵢ|²</p>
+        <p>Lengths in θ<sub>E</sub> of a 1 M☉ star. The map is built by inverse ray shooting on the GPU; μ is the lensed flux over the unlensed flux.</p>
+      </div>
+    </aside>
+  </div>
+  <footer class="credit">Created by James Chan <span class="sep">·</span> <a class="mail" href="mailto:jchan@amnh.org">jchan@amnh.org</a><br>This project is supported by <a class="mail" href="https://futurelens-cuny.github.io" target="_blank" rel="noopener">FutureLens</a></footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const LV_MAX = 8, NMAX = 512, LC_WINDOW = 30, SRC_RES = 512;
+const CMP_SIG = [0.02, 0.1, 0.4];
+const CMP_COL = ['#93e2f0', '#b8a2ff', '#ff93a6'];
+const LOGR = [-0.6, 2.1];
+const QUAL = [
+  {G:1024, R:256, F:512,  budget:6e7},
+  {G:2048, R:320, F:1024, budget:2.5e8},
+  {G:4096, R:400, F:2048, budget:1e9},
+];
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const S = {
+  kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
+  vdisp:0.3, drift:0.4, driftAng:90, rate:1,
+  srcMode:'gauss', srcScale:0.1, isco:0.035, blr:0.26, sx:0, sy:0, img:null,
+  Ls:1.5, Lv:5, quality:1, edge:'bounce', showField:true, showShoot:true, crit:true, rings:false, starsSrc:false, starsLens:true, compare:true, yMode:'mu',
+  playing:!reduceMotion, t:0,
+};
+
+// ---------- WebGL setup ----------
+const err = msg => { const e=$('err'); e.style.display='block'; e.textContent=msg; };
+const glc = document.createElement('canvas');
+const gl = glc.getContext('webgl2', {antialias:false, alpha:false, depth:false, stencil:false, premultipliedAlpha:false});
+if(!gl){ err('This page needs WebGL 2, which this browser or device does not provide.'); return; }
+if(!gl.getExtension('EXT_color_buffer_float')){ err('This page needs floating-point render targets (EXT_color_buffer_float), which this GPU does not provide.'); return; }
+const floatBlend = !!gl.getExtension('EXT_float_blend');
+const floatLinear = !!gl.getExtension('OES_texture_float_linear');
+gl.bindVertexArray(gl.createVertexArray());
+
+const HEAD = `#version 300 es
+precision highp float; precision highp int; precision highp sampler2D;
+`;
+const LENS_GLSL = `
+uniform sampler2D uStars; uniform int uN; uniform float uKs; uniform float uGam;
+vec2 lensEq(vec2 x){
+  vec2 a=vec2(0.0);
+  for(int k=0;k<uN;k++){ vec4 s=texelFetch(uStars,ivec2(k,0),0); vec2 r=x-s.xy; a+=s.z*r/(dot(r,r)+1e-9); }
+  return vec2((1.0-uKs-uGam)*x.x,(1.0-uKs+uGam)*x.y)-a;
+}`;
+const FULL_VS = HEAD + `out vec2 vUv;
+void main(){ vec2 p=vec2(float((gl_VertexID<<1)&2), float(gl_VertexID&2)); vUv=p; gl_Position=vec4(p*2.0-1.0,0.0,1.0); }`;
+
+const RAY_VS = HEAD + LENS_GLSL + `
+uniform vec2 uShoot; uniform int uG; uniform uint uSeed; uniform float uLs;
+uint hsh(uint x){ x^=x>>16; x*=0x7feb352du; x^=x>>15; x*=0x846ca68bu; x^=x>>16; return x; }
+void main(){
+  int i=gl_VertexID; int ix=i%uG; int iy=i/uG;
+  uint a=hsh(uint(i)^uSeed); uint b=hsh(a+0x9e3779b9u);
+  vec2 j=vec2(float(a>>8),float(b>>8))/16777216.0;
+  vec2 x=((vec2(float(ix),float(iy))+j)/float(uG)*2.0-1.0)*uShoot;
+  vec2 y=lensEq(x);
+  gl_Position=vec4(y/uLs,0.0,1.0); gl_PointSize=1.0;
+}`;
+const RAY_FS = HEAD + `out vec4 o; void main(){ o=vec4(1.0); }`;
+
+const ACC_FS = HEAD + `uniform sampler2D uPrev; uniform sampler2D uNew; uniform float uW; out vec4 o;
+void main(){ ivec2 p=ivec2(gl_FragCoord.xy); float a=texelFetch(uPrev,p,0).r; float b=texelFetch(uNew,p,0).r; o=vec4(mix(a,b,uW),0.0,0.0,1.0); }`;
+
+const CMAP_GLSL = `
+vec3 cmap(float t){
+  vec3 c0=vec3(0.016,0.024,0.043), c1=vec3(0.047,0.090,0.200), c2=vec3(0.063,0.220,0.400),
+       c3=vec3(0.106,0.440,0.580), c4=vec3(0.290,0.700,0.760), c5=vec3(0.660,0.900,0.910), c6=vec3(0.950,0.990,1.0);
+  if(t<0.25) return mix(c0,c1,t/0.25);
+  if(t<0.45) return mix(c1,c2,(t-0.25)/0.20);
+  if(t<0.62) return mix(c2,c3,(t-0.45)/0.17);
+  if(t<0.78) return mix(c3,c4,(t-0.62)/0.16);
+  if(t<0.92) return mix(c4,c5,(t-0.78)/0.14);
+  return mix(c5,c6,(t-0.92)/0.08);
+}`;
+const SRC_FS = HEAD + CMAP_GLSL + `
+in vec2 vUv; out vec4 o;
+uniform sampler2D uMap; uniform int uRes; uniform float uNorm; uniform float uLs; uniform vec2 uLog;
+uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH; uniform int uSrcMode;
+uniform sampler2D uStars; uniform int uN; uniform float uKt; uniform float uGam; uniform float uDots; uniform float uPx;
+float tf(ivec2 p){ p=clamp(p,ivec2(0),ivec2(uRes-1)); return texelFetch(uMap,p,0).r; }
+void main(){
+  vec2 beta=(vUv*2.0-1.0)*uLs;
+  vec2 p=vUv*float(uRes)-0.5; vec2 f=fract(p); ivec2 i=ivec2(floor(p));
+  float c=mix(mix(tf(i),tf(i+ivec2(1,0)),f.x), mix(tf(i+ivec2(0,1)),tf(i+ivec2(1,1)),f.x), f.y);
+  float mu=c*uNorm;
+  float l=log(max(mu,1e-3))/log(10.0);
+  vec3 col=cmap(clamp((l-uLog.x)/(uLog.y-uLog.x),0.0,1.0));
+  vec2 suv=(beta-uSrcC)/(2.0*uSrcH)+0.5;
+  float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0);
+  vec4 s=textureGrad(uSrc,clamp(suv,0.0,1.0),dFdx(suv),dFdy(suv));
+  float A=s.a*inside;
+  float fw=fwidth(A)+1e-5;
+  if(uSrcMode==2){
+    col=mix(col,s.rgb,0.6*inside);
+    vec2 e=min(suv,1.0-suv)*2.0*uSrcH/fwidth(beta.x);
+    float edge=inside*(1.0-smoothstep(0.5,1.5,min(e.x,e.y)));
+    col=mix(col,vec3(0.75,0.95,1.0),edge*0.8);
+  } else {
+    col=col*(1.0-A)+s.rgb*inside;
+  }
+  if(uDots>0.5){
+    float dotA=0.0;
+    for(int k=0;k<uN;k++){
+      vec4 st=texelFetch(uStars,ivec2(k,0),0);
+      vec2 b=vec2((1.0-uKt-uGam)*st.x,(1.0-uKt+uGam)*st.y);
+      float d=length(beta-b); float rad=(1.3+1.9*sqrt(st.z))*uPx;
+      dotA=max(dotA,1.0-smoothstep(rad-uPx,rad+0.5*uPx,d));
+    }
+    col=mix(col,vec3(1.0,0.95,0.84),dotA);
+  }
+  o=vec4(col,1.0);
+}`;
+
+const LENSVIEW_FS = HEAD + `
+in vec2 vUv; out vec4 o;
+uniform sampler2D uStars; uniform int uN; uniform float uKs; uniform float uGam;
+uniform float uLv; uniform float uPx; uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH;
+uniform float uCrit; uniform float uRings; uniform float uDots; uniform float uFieldR; uniform vec2 uShootR; uniform float uFieldOn; uniform float uShootOn;
+float frame(vec2 x, vec2 h, float px, float dash){
+  vec2 d=abs(abs(x)-h)/px;
+  float vx=(1.0-smoothstep(0.4,1.2,d.x))*step(abs(x.y),h.y+px);
+  float vy=(1.0-smoothstep(0.4,1.2,d.y))*step(abs(x.x),h.x+px);
+  float dv=dash>0.0?step(0.5,fract(x.y/(px*dash))):1.0;
+  float dh=dash>0.0?step(0.5,fract(x.x/(px*dash))):1.0;
+  return max(vx*dv,vy*dh);
+}
+void main(){
+  vec2 x=(vUv*2.0-1.0)*uLv;
+  vec2 al=vec2(0.0); float Sx=0.0, Tx=0.0, dotA=0.0, ringA=0.0;
+  for(int k=0;k<uN;k++){
+    vec4 s=texelFetch(uStars,ivec2(k,0),0);
+    vec2 r=x-s.xy; float r2=dot(r,r)+1e-9; float inv=s.z/r2;
+    al+=r*inv; float i2=inv/r2; Sx+=(r.x*r.x-r.y*r.y)*i2; Tx+=2.0*r.x*r.y*i2;
+    float d=sqrt(r2); float rad=(1.3+1.9*sqrt(s.z))*uPx;
+    dotA=max(dotA,1.0-smoothstep(rad-uPx,rad+0.5*uPx,d));
+    ringA=max(ringA,1.0-smoothstep(0.3*uPx,1.3*uPx,abs(d-sqrt(s.z))));
+  }
+  vec2 y=vec2((1.0-uKs-uGam)*x.x,(1.0-uKs+uGam)*x.y)-al;
+  float det=(1.0-uKs)*(1.0-uKs)-(uGam-Sx)*(uGam-Sx)-Tx*Tx;
+  vec3 col=vec3(0.027,0.035,0.058);
+  vec2 g=abs(fract(x+0.5)-0.5)/uPx;
+  col+=vec3(0.045,0.055,0.08)*(1.0-smoothstep(0.0,1.2,min(g.x,g.y)))*(1.0-smoothstep(0.03,0.07,uPx));
+  vec2 suv=(y-uSrcC)/(2.0*uSrcH)+0.5;
+  float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0);
+  col+=textureGrad(uSrc,clamp(suv,0.0,1.0),dFdx(suv),dFdy(suv)).rgb*inside;
+  float cl=1.0-smoothstep(0.6,1.6,abs(det)/(fwidth(det)+1e-6));
+  col=mix(col,vec3(0.576,0.886,0.941),cl*uCrit*0.85);
+  col=mix(col,vec3(0.95,0.72,0.42),ringA*uRings*0.4);
+  col=mix(col,vec3(0.62,0.65,0.72),(1.0-smoothstep(0.4,1.2,abs(length(x)-uFieldR)/uPx))*0.85*uFieldOn);
+  col=mix(col,vec3(0.72,0.63,1.0),frame(x,uShootR,uPx,10.0)*0.7*uShootOn);
+  col=mix(col,vec3(1.0,0.95,0.84),dotA*uDots);
+  o=vec4(min(col,vec3(1.0)),1.0);
+}`;
+
+const FLUX_FS = HEAD + LENS_GLSL + `
+in vec2 vUv; out vec4 o;
+uniform vec2 uShoot; uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH; uniform vec3 uSig;
+void main(){
+  vec2 x=(vUv*2.0-1.0)*uShoot;
+  vec2 y=lensEq(x);
+  vec2 suv=(y-uSrcC)/(2.0*uSrcH)+0.5;
+  float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0);
+  float A=textureLod(uSrc,clamp(suv,0.0,1.0),0.0).a*inside;
+  vec2 d=y-uSrcC; float r2=dot(d,d);
+  o=vec4(A, exp(-r2/(2.0*uSig.x*uSig.x)), exp(-r2/(2.0*uSig.y*uSig.y)), exp(-r2/(2.0*uSig.z*uSig.z)));
+}`;
+
+function program(vs, fs){
+  const p = gl.createProgram();
+  for(const [type, src] of [[gl.VERTEX_SHADER, vs],[gl.FRAGMENT_SHADER, fs]]){
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    gl.attachShader(p, s);
+  }
+  gl.linkProgram(p);
+  if(!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+  for(let i=0;i<n;i++){ const info = gl.getActiveUniform(p, i); u[info.name] = gl.getUniformLocation(p, info.name); }
+  return {p, u};
+}
+let P;
+try{
+  P = { ray:program(RAY_VS, RAY_FS), acc:program(FULL_VS, ACC_FS), src:program(FULL_VS, SRC_FS), lens:program(FULL_VS, LENSVIEW_FS), flux:program(FULL_VS, FLUX_FS) };
+}catch(e){ err('Shader compile failed: ' + e.message); return; }
+const U = (pr, name) => pr.u[name] ?? null;
+
+function makeTex(w, h, ifmt, fmt, type, filter, data=null){
+  const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, ifmt, w, h, 0, fmt, type, data);
+  return t;
+}
+function makeFB(tex, level=0){
+  const fb = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, level);
+  if(gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) throw new Error('Incomplete framebuffer');
+  return fb;
+}
+
+const starData = new Float32Array(NMAX*4);
+const starTex = makeTex(NMAX, 1, gl.RGBA32F, gl.RGBA, gl.FLOAT, gl.NEAREST, starData);
+const srcTex = makeTex(SRC_RES, SRC_RES, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR, null);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+{ const an = gl.getExtension('EXT_texture_filter_anisotropic'); if(an) gl.texParameterf(gl.TEXTURE_2D, an.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(an.MAX_TEXTURE_MAX_ANISOTROPY_EXT))); }
+
+const T = {};
+function allocTargets(){
+  for(const k of ['passTex','acc0','acc1','fluxTex']) if(T[k]) gl.deleteTexture(T[k]);
+  for(const k of ['passFB','accFB0','accFB1','fluxFB','readFB']) if(T[k]) gl.deleteFramebuffer(T[k]);
+  const q = QUAL[S.quality];
+  T.R = q.R; T.F = q.F;
+  T.passTex = floatBlend ? makeTex(T.R,T.R,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST) : makeTex(T.R,T.R,gl.R16F,gl.RED,gl.HALF_FLOAT,gl.NEAREST);
+  T.acc0 = makeTex(T.R,T.R,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST);
+  T.acc1 = makeTex(T.R,T.R,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST);
+  T.passFB = makeFB(T.passTex); T.accFB0 = makeFB(T.acc0); T.accFB1 = makeFB(T.acc1);
+  T.fluxTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, T.fluxTex);
+  const levels = Math.log2(T.F) + 1;
+  gl.texStorage2D(gl.TEXTURE_2D, levels, floatLinear ? gl.RGBA32F : gl.RGBA16F, T.F, T.F);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  T.readLevel = Math.log2(T.F/16);
+  T.fluxFB = makeFB(T.fluxTex, 0); T.readFB = makeFB(T.fluxTex, T.readLevel);
+  acc.cur = 0; acc.k = 0;
+}
+const acc = {cur:0, k:0};
+const readBuf = new Float32Array(16*16*4);
+
+// ---------- Geometry & stars ----------
+const G = {};
+let N = 0, ux = new Float32Array(NMAX), uy = new Float32Array(NMAX);
+const bx = new Float32Array(NMAX).fill(1), by = new Float32Array(NMAX).fill(1);
+function salpeterSample(m1=1){ const a=-1.35, m0=0.1; const u=Math.random(); return Math.pow(Math.pow(m0,a)+u*(Math.pow(m1,a)-Math.pow(m0,a)), 1/a); }
+const MASS_FN = {
+  equal: () => 1,
+  salpeter: () => salpeterSample(1),
+  salpeter10: () => salpeterSample(10),
+  log10: () => 10**(Math.random()*2 - 1),
+};
+const MASS_MEAN = Object.fromEntries(Object.entries(MASS_FN).map(([k,f]) => { let s=0; for(let i=0;i<40000;i++) s+=f(); return [k, s/40000]; }));
+function gauss(){ let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+function computeGeometry(){
+  const k = S.kappa, g = S.gamma;
+  G.ks = (1 - S.fstar) * k; G.kstarTarget = S.fstar * k;
+  const lx = Math.abs(1-k-g), ly = Math.abs(1-k+g);
+  G.Lx = Math.min(30, 1.1*S.Ls/Math.max(lx,1e-3) + 2.5);
+  G.Ly = Math.min(30, 1.1*S.Ls/Math.max(ly,1e-3) + 2.5);
+  // circular star field enclosing the ray-shooting region and the largest lens view
+  G.FR = Math.max(1.2*Math.hypot(G.Lx, G.Ly), Math.SQRT2*LV_MAX) + 3;
+  const d = (1-k)*(1-k) - g*g;
+  G.muMac = 1/Math.max(Math.abs(d), 1e-4);
+  G.type = (1-k-g > 0 && 1-k+g > 0) ? 'minimum' : (d < 0 ? 'saddle' : 'maximum');
+}
+function genStars(){
+  computeGeometry();
+  const area = Math.PI*G.FR*G.FR;
+  const mMean = MASS_MEAN[S.massFn];
+  N = Math.min(NMAX, Math.round(G.kstarTarget*area/(Math.PI*mMean)));
+  let msum = 0;
+  for(let i=0;i<N;i++){
+    const m = MASS_FN[S.massFn]();
+    const rr = G.FR*Math.sqrt(Math.random()), ph = 2*Math.PI*Math.random();
+    starData[i*4] = rr*Math.cos(ph);
+    starData[i*4+1] = rr*Math.sin(ph);
+    starData[i*4+2] = m; starData[i*4+3] = 0;
+    ux[i] = gauss(); uy[i] = gauss(); bx[i] = 1; by[i] = 1; msum += m;
+  }
+  G.kstar = Math.PI*msum/area;
+  { const el = $('Lv'), mx = Math.ceil(G.FR*1.08); el.max = Math.max(8, mx); if(S.Lv > +el.max){ S.Lv = +el.max; } el.value = S.Lv; $('LvOut').textContent = fmt(S.Lv,2)+' θE'; updateScalebars(); }
+  uploadStars(); resetMap(); clearLC(); fluxDirty = true; updateReadouts();
+}
+function uploadStars(){
+  gl.bindTexture(gl.TEXTURE_2D, starTex);
+  gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, NMAX, 1, gl.RGBA, gl.FLOAT, starData);
+}
+function stepStars(dt){
+  const a = S.driftAng*Math.PI/180, dx = S.drift*Math.cos(a), dy = S.drift*Math.sin(a);
+  const R = G.FR;
+  for(let i=0;i<N;i++){
+    let x = starData[i*4] + bx[i]*(S.vdisp*ux[i] + dx)*dt;
+    let y = starData[i*4+1] + by[i]*(S.vdisp*uy[i] + dy)*dt;
+    const r = Math.hypot(x, y);
+    if(r > R){
+      if(S.edge === 'bounce'){ const s = (2*R - r)/r; x *= s; y *= s; bx[i] = -bx[i]; by[i] = -by[i]; }
+      else { const s = -(2*R - r)/r; x *= s; y *= s; }
+    }
+    starData[i*4] = x; starData[i*4+1] = y;
+  }
+  uploadStars();
+}
+function resetMap(){ acc.k = 0; viewDirty = true; }
+
+// ---------- Source texture ----------
+const srcPix = new Uint8Array(SRC_RES*SRC_RES*4);
+const work = document.createElement('canvas'); work.width = work.height = SRC_RES;
+const wctx = work.getContext('2d', {willReadFrequently:true});
+let srcFlux = 1;
+// thin disk at one wavelength: r in θE, s = disk scale, q = ISCO radius
+function diskRaw(r, s, q){ if(r <= q) return 0; const xi = Math.pow(r/s, 0.75)*Math.pow(1 - Math.sqrt(q/r), -0.25); return 1/(Math.exp(xi) - 1); }
+function diskMax(s, q){ let m = 0; const r1 = Math.max(6*s, 3*q); for(let i=1;i<=4000;i++){ const r = q + (r1-q)*i/4000; m = Math.max(m, diskRaw(r, s, q)); } return m || 1; }
+function buildSource(){
+  const s = S.srcScale, n = SRC_RES;
+  if(S.srcMode === 'image' && S.img){
+    G.srcH = 3*s;
+    wctx.clearRect(0,0,n,n);
+    const iw = S.img.naturalWidth, ih = S.img.naturalHeight, sc = Math.max(n/iw, n/ih);
+    wctx.drawImage(S.img, (n-iw*sc)/2, (n-ih*sc)/2, iw*sc, ih*sc);
+    const d = wctx.getImageData(0,0,n,n).data;
+    for(let i=0;i<n*n;i++){
+      const al = d[i*4+3]/255;
+      const r = d[i*4]*al, g = d[i*4+1]*al, b = d[i*4+2]*al;
+      srcPix[i*4]=r; srcPix[i*4+1]=g; srcPix[i*4+2]=b;
+      srcPix[i*4+3] = 0.2126*r + 0.7152*g + 0.0722*b;
+    }
+  } else {
+    G.srcH = S.srcMode === 'disk' ? Math.max(5*s, 1.5*S.blr, 1.3*S.isco) : 4*s;
+    const dmax = S.srcMode === 'disk' ? diskMax(s, S.isco) : 1, bw = 0.15*S.blr;
+    const h = G.srcH;
+    for(let j=0;j<n;j++) for(let i=0;i<n;i++){
+      const x = ((i+0.5)/n*2-1)*h, y = ((j+0.5)/n*2-1)*h, r = Math.hypot(x,y);
+      let R,Gc,B,A;
+      if(S.srcMode === 'disk'){
+        // thin disk seen face-on at one wavelength, with an empty hole inside the ISCO
+        const ad = diskRaw(r, s, S.isco)/dmax;
+        const ar = 0.28*Math.exp(-((r-S.blr)**2)/(2*bw*bw));
+        A = Math.min(1, ad+ar);
+        const w = ad*ad;
+        R = ad + 1.00*ar; Gc = ad*(0.54 + 0.42*w) + 0.36*ar; B = ad*(0.24 + 0.62*w) + 0.45*ar;
+        const mx = Math.max(R,Gc,B); if(mx > 1){ R/=mx; Gc/=mx; B/=mx; }
+      } else {
+        A = Math.exp(-r*r/(2*s*s));
+        const w = A*A;
+        R = A*(1.0); Gc = A*(0.54 + 0.42*w); B = A*(0.24 + 0.62*w);
+      }
+      const o = (j*n+i)*4;
+      srcPix[o]=Math.round(R*255); srcPix[o+1]=Math.round(Gc*255); srcPix[o+2]=Math.round(B*255); srcPix[o+3]=Math.round(A*255);
+    }
+  }
+  let sum = 0; for(let i=0;i<n*n;i++) sum += srcPix[i*4+3];
+  srcFlux = Math.max(1e-12, sum/255 * (2*G.srcH/n)**2);
+  gl.bindTexture(gl.TEXTURE_2D, srcTex);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, n, n, gl.RGBA, gl.UNSIGNED_BYTE, srcPix);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  fluxDirty = true; viewDirty = true;
+}
+
+// ---------- Render passes ----------
+function bindTex(unit, tex){ gl.activeTexture(gl.TEXTURE0+unit); gl.bindTexture(gl.TEXTURE_2D, tex); }
+function lensUniforms(pr){
+  gl.uniform1i(U(pr,'uStars'), 0); bindTex(0, starTex);
+  gl.uniform1i(U(pr,'uN'), N); gl.uniform1f(U(pr,'uKs'), G.ks); gl.uniform1f(U(pr,'uGam'), S.gamma);
+}
+function rayG(){ const q = QUAL[S.quality]; return Math.max(256, Math.min(q.G, Math.floor(Math.sqrt(q.budget/Math.max(N,1))))); }
+function rayPass(){
+  const Gn = rayG(); G.rays = Gn*Gn;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, T.passFB); gl.viewport(0,0,T.R,T.R);
+  gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
+  const pr = P.ray; gl.useProgram(pr.p); lensUniforms(pr);
+  gl.uniform2f(U(pr,'uShoot'), G.Lx, G.Ly); gl.uniform1i(U(pr,'uG'), Gn);
+  gl.uniform1ui(U(pr,'uSeed'), S.playing ? 0x2545F491 : (Math.random()*4294967295)>>>0); gl.uniform1f(U(pr,'uLs'), S.Ls);
+  gl.drawArrays(gl.POINTS, 0, Gn*Gn);
+  gl.disable(gl.BLEND);
+  // accumulate
+  acc.k++;
+  const w = S.playing ? Math.max(1/acc.k, 0.5) : 1/acc.k;
+  const dst = 1 - acc.cur;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dst ? T.accFB1 : T.accFB0);
+  const pa = P.acc; gl.useProgram(pa.p);
+  gl.uniform1i(U(pa,'uPrev'), 0); bindTex(0, acc.cur ? T.acc1 : T.acc0);
+  gl.uniform1i(U(pa,'uNew'), 1); bindTex(1, T.passTex);
+  gl.uniform1f(U(pa,'uW'), w);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  acc.cur = dst;
+  G.norm = (4*G.Lx*G.Ly) / (G.rays * (2*S.Ls/T.R)**2);
+}
+function srcModeId(){ return S.srcMode === 'image' && S.img ? 2 : (S.srcMode === 'disk' ? 1 : 0); }
+function setSrcUniforms(pr, unit){
+  gl.uniform1i(U(pr,'uSrc'), unit); bindTex(unit, srcTex);
+  gl.uniform2f(U(pr,'uSrcC'), S.sx, S.sy); gl.uniform1f(U(pr,'uSrcH'), G.srcH);
+}
+const srcCv = $('srcCv'), lensCv = $('lensCv');
+const sctx = srcCv.getContext('2d'), lctx = lensCv.getContext('2d');
+function prepareDefault(w){
+  const need = Math.max(srcCv.width, lensCv.width, 2);
+  if(glc.width !== need || glc.height !== need){ glc.width = need; glc.height = need; }
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, w, w);
+}
+function renderSource(){
+  const w = srcCv.width; prepareDefault(w);
+  const pr = P.src; gl.useProgram(pr.p);
+  gl.uniform1i(U(pr,'uMap'), 0); bindTex(0, acc.cur ? T.acc1 : T.acc0);
+  gl.uniform1i(U(pr,'uRes'), T.R); gl.uniform1f(U(pr,'uNorm'), G.norm || 0);
+  gl.uniform1f(U(pr,'uLs'), S.Ls); gl.uniform2f(U(pr,'uLog'), LOGR[0], LOGR[1]);
+  setSrcUniforms(pr, 1); gl.uniform1i(U(pr,'uSrcMode'), srcModeId());
+  gl.uniform1i(U(pr,'uStars'), 2); bindTex(2, starTex); gl.uniform1i(U(pr,'uN'), N);
+  gl.uniform1f(U(pr,'uKt'), G.ks + G.kstar); gl.uniform1f(U(pr,'uGam'), S.gamma);
+  gl.uniform1f(U(pr,'uDots'), S.starsSrc ? 1 : 0); gl.uniform1f(U(pr,'uPx'), 2*S.Ls/w);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  sctx.drawImage(glc, 0, glc.height - w, w, w, 0, 0, w, w);
+}
+function renderLens(){
+  const w = lensCv.width; prepareDefault(w);
+  const pr = P.lens; gl.useProgram(pr.p); lensUniforms(pr);
+  gl.uniform1f(U(pr,'uLv'), S.Lv); gl.uniform1f(U(pr,'uPx'), 2*S.Lv/w);
+  setSrcUniforms(pr, 1);
+  gl.uniform1f(U(pr,'uDots'), S.starsLens ? 1 : 0);
+  gl.uniform1f(U(pr,'uFieldR'), G.FR); gl.uniform2f(U(pr,'uShootR'), G.Lx, G.Ly);
+  gl.uniform1f(U(pr,'uFieldOn'), S.showField ? 1 : 0); gl.uniform1f(U(pr,'uShootOn'), S.showShoot ? 1 : 0);
+  gl.uniform1f(U(pr,'uCrit'), S.crit ? 1 : 0); gl.uniform1f(U(pr,'uRings'), S.rings ? 1 : 0);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  lctx.drawImage(glc, 0, glc.height - w, w, w, 0, 0, w, w);
+}
+const cur = {mu:NaN, g:[NaN,NaN,NaN]};
+function computeFlux(){
+  gl.bindFramebuffer(gl.FRAMEBUFFER, T.fluxFB); gl.viewport(0,0,T.F,T.F);
+  const pr = P.flux; gl.useProgram(pr.p); lensUniforms(pr);
+  gl.uniform2f(U(pr,'uShoot'), G.Lx, G.Ly); setSrcUniforms(pr, 1);
+  gl.uniform3f(U(pr,'uSig'), CMP_SIG[0], CMP_SIG[1], CMP_SIG[2]);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.bindTexture(gl.TEXTURE_2D, T.fluxTex); gl.generateMipmap(gl.TEXTURE_2D);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, T.readFB);
+  gl.readPixels(0, 0, 16, 16, gl.RGBA, gl.FLOAT, readBuf);
+  let a=0,b=0,c=0,d=0;
+  for(let i=0;i<256;i++){ a+=readBuf[i*4]; b+=readBuf[i*4+1]; c+=readBuf[i*4+2]; d+=readBuf[i*4+3]; }
+  const blk = (2*G.Lx/16)*(2*G.Ly/16);
+  cur.mu = a*blk/srcFlux;
+  cur.g = [b,c,d].map((v,i) => v*blk/(2*Math.PI*CMP_SIG[i]**2));
+}
+
+// ---------- Light curve ----------
+let lc = [];
+function clearLC(){ lc = []; lcDirty = true; }
+function pushLC(){
+  lc.push({t:S.t, m:cur.mu, g:cur.g.slice()});
+  while(lc.length && lc[0].t < S.t - LC_WINDOW) lc.shift();
+  lcDirty = true;
+}
+const lcCv = $('lcCv'), lcx = lcCv.getContext('2d');
+function niceStep(span, n){ const s0 = span/n, p = 10**Math.floor(Math.log10(s0)), r = s0/p; return (r<1.5?1:r<3?2:r<7?5:10)*p; }
+function drawLC(){
+  const dpr = devicePixelRatio || 1, W = lcCv.clientWidth, H = lcCv.clientHeight;
+  if(lcCv.width !== Math.round(W*dpr) || lcCv.height !== Math.round(H*dpr)){ lcCv.width = Math.round(W*dpr); lcCv.height = Math.round(H*dpr); }
+  const c = lcx; c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const pl = 52, pr = 14, pt = 12, pb = 28, w = W-pl-pr, h = H-pt-pb;
+  const mag = S.yMode === 'mag';
+  const val = m => mag ? 2.5*Math.log10(Math.max(m,1e-6)/G.muMac) : m;
+  const t1 = Math.max(S.t, LC_WINDOW), t0 = t1 - LC_WINDOW;
+  const series = [{k:'m', col:'#f2b45a', lw:2.2, label:S.srcMode==='image'&&S.img?(S.imgName||'image'):(S.srcMode==='disk'?`disk + BLR, s = ${S.srcScale.toFixed(2)}`:`Gaussian σ = ${S.srcScale.toFixed(2)}`)}];
+  if(S.compare) CMP_SIG.forEach((s,i) => series.push({k:i, col:CMP_COL[i], lw:1.3, label:`σ = ${s}`}));
+  let lo = Infinity, hi = -Infinity;
+  const base = val(G.muMac);
+  for(const p of lc) for(const s of series){ const v = val(s.k==='m'?p.m:p.g[s.k]); if(isFinite(v)){ lo=Math.min(lo,v); hi=Math.max(hi,v); } }
+  if(!isFinite(lo)){ lo = base*0.5; hi = base*1.5; }
+  lo = Math.min(lo, base); hi = Math.max(hi, base);
+  if(!mag) lo = Math.max(0, lo);
+  const padv = (hi-lo)*0.08 || (mag ? 0.2 : base*0.2);
+  lo -= padv; hi += padv; if(!mag) lo = Math.max(0, lo);
+  const X = t => pl + (t-t0)/(t1-t0)*w, Y = v => pt + h - (v-lo)/(hi-lo)*h;
+  c.font = '11px "IBM Plex Mono", ui-monospace, monospace'; c.textBaseline = 'middle';
+  // grid
+  const ys = niceStep(hi-lo, 5);
+  c.strokeStyle = '#1b2232'; c.lineWidth = 1; c.fillStyle = '#8790a6'; c.textAlign = 'right';
+  for(let v = Math.ceil(lo/ys)*ys; v <= hi+1e-9; v += ys){
+    const y = Math.round(Y(v))+0.5; c.beginPath(); c.moveTo(pl,y); c.lineTo(pl+w,y); c.stroke();
+    const lab = mag ? (-v).toFixed(ys<0.1?2:1) : (v>=100?v.toFixed(0):v.toPrecision(3).replace(/\.?0+$/,''));
+    c.fillText(lab, pl-8, y);
+  }
+  const xs = niceStep(t1-t0, 6); c.textAlign = 'center'; c.textBaseline = 'top';
+  for(let t = Math.ceil(t0/xs)*xs; t <= t1+1e-9; t += xs){
+    const x = Math.round(X(t))+0.5; c.beginPath(); c.moveTo(x,pt); c.lineTo(x,pt+h); c.stroke();
+    c.fillText(t.toFixed(0), x, pt+h+7);
+  }
+  // macro line
+  c.setLineDash([4,4]); c.strokeStyle = '#5b6680'; c.beginPath(); c.moveTo(pl, Y(base)); c.lineTo(pl+w, Y(base)); c.stroke(); c.setLineDash([]);
+  c.fillStyle = '#8790a6'; c.textAlign = 'right'; c.textBaseline = 'bottom';
+  c.fillText(mag ? 'macro' : `macro μ = ${G.muMac.toFixed(2)}`, pl+w-4, Y(base)-3);
+  // axis titles
+  c.save(); c.translate(13, pt+h/2); c.rotate(-Math.PI/2); c.textAlign='center'; c.textBaseline='middle';
+  c.fillText(mag ? 'Δm (mag, brighter ↑)' : 'magnification μ', 0, 0); c.restore();
+  // series (draw comparison first, main last)
+  c.save(); c.beginPath(); c.rect(pl, pt, w, h); c.clip();
+  for(const s of series.slice(1).concat(series[0])){
+    c.strokeStyle = s.col; c.lineWidth = s.lw; c.lineJoin = 'round'; c.beginPath();
+    let started = false;
+    for(const p of lc){ const v = val(s.k==='m'?p.m:p.g[s.k]); if(!isFinite(v)) continue; const x=X(p.t), y=Y(v); if(started) c.lineTo(x,y); else { c.moveTo(x,y); started=true; } }
+    c.stroke();
+  }
+  if(lc.length){ const p = lc[lc.length-1]; c.fillStyle = '#f2b45a'; c.beginPath(); c.arc(X(p.t), Y(val(p.m)), 3.5, 0, 7); c.fill(); }
+  c.restore();
+  // legend
+  c.textAlign = 'left'; c.textBaseline = 'middle'; let lx = pl + 10, ly = pt + 10;
+  c.fillStyle = 'rgba(13,17,26,0.82)';
+  const lw = series.reduce((m,s) => Math.max(m, c.measureText(s.label).width), 0) + 34;
+  c.fillRect(lx-6, ly-8, lw, series.length*16+2);
+  series.forEach((s,i) => { const y = ly + i*16; c.strokeStyle = s.col; c.lineWidth = s.lw; c.beginPath(); c.moveTo(lx, y); c.lineTo(lx+18, y); c.stroke(); c.fillStyle = '#c9d0e0'; c.fillText(s.label, lx+24, y); });
+}
+
+// ---------- Colorbar & scale bars ----------
+const STOPS = [[0,[4,6,11]],[0.25,[12,23,51]],[0.45,[16,56,102]],[0.62,[27,112,148]],[0.78,[74,179,194]],[0.92,[168,230,232]],[1,[242,252,255]]];
+function cmapJS(t){ for(let i=1;i<STOPS.length;i++){ if(t<=STOPS[i][0]){ const [a,ca]=STOPS[i-1],[b,cb]=STOPS[i], f=(t-a)/(b-a); return ca.map((v,k)=>Math.round(v+(cb[k]-v)*f)); } } return STOPS[STOPS.length-1][1]; }
+function drawColorbar(){
+  const c = $('cbar'), dpr = devicePixelRatio||1, W = c.clientWidth, H = c.clientHeight;
+  c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
+  const x = c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
+  for(let i=0;i<W;i++){ const [r,g,b] = cmapJS(i/W); x.fillStyle = `rgb(${r},${g},${b})`; x.fillRect(i,4,1.5,8); }
+  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.fillStyle = '#8790a6'; x.textBaseline = 'top';
+  const pos = v => (Math.log10(v)-LOGR[0])/(LOGR[1]-LOGR[0])*W;
+  for(const v of [0.3,1,3,10,30,100]){ const p = pos(v); x.fillStyle='#8790a6'; x.fillRect(Math.round(p),12,1,3); x.textAlign = p<12?'left':(p>W-14?'right':'center'); x.fillText(String(v), p, 17); }
+  const pm = Math.max(0, Math.min(W, pos(G.muMac||1)));
+  x.fillStyle = '#f2b45a'; x.beginPath(); x.moveTo(pm-4,0); x.lineTo(pm+4,0); x.lineTo(pm,5); x.fill();
+}
+function niceLen(half, cssW){ const target = half*2*0.25; for(const L of [0.05,0.1,0.2,0.5,1,2,5,10,20]) if(L >= target*0.6) return L; return 20; }
+function updateScalebars(){
+  for(const [id, half, cv] of [['sbSrc', S.Ls, srcCv],['sbLens', S.Lv, lensCv]]){
+    const W = cv.clientWidth, L = niceLen(half, W), el = $(id);
+    el.querySelector('.bar').style.width = (L/(2*half)*W) + 'px';
+    el.querySelector('.t').textContent = `${L} θE`;
+  }
+}
+
+// ---------- Readouts & sizing ----------
+function fmt(v, d=2){ return Number(v).toFixed(d); }
+function updateReadouts(){
+  $('readN').textContent = N >= NMAX ? `${N} (capped)` : String(N);
+  $('readK').textContent = `${fmt(G.kstar,3)} / ${fmt(G.ks,3)}`;
+  $('readMac').textContent = fmt(G.muMac, 2);
+  $('macroNote').textContent = fmt(G.muMac, 2);
+  $('readType').textContent = G.type;
+  $('lensMeta').textContent = `${N} stars · κ⋆ ${fmt(G.kstar,2)}`;
+  $('srcPos').textContent = `(${fmt(S.sx)}, ${fmt(S.sy)})`;
+  drawColorbar();
+}
+function resize(){
+  const dpr = devicePixelRatio || 1;
+  for(const cv of [srcCv, lensCv]){ const px = Math.max(64, Math.min(760, Math.round(cv.clientWidth*dpr))); if(cv.width !== px){ cv.width = px; cv.height = px; } }
+  updateScalebars(); drawColorbar(); lcDirty = true; viewDirty = true;
+}
+new ResizeObserver(resize).observe(document.querySelector('.panels'));
+new ResizeObserver(() => { lcDirty = true; }).observe(lcCv);
+
+// ---------- Controls ----------
+let fluxDirty = true, viewDirty = true, lcDirty = true;
+function bindRange(id, key, fmtFn, onChange){
+  const el = $(id), out = $(id+'Out');
+  const show = () => { if(out) out.textContent = fmtFn(S[key]); };
+  el.value = S[key]; show();
+  el.addEventListener('input', () => { S[key] = parseFloat(el.value); show(); onChange && onChange(); viewDirty = true; });
+  return {el, show};
+}
+const modelChanged = () => genStars();
+const ctl = {
+  kappa: bindRange('kappa','kappa', v=>fmt(v), modelChanged),
+  gamma: bindRange('gamma','gamma', v=>fmt(v), modelChanged),
+  fstar: bindRange('fstar','fstar', v=>Math.round(v*100)+'%', modelChanged),
+  vdisp: bindRange('vdisp','vdisp', v=>fmt(v)+' θE/t'),
+  drift: bindRange('drift','drift', v=>fmt(v)+' θE/t'),
+  driftAng: bindRange('driftAng','driftAng', v=>v+'°'),
+  rate: bindRange('rate','rate', v=>fmt(v,1)+'×'),
+  Ls: bindRange('Ls','Ls', v=>fmt(v,1)+' θE', () => { S.sx = clamp(S.sx,-S.Ls,S.Ls); S.sy = clamp(S.sy,-S.Ls,S.Ls); genStars(); updateScalebars(); }),
+  Lv: bindRange('Lv','Lv', v=>fmt(v,2)+' θE', () => updateScalebars()),
+};
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+const sizeEl = $('srcSize');
+const sizeFromSlider = v => 10**(-2 + 2*v/100);
+const logSlider = (v, a, b) => 10**(a + (b-a)*v/100);
+const toSlider = (x, a, b) => Math.round((Math.log10(x)-a)/(b-a)*100);
+const ISCO_R = [-3, 0], BLR_R = [-1.7, 0.5];
+const iscoEl = $('isco'), blrEl = $('blr');
+function showDisk(){ $('iscoOut').textContent = fmt(S.isco, S.isco<0.1?3:2) + ' θE'; $('blrOut').textContent = fmt(S.blr, S.blr<0.1?3:2) + ' θE'; $('diskCtl').hidden = S.srcMode !== 'disk'; }
+iscoEl.value = toSlider(S.isco, ...ISCO_R); blrEl.value = toSlider(S.blr, ...BLR_R);
+iscoEl.addEventListener('input', () => { S.isco = logSlider(+iscoEl.value, ...ISCO_R); showDisk(); buildSource(); lcDirty = true; });
+blrEl.addEventListener('input', () => { S.blr = logSlider(+blrEl.value, ...BLR_R); showDisk(); buildSource(); lcDirty = true; });
+function showSize(){ showDisk(); $('srcSizeOut').textContent = fmt(S.srcScale, S.srcScale<0.1?3:2) + ' θE'; $('srcSizeLbl').textContent = S.srcMode==='image' ? 'Half-width / 3' : (S.srcMode==='disk' ? 'Disk scale' : 'Size σ'); }
+sizeEl.value = Math.round((Math.log10(S.srcScale)+2)*50); showSize();
+sizeEl.addEventListener('input', () => { S.srcScale = sizeFromSlider(+sizeEl.value); showSize(); buildSource(); lcDirty = true; });
+$('fitField').addEventListener('click', () => { const el = $('Lv'); S.Lv = +el.max; el.value = S.Lv; $('LvOut').textContent = fmt(S.Lv,2)+' θE'; updateScalebars(); viewDirty = true; });
+$('zoomBack').addEventListener('click', () => { const el = $('Lv'); S.Lv = 5; el.value = 5; $('LvOut').textContent = fmt(5,2)+' θE'; updateScalebars(); viewDirty = true; });
+$('edge').addEventListener('change', e => { S.edge = e.target.value; $('edgeNote').textContent = S.edge === 'bounce' ? 'A star reaching the edge turns back inward.' : 'A star leaving the edge reappears on the opposite side.'; });
+$('massFn').addEventListener('change', e => { S.massFn = e.target.value; genStars(); });
+$('regen').addEventListener('click', genStars);
+$('quality').addEventListener('change', e => { S.quality = +e.target.value; allocTargets(); fluxDirty = true; });
+for(const id of ['starsSrc','starsLens','crit','rings','compare','showField','showShoot']) $(id).addEventListener('change', e => { S[id] = e.target.checked; viewDirty = true; lcDirty = true; });
+function setMode(m){
+  if(m === 'image' && !S.img){ upMsg('Choose a picture with the Upload image button, or drag one onto the source plane.'); try{ $('fileIn').click(); }catch(e){} return; }
+  S.srcMode = m;
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+  showSize(); buildSource(); lcDirty = true;
+}
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+function upMsg(text, bad){ const el = $('upMsg'); el.textContent = text; el.hidden = !text; el.classList.toggle('bad', !!bad); }
+function loadFile(file){
+  $('fileIn').value = '';
+  if(!file){ upMsg('No file was received. Try the Upload image button, or drag the file onto the source plane.', true); return; }
+  upMsg('Loading ' + file.name + '…');
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => { S.img = img; S.imgName = file.name; setMode('image'); upMsg('Loaded ' + file.name + ' (' + img.naturalWidth + '×' + img.naturalHeight + ')'); };
+  img.onerror = () => upMsg(file.name + ' could not be read as an image' + (/\.hei[cf]$/i.test(file.name) ? ' (HEIC is not supported by most browsers)' : '') + '. Save it as PNG or JPEG and try again.', true);
+  img.src = url;
+}
+$('fileIn').addEventListener('change', e => loadFile(e.target.files[0]));
+const srcBox = srcCv.parentElement;
+srcBox.addEventListener('dragover', e => e.preventDefault());
+srcBox.addEventListener('drop', e => { e.preventDefault(); loadFile(e.dataTransfer.files[0]); });
+$('centerBtn').addEventListener('click', () => { S.sx = 0; S.sy = 0; fluxDirty = true; viewDirty = true; updateReadouts(); });
+document.querySelectorAll('[data-y]').forEach(b => b.addEventListener('click', () => {
+  S.yMode = b.dataset.y; document.querySelectorAll('[data-y]').forEach(x => x.setAttribute('aria-pressed', x === b)); lcDirty = true;
+}));
+$('clearBtn').addEventListener('click', clearLC);
+const playBtn = $('playBtn');
+function setPlaying(p){ S.playing = p; playBtn.textContent = p ? 'Pause' : 'Play'; acc.k = 0; viewDirty = true; }
+playBtn.addEventListener('click', () => setPlaying(!S.playing));
+setPlaying(S.playing);
+const PRESETS = {
+  min:{kappa:0.45, gamma:0.40, fstar:0.3},
+  saddle:{kappa:0.55, gamma:0.60, fstar:0.3},
+  sparse:{kappa:0.30, gamma:0.20, fstar:0.1},
+  dense:{kappa:0.60, gamma:0.20, fstar:1.0},
+};
+document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+  Object.assign(S, PRESETS[b.dataset.preset]);
+  for(const k of ['kappa','gamma','fstar']){ ctl[k].el.value = S[k]; ctl[k].show(); }
+  genStars();
+}));
+// drag source
+let dragging = false;
+function moveSrc(e){
+  const r = srcCv.getBoundingClientRect();
+  S.sx = clamp(((e.clientX - r.left)/r.width*2 - 1)*S.Ls, -S.Ls, S.Ls);
+  S.sy = clamp((1 - (e.clientY - r.top)/r.height*2)*S.Ls, -S.Ls, S.Ls);
+  fluxDirty = true; viewDirty = true; $('srcPos').textContent = `(${fmt(S.sx)}, ${fmt(S.sy)})`;
+}
+srcCv.addEventListener('pointerdown', e => { dragging = true; srcCv.setPointerCapture(e.pointerId); moveSrc(e); });
+srcCv.addEventListener('pointermove', e => { if(dragging) moveSrc(e); });
+srcCv.addEventListener('pointerup', () => { dragging = false; });
+srcCv.addEventListener('pointercancel', () => { dragging = false; });
+
+// ---------- Main loop ----------
+const MAX_STILL = 160;
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(0.05, (now - last)/1000); last = now;
+  if(S.playing){ const d = dt*S.rate; stepStars(d); S.t += d; viewDirty = true; }
+  const needRays = S.playing || acc.k < MAX_STILL;
+  if(needRays) rayPass();
+  if(needRays || viewDirty){ renderSource(); renderLens(); viewDirty = false; }
+  if(S.playing || fluxDirty){
+    computeFlux(); fluxDirty = false;
+    if(S.playing) pushLC(); else lcDirty = true;
+    $('muNow').textContent = isFinite(cur.mu) ? cur.mu.toFixed(2) : '–';
+    $('tNow').textContent = S.t.toFixed(1);
+    $('srcMeta').textContent = `${(G.rays/1e6).toFixed(1)}M rays/pass`;
+  }
+  if(lcDirty){ drawLC(); lcDirty = false; }
+  requestAnimationFrame(frame);
+}
+
+const DEFAULT_IMG = 'data:image/png;base64,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';
+{ const im = new Image(); im.onload = () => { if(!S.img){ S.img = im; S.imgName = 'FUTURELENS logo'; if(S.srcMode === 'image') buildSource(); } }; im.src = DEFAULT_IMG; }
+computeGeometry();
+allocTargets();
+buildSource();
+genStars();
+resize();
+if(document.fonts) document.fonts.ready.then(() => { drawColorbar(); lcDirty = true; });
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
