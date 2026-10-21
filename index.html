@@ -133,6 +133,10 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .eq p{margin:0 0 6px}
 .eq a{color:var(--cyan)}
 .lcnote{margin:0;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.mfstats{display:flex;justify-content:space-between;gap:12px;margin:4px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mfstats b{font-weight:500;margin-left:4px}
+.mfstats b.f{color:var(--amber)}
+.mfstats b.e{color:#e6e9f2}
 .seedrow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
 .seedrow button{white-space:nowrap;padding:6px 9px}
 #seedBox{display:inline-flex;flex:none}
@@ -276,7 +280,8 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
           <input type="range" id="fstar" min="0" max="1" step="0.01" value="0.3"></div>
         <div class="row"><label for="massFn">Stellar masses</label>
           <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select>
-          <canvas id="mfCv" aria-label="Histogram of stellar masses in the current star field"></canvas></div>
+          <canvas id="mfCv" aria-label="Histogram of stellar masses in the current star field"></canvas>
+          <p class="mfstats" id="mfStats"></p></div>
         <div class="seedrow"><button id="regen">Random star field</button><button id="showSeed" class="seedbtn" aria-expanded="false" aria-controls="seedBox" title="Show the random seed. The same seed and settings give the same star field.">Seed</button><span id="seedBox" hidden><input type="number" id="seed" min="0" max="999999" step="1" inputmode="numeric" aria-label="Random seed"></span></div>
         <dl class="readouts">
           <dt>Stars</dt><dd id="readN">–</dd>
@@ -494,7 +499,8 @@ void main(){
     float sq=max((1.0-smoothstep(0.15,0.65,sd.x))*step(abs(x.y),uSrcLs+uPx),(1.0-smoothstep(0.15,0.65,sd.y))*step(abs(x.x),uSrcLs+uPx));
     col=mix(col,vec3(0.62,0.65,0.72),sq*0.75);
   }
-  float cl=1.0-smoothstep(0.6,1.6,abs(det)/(fwidth(det)+1e-6));
+  // a real crossing of det A = 0; the |det| cap removes a false ring at each star's centre, where det diverges
+  float cl=(1.0-smoothstep(0.6,1.6,abs(det)/(fwidth(det)+1e-6)))*(1.0-smoothstep(0.3,0.6,abs(det)));
   col=mix(col,vec3(0.576,0.886,0.941),cl*uCrit*0.85);
   col=mix(col,vec3(0.95,0.72,0.42),ringA*uRings*0.4);
   col=mix(col,vec3(0.62,0.65,0.72),(1.0-smoothstep(0.4,1.2,abs(length(x)-uFieldR)/uPx))*0.85*uFieldOn);
@@ -911,7 +917,24 @@ function mfModel(){
   for(let b=0;b<MF_NB;b++){ let s = 0; for(let k=0;k<40;k++){ s += pdf(MF_LO + (b + (k+0.5)/40)*MF_W); } out[b] = s; tot += s; }
   return out.map(v => v/tot);
 }
+function mfMoments(){
+  // expected mean and standard deviation of m for the chosen mass function
+  if(S.massFn === 'equal') return [1, 0];
+  const m1 = S.massFn === 'salpeter' ? 1 : 10, flat = S.massFn === 'log10';
+  let w0 = 0, w1 = 0, w2 = 0; const n = 4000, a = Math.log(0.1), bnd = Math.log(m1);
+  for(let i=0;i<n;i++){ const lm = a + (bnd - a)*(i + 0.5)/n, m = Math.exp(lm), p = flat ? 1 : Math.pow(m, -1.35); w0 += p; w1 += p*m; w2 += p*m*m; }
+  const mean = w1/w0; return [mean, Math.sqrt(Math.max(0, w2/w0 - mean*mean))];
+}
+function mfStats(){
+  const el = $('mfStats'); if(!el) return;
+  const [em, es] = mfMoments();
+  let s1 = 0, s2 = 0; for(let i=0;i<N;i++){ const m = starData[i*4+2]; s1 += m; s2 += m*m; }
+  const fm = N ? s1/N : 0, fs = N ? Math.sqrt(Math.max(0, s2/N - fm*fm)) : 0;
+  el.innerHTML = `<span>⟨m⟩ <b class="f">${fmt(fm)}</b> <b class="e">${fmt(em)}</b></span><span>σ <b class="f">${fmt(fs)}</b> <b class="e">${fmt(es)}</b> M☉</span>`;
+  el.title = `This field: mean ${fmt(fm)}, std ${fmt(fs)} M☉. Expected: mean ${fmt(em)}, std ${fmt(es)} M☉.`;
+}
 function drawMF(){
+  mfStats();
   const c = $('mfCv'); if(!c) return;
   const dpr = devicePixelRatio || 1, W = c.clientWidth, H = c.clientHeight;
   if(!W) return;
