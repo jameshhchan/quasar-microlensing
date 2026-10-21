@@ -156,8 +156,8 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
             <span class="lim"><span class="sw" style="background:linear-gradient(90deg,#ff8a3d,#fff4dc)"></span>lensed images</span>
           </div>
           <div class="legendrow fieldrow">
-            <label class="mtog"><input type="checkbox" id="showField" checked><span class="sw" style="background:#9ea6b8"></span>Star field</label>
-            <label class="mtog"><input type="checkbox" id="showShoot" checked><span class="sw" style="background:repeating-linear-gradient(90deg,var(--violet) 0 4px,transparent 4px 7px)"></span>Ray-shooting region</label>
+            <label class="mtog"><input type="checkbox" id="showField"><span class="sw" style="background:#9ea6b8"></span>Star field</label>
+            <label class="mtog"><input type="checkbox" id="showShoot"><span class="sw" style="background:repeating-linear-gradient(90deg,var(--violet) 0 4px,transparent 4px 7px)"></span>Ray-shooting region</label>
             <span class="zoombtns"><button id="fitField">Show whole star field</button><button id="zoomBack">Zoom back</button></span>
           </div>
         </figure>
@@ -258,7 +258,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
       </div>
     </aside>
   </div>
-  <footer class="credit">Created by James Chan <span class="sep">·</span> <a class="mail" href="mailto:jchan@amnh.org">jchan@amnh.org</a><br>This project is supported by <a class="mail" href="https://futurelens-cuny.github.io" target="_blank" rel="noopener">FutureLens</a></footer>
+  <footer class="credit">© 2026 James Chan. All rights reserved. <span class="sep">·</span> <a class="mail" href="mailto:jchan@amnh.org">jchan@amnh.org</a><br>This project is supported by <a class="mail" href="https://futurelens-cuny.github.io" target="_blank" rel="noopener">FutureLens</a></footer>
 </div>
 
 <script>
@@ -280,7 +280,7 @@ const S = {
   kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
   vdisp:0.3, drift:0.4, driftAng:90, rate:1,
   srcMode:'gauss', srcScale:0.1, isco:0.035, blr:0.26, sx:0, sy:0, img:null,
-  Ls:1.5, Lv:5, quality:1, edge:'bounce', showField:true, showShoot:true, crit:true, rings:false, starsSrc:false, starsLens:true, compare:true, yMode:'mu',
+  Ls:1.5, Lv:5, quality:1, edge:'bounce', showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:true, yMode:'mu',
   playing:!reduceMotion, t:0,
 };
 
