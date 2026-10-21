@@ -71,6 +71,7 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .fieldrow .zoombtns button{font-size:12px;padding:4px 9px}
 .legendrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff2d6;vertical-align:middle;margin-right:6px}
 #cbar{width:100%;height:32px;display:block}
+#mfCv{width:100%;height:96px;display:block;margin-top:6px}
 .lc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .lchead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
 .lchead .left{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
@@ -217,7 +218,8 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <div class="row"><div class="top"><label for="fstar">Fraction in stars<span class="sym">κ⋆/κ</span></label><output id="fstarOut"></output></div>
           <input type="range" id="fstar" min="0" max="1" step="0.01" value="0.3"></div>
         <div class="row"><label for="massFn">Stellar masses</label>
-          <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select></div>
+          <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select>
+          <canvas id="mfCv" aria-label="Histogram of stellar masses in the current star field"></canvas></div>
         <button id="regen">New star field</button>
         <dl class="readouts">
           <dt>Stars</dt><dd id="readN">–</dd>
@@ -788,7 +790,49 @@ function updateScalebars(){
 
 // ---------- Readouts & sizing ----------
 function fmt(v, d=2){ return Number(v).toFixed(d); }
+// ---------- Mass function plot ----------
+const MF_LO = -1.05, MF_W = 0.1, MF_NB = 21;
+function mfModel(){
+  // expected fraction of stars per log-mass bin
+  const out = new Array(MF_NB).fill(0);
+  if(S.massFn === 'equal'){ out[Math.round((0 - MF_LO)/MF_W - 0.5)] = 1; return out; }
+  const m1 = S.massFn === 'salpeter' ? 1 : 10, flat = S.massFn === 'log10';
+  const pdf = lm => { const m = 10**lm; return (m < 0.1 || m > m1) ? 0 : (flat ? 1 : Math.pow(m, -1.35)); };
+  let tot = 0;
+  for(let b=0;b<MF_NB;b++){ let s = 0; for(let k=0;k<40;k++){ s += pdf(MF_LO + (b + (k+0.5)/40)*MF_W); } out[b] = s; tot += s; }
+  return out.map(v => v/tot);
+}
+function drawMF(){
+  const c = $('mfCv'); if(!c) return;
+  const dpr = devicePixelRatio || 1, W = c.clientWidth, H = c.clientHeight;
+  if(!W) return;
+  c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
+  const x = c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
+  const pl = 4, pr = 4, pt = 16, pb = 16, w = W-pl-pr, h = H-pt-pb;
+  const counts = new Array(MF_NB).fill(0);
+  for(let i=0;i<N;i++){ const b = Math.floor((Math.log10(starData[i*4+2]) - MF_LO)/MF_W); if(b >= 0 && b < MF_NB) counts[b]++; }
+  const model = mfModel().map(v => v*N);
+  const ymax = Math.max(1, ...counts, ...model)*1.1;
+  const X = lm => pl + (lm - MF_LO)/(MF_NB*MF_W)*w, Y = v => pt + h - v/ymax*h;
+  x.fillStyle = 'rgba(242,180,90,0.55)';
+  for(let b=0;b<MF_NB;b++){ if(!counts[b]) continue; const x0 = X(MF_LO + b*MF_W), x1 = X(MF_LO + (b+1)*MF_W); x.fillRect(x0+0.5, Y(counts[b]), x1-x0-1, pt+h-Y(counts[b])); }
+  x.strokeStyle = '#e6e9f2'; x.lineWidth = 1.2; x.beginPath();
+  let started = false;
+  for(let b=0;b<MF_NB;b++){ const x0 = X(MF_LO + b*MF_W), x1 = X(MF_LO + (b+1)*MF_W), y = Y(model[b]); if(!started){ x.moveTo(x0, Y(0)); started = true; } x.lineTo(x0, y); x.lineTo(x1, y); }
+  x.lineTo(X(MF_LO + MF_NB*MF_W), Y(0)); x.stroke();
+  x.strokeStyle = '#2a3346'; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
+  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.fillStyle = '#8790a6'; x.textBaseline = 'top';
+  for(const [lm, lab] of [[-1,'0.1'],[0,'1'],[1,'10 M☉']]){ const px = X(lm); x.fillRect(Math.round(px), pt+h, 1, 3); x.textAlign = lm < 0 ? 'left' : (lm > 0 ? 'right' : 'center'); x.fillText(lab, lm < 0 ? px - 2 : (lm > 0 ? px + 4 : px), pt+h+4); }
+  x.textBaseline = 'top'; x.textAlign = 'left'; x.fillStyle = '#8790a6';
+  x.fillText(`${N} stars`, pl, 1);
+  x.textAlign = 'right'; x.fillStyle = '#c9d0e0'; x.fillText('— expected', pl+w, 1);
+  const tw = x.measureText('— expected').width, dl = 'this field', dw = x.measureText(dl).width;
+  const dx = pl + w - tw - 14;
+  x.fillStyle = '#8790a6'; x.fillText(dl, dx, 1);
+  x.fillStyle = 'rgba(242,180,90,0.8)'; x.fillRect(dx - dw - 13, 3, 8, 8);
+}
 function updateReadouts(){
+  drawMF();
   $('readN').textContent = N >= NMAX ? `${N} (capped)` : String(N);
   $('readK').textContent = `${fmt(G.kstar,3)} / ${fmt(G.ks,3)}`;
   $('readMac').textContent = fmt(G.muMac, 2);
@@ -801,7 +845,7 @@ function updateReadouts(){
 function resize(){
   const dpr = devicePixelRatio || 1;
   for(const cv of [srcCv, lensCv]){ const px = Math.max(64, Math.min(760, Math.round(cv.clientWidth*dpr))); if(cv.width !== px){ cv.width = px; cv.height = px; } }
-  updateScalebars(); drawColorbar(); lcDirty = true; viewDirty = true;
+  updateScalebars(); drawColorbar(); drawMF(); lcDirty = true; viewDirty = true;
 }
 new ResizeObserver(resize).observe(document.querySelector('.panels'));
 new ResizeObserver(() => { lcDirty = true; }).observe(lcCv);
