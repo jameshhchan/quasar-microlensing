@@ -97,6 +97,7 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .legendrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff2d6;vertical-align:middle;margin-right:6px}
 #cbar{width:100%;height:32px;display:block}
 #mfCv{width:100%;height:96px;display:block;margin-top:6px}
+#profCv{width:100%;height:92px;display:block}
 .lc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .lchead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
 .lchead .left{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
@@ -105,7 +106,12 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .big b{color:var(--amber);font-weight:500;font-size:15px}
 .lchead .right .mtog{margin-right:8px}
 .lchead .right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-#lcCv{width:100%;height:230px;display:block}
+#lcCv{width:100%;height:230px;display:block;touch-action:pan-y}
+.lclegend{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:11.5px;color:#c9d0e0;padding-left:52px;margin-bottom:-4px}
+.lclegend .lgi{display:inline-flex;align-items:center;gap:7px}
+.lclegend i{display:inline-block;width:18px;border-radius:2px}
+.lcscroll{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--muted);padding-left:52px}
+.lcscroll input{flex:1;min-width:0;accent-color:#9ea6b8}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .seg button{border:0;border-radius:0;background:transparent;color:var(--muted);padding:5px 10px}
 .seg button+button{border-left:1px solid var(--line)}
@@ -137,14 +143,34 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .mfstats b{font-weight:500;margin-left:4px}
 .mfstats b.f{color:var(--amber)}
 .mfstats b.e{color:#e6e9f2}
+.srcgrp input[type=range]{accent-color:var(--srcc,var(--amber))}
+.srcgrp output{color:var(--srcc,var(--amber))}
+.tbadge{position:absolute;left:10px;top:8px;font-family:var(--mono);font-size:11.5px;color:#dfe5f2;background:rgba(6,8,14,.6);padding:2px 7px;border-radius:4px;pointer-events:none}
+.tbadge.viewing{color:#0b0e15;background:#c3c9d6}
+.cmsel{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.cmsel select{width:auto;font-size:11.5px;padding:2px 6px}
 .srclab{position:absolute;transform:translate(-50%,-50%);font-family:var(--mono);font-size:12px;font-weight:500;pointer-events:none;text-shadow:0 0 3px #000,0 0 6px #000}
 .srctabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .srctabs button{padding:5px 10px;font-size:12.5px}
-.srctabs button[aria-pressed="true"]{border-color:var(--amber);color:var(--fg);background:var(--raise)}
+.srctabs button[aria-pressed="true"]{color:var(--fg);background:var(--raise)}
 .srctabs button[aria-pressed="false"]{color:var(--muted);background:transparent}
 .srctabs .addsrc{color:var(--muted);background:transparent}
 .srctabs .rmsrc{margin-left:auto;color:var(--muted);background:transparent}
 .srctabs .tabsw{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:0}
+.contact{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.contact a{font-family:var(--mono);color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(147,226,240,.35)}
+.disclaimer{margin:-6px 0 0;padding:0 4px;font-size:12.5px;color:var(--muted)}
+.disclaimer{line-height:1.8}
+.disclaimer a.mono{font-family:var(--mono)}
+.disclaimer a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(147,226,240,.35)}
+.tourbtn{border-color:var(--amber);color:var(--amber);background:transparent}
+.tour-hole{position:fixed;z-index:50;border-radius:10px;box-shadow:0 0 0 9999px rgba(3,5,10,.72);outline:2px solid var(--amber);outline-offset:3px;pointer-events:none}
+.tour-card{position:fixed;z-index:51;width:min(340px,calc(100vw - 32px));background:var(--raise);border:1px solid #33405a;border-radius:10px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:8px}
+.tour-card h4{margin:0;font-family:var(--display);font-weight:500;font-size:18px}
+.tour-card p{margin:0;font-size:13px;color:#c9d0e0;line-height:1.5}
+.tour-card .tnav{display:flex;align-items:center;gap:6px;margin-top:4px}
+.tour-card .tstep{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-right:auto}
+@media (prefers-reduced-motion:reduce){.tour-hole{transition:none}}
 .seedrow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
 .seedrow button{white-space:nowrap;padding:6px 9px}
 #seedBox{display:inline-flex;flex:none}
@@ -177,6 +203,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
       <h1>Quasar Microlensing <em>Lab</em></h1>
       <p class="lede">Visualizing microlensing light curves of lensed quasars</p>
     </div>
+    <button id="tourBtn" class="tourbtn">Take the tour</button>
   </header>
 
   <div id="err"></div>
@@ -187,6 +214,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <figure class="panel">
           <div class="ph"><h2>Source plane <i>β</i></h2></div>
           <div class="cv"><canvas id="srcCv" aria-label="Source plane magnification map with the source overlaid. Drag to move the source."></canvas>
+            <span class="tbadge">t = 0.0</span>
             <div class="scalebar" id="sbSrc"><span class="bar"></span><span class="t"></span></div>
             <div class="hint">Drag to move the source</div>
             <span class="srclab"></span><span class="srclab"></span><span class="srclab"></span><span class="srclab"></span>
@@ -194,14 +222,14 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
           <div class="opts stack">
             <div class="optrow"><span class="lab">Scale</span>
               <div class="scalebox"><canvas id="cbar" aria-label="Magnification color scale"></canvas>
-                <div class="cbnote"><span><span class="tri" title="Macro magnification: the value if all the mass were smooth"></span>μ₀ = 1 / |(1−κ)² − γ²| = <b id="macroNote">–</b></span><span>magnification μ</span></div></div>
+                <div class="cbnote"><span><span class="tri" title="Macro magnification: the value if all the mass were smooth"></span>μ₀ = 1 / |(1−κ)² − γ²| = <b id="macroNote">–</b></span><label class="cmsel">Colours <select id="cmapSel" aria-label="Colour map for the magnification map"><option value="ocean">Ocean</option><option value="magma">Magma</option><option value="gray">Grey</option><option value="viridis">Viridis</option><option value="cosmic">Cosmic</option></select></label></div></div>
             </div>
             <div class="optrow"><span class="lab">Show</span>
               <div class="items">
                 <label class="mtog"><input type="checkbox" id="showSrc" checked><span class="sw" style="background:linear-gradient(90deg,#ff8a3d,#fff4dc)"></span>Source</label>
                 <label class="mtog"><input type="checkbox" id="starsSrc"><span class="dot"></span>Stars</label>
                 <label class="mtog"><input type="checkbox" id="caust"><span class="sw" style="background:var(--cyan)"></span>Caustics</label>
-                <label class="mtog"><input type="checkbox" id="showMap" checked><span class="sw" style="background:linear-gradient(90deg,#10386a,#a8e6ea)"></span>Map</label>
+                <label class="mtog"><input type="checkbox" id="showMap" checked><span class="sw" id="mapSw" style="background:linear-gradient(90deg,#10386a,#a8e6ea)"></span>Map</label>
               </div>
             </div>
           </div>
@@ -210,6 +238,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <figure class="panel">
           <div class="ph"><h2>Lens plane <i>θ</i></h2></div>
           <div class="cv"><canvas id="lensCv" aria-label="Lens plane with moving stars, critical curves and lensed images"></canvas>
+            <span class="tbadge">t = 0.0</span>
             <div class="scalebar" id="sbLens"><span class="bar"></span><span class="t"></span></div>
           </div>
           <div class="opts cols">
@@ -247,16 +276,20 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
               <button data-y="mu" aria-pressed="true">μ</button>
               <button data-y="mag" aria-pressed="false">Δmag</button>
             </div>
+            <button id="zoomOut" hidden>Zoom out</button>
             <button id="clearBtn" title="Return the stars to their starting positions, reset time to 0 and clear the light curve">Restart</button>
             <button id="playBtn" class="primary">Pause</button>
           </div>
         </div>
+        <div class="lclegend" id="lcLegend"></div>
         <canvas id="lcCv" aria-label="Magnification versus time"></canvas>
+        <div class="lcscroll" id="lcScrollRow" hidden><span>Earlier</span><input type="range" id="lcScroll" step="any" aria-label="Scroll through the light curve history"><span>Latest</span></div>
       </section>
+      <p class="disclaimer">Built for education, not for scientific analysis. For research, please use <a href="https://github.com/JFagin/microcaustics" target="_blank" rel="noopener">microcaustics</a>.<br>If you have any questions, please reach out to me: <a class="mono" href="mailto:jchan@amnh.org">jchan@amnh.org</a></p>
     </section>
 
     <aside class="controls">
-      <div class="group">
+      <div class="group srcgrp">
         <h3>Source</h3>
         <div class="srctabs" id="srcTabs" role="group" aria-label="Sources"></div>
         <div class="seg" role="group" aria-label="Source type">
@@ -277,6 +310,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
           <div class="row"><div class="top"><label for="blr">BLR radius</label><output id="blrOut"></output></div>
             <input type="range" id="blr" min="0" max="100" step="1"></div>
         </div>
+        <canvas id="profCv" aria-label="Radial light profile of the selected source"></canvas>
         <dl class="readouts"><dt>Position β</dt><dd id="srcPos">(0.00, 0.00)</dd></dl>
       </div>
 
@@ -332,7 +366,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
       </div>
     </aside>
   </div>
-  <footer class="credit">© 2026 James Chan. All rights reserved. <span class="sep">·</span> <a class="mail" href="mailto:jchan@amnh.org">jchan@amnh.org</a><br>This project is supported by <a class="mail" href="https://futurelens-cuny.github.io" target="_blank" rel="noopener">FutureLens</a></footer>
+  <footer class="credit">© 2026 James Chan. All rights reserved.<br>This project is supported by <a class="mail" href="https://futurelens-cuny.github.io" target="_blank" rel="noopener">FutureLens</a></footer>
 </div>
 
 <script>
@@ -341,7 +375,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 const $ = id => document.getElementById(id);
 const LV_MAX = 8, NMAX = 512, LC_WINDOW = 30, SRC_RES = 512;
 const CMP_SIG = [0.02, 0.1, 0.4];
-const CMP_COL = ['#93e2f0', '#b8a2ff', '#ff93a6'];
+const CMP_COL = ['#93e2f0', '#b8a2ff', '#7f9cff'];
 const LOGR = [-0.6, 2.1];
 const QUAL = [
   {G:1024, R:256, F:512,  budget:6e7},
@@ -353,15 +387,20 @@ const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: r
 const S = {
   kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
   vdisp:0.3, drift:0.4, driftAng:90, rate:1,
-  seed:Math.floor(Math.random()*1000000), active:0, nSrc:1,
-  Ls:1.5, Lv:5, quality:1, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:true, yMode:'mu',
+  seed:Math.floor(Math.random()*1000000), active:0,
+  Ls:1.5, Lv:5, quality:1, lcZoom:null, viewT:null, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:true, yMode:'mu',
   playing:!reduceMotion, t:0,
 };
 // two independent sources; S.srcMode, S.sx, ... read and write the one being edited (S.active)
-const MAX_SRC = 4, SRC_NAMES = 'ABCD', SRC_COL = ['#f2b45a', '#9be38b', '#ff7a59', '#f2f2f2'];
+const MAX_SRC = 4, SRC_NAMES = 'ABCD', SRC_COL = ['#f2b45a', '#7ee07a', '#ff6b5c', '#f2f2f2'];
+// each source's colour on the planes: [edge, core] RGB, matching SRC_COL
+const SRC_PAL = [[[1,0.54,0.24],[1,0.96,0.86]], [[0.38,0.9,0.35],[0.88,1,0.85]], [[1,0.32,0.26],[1,0.88,0.84]], [[0.74,0.77,0.84],[1,1,1]]];
 const SRC_POS = [[0,0],[0.6,0.5],[-0.6,0.5],[0,-0.6]];
-function freshSrc(i){ return {srcMode:'gauss', srcScale:i ? 0.2 : 0.1, isco:0.035, blr:0.26, sx:SRC_POS[i][0], sy:SRC_POS[i][1], img:null, imgName:'', srcH:0.4, flux:1, tex:null}; }
-const SRC = [0,1,2,3].map(freshSrc);
+function freshSrc(i){ return {on:false, srcMode:'gauss', srcScale:i ? 0.2 : 0.1, isco:0.035, blr:0.26, sx:SRC_POS[i][0], sy:SRC_POS[i][1], img:null, imgName:'', srcH:0.4, flux:1, tex:null}; }
+const SRC = [0,1,2,3].map(freshSrc); SRC[0].on = true;
+// letters and colours belong to slots, so removing B leaves C and D unchanged
+const ACT = () => SRC.map((q, i) => q.on ? i : -1).filter(i => i >= 0);
+Object.defineProperty(S, 'nSrc', {get(){ return ACT().length; }});
 for(const k of ['srcMode','srcScale','isco','blr','sx','sy','img','imgName'])
   Object.defineProperty(S, k, {get(){ return SRC[S.active][k]; }, set(v){ SRC[S.active][k] = v; }, enumerable:true});
 
@@ -422,15 +461,10 @@ const ACC_FS = HEAD + `uniform sampler2D uPrev; uniform sampler2D uNew; uniform 
 void main(){ ivec2 p=ivec2(gl_FragCoord.xy); float a=texelFetch(uPrev,p,0).r; float b=texelFetch(uNew,p,0).r; o=vec4(mix(a,b,uW),0.0,0.0,1.0); }`;
 
 const CMAP_GLSL = `
+uniform vec3 uCm[7]; uniform float uCp[7];
 vec3 cmap(float t){
-  vec3 c0=vec3(0.016,0.024,0.043), c1=vec3(0.047,0.090,0.200), c2=vec3(0.063,0.220,0.400),
-       c3=vec3(0.106,0.440,0.580), c4=vec3(0.290,0.700,0.760), c5=vec3(0.660,0.900,0.910), c6=vec3(0.950,0.990,1.0);
-  if(t<0.25) return mix(c0,c1,t/0.25);
-  if(t<0.45) return mix(c1,c2,(t-0.25)/0.20);
-  if(t<0.62) return mix(c2,c3,(t-0.45)/0.17);
-  if(t<0.78) return mix(c3,c4,(t-0.62)/0.16);
-  if(t<0.92) return mix(c4,c5,(t-0.78)/0.14);
-  return mix(c5,c6,(t-0.92)/0.08);
+  for(int k=0;k<6;k++){ if(t <= uCp[k+1]) return mix(uCm[k], uCm[k+1], (t - uCp[k])/max(uCp[k+1] - uCp[k], 1e-6)); }
+  return uCm[6];
 }`;
 const SRC_FS = HEAD + CMAP_GLSL + `
 in vec2 vUv; out vec4 o;
@@ -467,7 +501,7 @@ void main(){
   if(uNS>3) col=overlay(col,uSrc4,uSrcC4,uSrcH4,uSrcMode4,beta,uSrcOn);
   if(uCauOn>0.5){
     float cc=texture(uCau,vUv).r;
-    col=mix(col,vec3(0.576,0.886,0.941),smoothstep(0.0,0.6,cc)*0.9);
+    col=mix(col,vec3(0.576,0.886,0.941),smoothstep(0.15,0.9,cc)*0.9);
   }
   if(uDots>0.5){
     // stars at their lens-plane coordinates, no mapping
@@ -720,29 +754,42 @@ function buildSource(idx = S.active){
     }
   } else {
     src.srcH = S.srcMode === 'disk' ? Math.max(5*s, 1.5*S.blr, 1.3*S.isco) : 4*s;
-    const dmax = S.srcMode === 'disk' ? diskMax(s, S.isco) : 1, bw = 0.15*S.blr;
-    const h = src.srcH;
+    const h = src.srcH, bw = 0.15*S.blr;
+    // normalise the disk to its brightest pixel (without an ISCO the thin-disk profile keeps rising toward r = 0)
+    let dmax = 1;
+    if(S.srcMode === 'disk'){ dmax = 0; for(let j=0;j<n;j++) for(let i=0;i<n;i++){ const r = Math.hypot(((i+0.5)/n*2-1)*h, ((j+0.5)/n*2-1)*h); dmax = Math.max(dmax, diskRaw(r, s, S.isco)); } dmax = dmax || 1; }
     for(let j=0;j<n;j++) for(let i=0;i<n;i++){
       const x = ((i+0.5)/n*2-1)*h, y = ((j+0.5)/n*2-1)*h, r = Math.hypot(x,y);
       let R,Gc,B,A;
       if(S.srcMode === 'disk'){
         // thin disk seen face-on at one wavelength, with an empty hole inside the ISCO
         const ad = diskRaw(r, s, S.isco)/dmax;
-        const ar = 0.28*Math.exp(-((r-S.blr)**2)/(2*bw*bw));
+        const ar = S.blr > 0 ? 0.28*Math.exp(-((r-S.blr)**2)/(2*bw*bw)) : 0;
         A = Math.min(1, ad+ar);
-        const w = ad*ad;
-        R = ad + 1.00*ar; Gc = ad*(0.54 + 0.42*w) + 0.36*ar; B = ad*(0.24 + 0.62*w) + 0.45*ar;
+        const w = ad*ad, [e, k] = SRC_PAL[idx];
+        R = ad*(e[0] + (k[0]-e[0])*w) + 1.00*ar; Gc = ad*(e[1] + (k[1]-e[1])*w) + 0.36*ar; B = ad*(e[2] + (k[2]-e[2])*w) + 0.45*ar;
         const mx = Math.max(R,Gc,B); if(mx > 1){ R/=mx; Gc/=mx; B/=mx; }
       } else {
         A = Math.exp(-r*r/(2*s*s));
-        const w = A*A;
-        R = A*(1.0); Gc = A*(0.54 + 0.42*w); B = A*(0.24 + 0.62*w);
+        const w = A*A, [e, k] = SRC_PAL[idx];
+        R = A*(e[0] + (k[0]-e[0])*w); Gc = A*(e[1] + (k[1]-e[1])*w); B = A*(e[2] + (k[2]-e[2])*w);
       }
       const o = (j*n+i)*4;
       srcPix[o]=Math.round(R*255); srcPix[o+1]=Math.round(Gc*255); srcPix[o+2]=Math.round(B*255); srcPix[o+3]=Math.round(A*255);
     }
   }
   let sum = 0; for(let i=0;i<n*n;i++) sum += srcPix[i*4+3];
+  { // radial light profile and half-light radius from the texture itself
+    const NB = 90, Rm = src.srcH*1.415, mean = new Float32Array(NB), cnt = new Float32Array(NB), fl = new Float32Array(NB);
+    for(let j=0;j<n;j++) for(let i=0;i<n;i++){
+      const x = ((i+0.5)/n*2-1)*src.srcH, y = ((j+0.5)/n*2-1)*src.srcH, b = Math.min(NB-1, Math.floor(Math.hypot(x,y)/Rm*NB));
+      const a = srcPix[((n-1-j)*n+i)*4+3]; mean[b] += a; cnt[b]++; fl[b] += a;
+    }
+    let mx = 0; for(let b=0;b<NB;b++){ mean[b] = cnt[b] ? mean[b]/cnt[b] : 0; mx = Math.max(mx, mean[b]); }
+    let acc2 = 0, half = 0; const tot = fl.reduce((a,v) => a+v, 0);
+    for(let b=0;b<NB;b++){ const prev = acc2; acc2 += fl[b]; if(!half && acc2 >= tot/2){ half = (b + (tot/2 - prev)/Math.max(fl[b],1e-9))/NB*Rm; } }
+    src.prof = {mean: Array.from(mean, v => mx ? v/mx : 0), Rm, half};
+  }
   src.flux = Math.max(1e-12, sum/255 * (2*src.srcH/n)**2);
   gl.bindTexture(gl.TEXTURE_2D, src.tex);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -750,6 +797,7 @@ function buildSource(idx = S.active){
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
   gl.generateMipmap(gl.TEXTURE_2D);
   S.active = keep;
+  if(idx === S.active) drawProf();
   fluxDirty = true; viewDirty = true;
 }
 
@@ -791,7 +839,7 @@ function causticPass(){
   const pr = P.cau; gl.useProgram(pr.p); lensUniforms(pr);
   gl.uniform2f(U(pr,'uShoot'), G.Lx, G.Ly); gl.uniform1i(U(pr,'uG'), Gn);
   gl.uniform1ui(U(pr,'uSeed'), S.playing ? 0x6a09e667 : (Math.random()*4294967295)>>>0); gl.uniform1f(U(pr,'uLs'), S.Ls);
-  gl.uniform1f(U(pr,'uEps'), 0.03);
+  gl.uniform1f(U(pr,'uEps'), 0.016);
   gl.drawArrays(gl.POINTS, 0, Gn*Gn);
   gl.disable(gl.BLEND);
   cau.k++;
@@ -804,8 +852,9 @@ function setSrcUniforms(pr, unit, i = 0, suffix = ''){
 }
 const SRC_UNIT = [1, 4, 5, 6], SRC_SUF = ['', '2', '3', '4'];
 function setAllSrc(pr){
-  for(let i=0;i<MAX_SRC;i++){ setSrcUniforms(pr, SRC_UNIT[i], i, SRC_SUF[i]); gl.uniform1i(U(pr,'uSrcMode'+SRC_SUF[i]), srcModeId(i)); }
-  gl.uniform1i(U(pr,'uNS'), S.nSrc);
+  const act = ACT();
+  for(let k=0;k<MAX_SRC;k++){ const i = act[k] ?? act[0]; setSrcUniforms(pr, SRC_UNIT[k], i, SRC_SUF[k]); gl.uniform1i(U(pr,'uSrcMode'+SRC_SUF[k]), srcModeId(i)); }
+  gl.uniform1i(U(pr,'uNS'), act.length);
 }
 const srcCv = $('srcCv'), lensCv = $('lensCv');
 const sctx = srcCv.getContext('2d'), lctx = lensCv.getContext('2d');
@@ -820,6 +869,7 @@ function renderSource(){
   gl.uniform1i(U(pr,'uMap'), 0); bindTex(0, acc.cur ? T.acc1 : T.acc0);
   gl.uniform1i(U(pr,'uRes'), T.R); gl.uniform1f(U(pr,'uNorm'), G.norm || 0);
   gl.uniform1f(U(pr,'uLs'), S.Ls); gl.uniform2f(U(pr,'uLog'), LOGR[0], LOGR[1]);
+  gl.uniform3fv(U(pr,'uCm[0]') ?? U(pr,'uCm'), STOPS.flatMap(([, c]) => c.map(v => v/255))); gl.uniform1fv(U(pr,'uCp[0]') ?? U(pr,'uCp'), STOPS.map(([t]) => t));
   setAllSrc(pr);
   gl.uniform1i(U(pr,'uStars'), 2); bindTex(2, starTex); gl.uniform1i(U(pr,'uN'), N);
   gl.uniform1f(U(pr,'uDots'), S.starsSrc ? 1 : 0); gl.uniform1f(U(pr,'uPx'), 2*S.Ls/w); gl.uniform1f(U(pr,'uSrcOn'), S.showSrc ? 1 : 0);
@@ -828,7 +878,7 @@ function renderSource(){
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   sctx.drawImage(glc, 0, glc.height - w, w, w, 0, 0, w, w);
   document.querySelectorAll('.srclab').forEach((el, i) => {
-    const q = SRC[i], on = S.nSrc > 1 && i < S.nSrc && S.showSrc;
+    const q = SRC[i], on = S.nSrc > 1 && q.on && S.showSrc;
     el.hidden = !on; if(!on) return;
     // visible radius of the source, then the letter just outside it, up and to the right
     const vis = q.srcMode === 'image' && q.img ? q.srcH*1.41 : q.srcMode === 'disk' ? Math.max(1.25*q.blr, 1.6*q.srcScale) : 1.6*q.srcScale;
@@ -851,7 +901,7 @@ function renderLens(){
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   lctx.drawImage(glc, 0, glc.height - w, w, w, 0, 0, w, w);
 }
-const cur = {mu:NaN, all:[NaN], g:[NaN,NaN,NaN]};
+const cur = {mu:NaN, all:[NaN,NaN,NaN,NaN], g:[NaN,NaN,NaN]};
 function fluxPass(i){
   gl.bindFramebuffer(gl.FRAMEBUFFER, T.fluxFB); gl.viewport(0,0,T.F,T.F);
   const pr = P.flux; gl.useProgram(pr.p); lensUniforms(pr);
@@ -867,19 +917,48 @@ function fluxPass(i){
 }
 function computeFlux(){
   const blk = (2*G.Lx/16)*(2*G.Ly/16);
-  const [a,b,c,d] = fluxPass(0);
-  cur.mu = a*blk/SRC[0].flux;
+  const act = ACT(), first = act[0];
+  const [a,b,c,d] = fluxPass(first);
+  cur.all = [NaN, NaN, NaN, NaN];
+  cur.all[first] = cur.mu = a*blk/SRC[first].flux;
   cur.g = [b,c,d].map((v,i) => v*blk/(2*Math.PI*CMP_SIG[i]**2));
-  cur.all = [cur.mu];
-  for(let i=1;i<S.nSrc;i++) cur.all.push(fluxPass(i)[0]*blk/SRC[i].flux);
+  for(const i of act.slice(1)) cur.all[i] = fluxPass(i)[0]*blk/SRC[i].flux;
 }
 
 // ---------- Light curve ----------
-let lc = [];
-function clearLC(){ lc = []; lcDirty = true; }
+let lc = [], lcGeom = null, lcSel = null, lcHover = null;
+// star positions recorded every SNAP_DT so a paused light curve can be clicked to view any past moment
+const SNAP_DT = 0.1, SNAP_BUDGET = 2e6; // at most ~8 MB of positions
+let snaps = [], snapFloats = 0, live = null;
+function snapPush(){
+  if(snaps.length && S.t - snaps[snaps.length-1].t < SNAP_DT) return;
+  const pos = new Float32Array(2*N); for(let i=0;i<N;i++){ pos[2*i] = starData[i*4]; pos[2*i+1] = starData[i*4+1]; }
+  snaps.push({t:S.t, pos}); snapFloats += pos.length;
+  while(snapFloats > SNAP_BUDGET && snaps.length > 1){ snapFloats -= snaps.shift().pos.length; }
+}
+function viewAt(t){
+  if(!snaps.length) return;
+  if(!live) live = {t:S.t, pos:starData.slice()};
+  let lo = 0, hi = snaps.length - 1;
+  while(lo < hi){ const m = (lo + hi) >> 1; if(snaps[m].t < t) lo = m + 1; else hi = m; }
+  if(lo > 0 && Math.abs(snaps[lo-1].t - t) < Math.abs(snaps[lo].t - t)) lo--;
+  const sn = snaps[lo]; for(let i=0;i<N;i++){ starData[i*4] = sn.pos[2*i]; starData[i*4+1] = sn.pos[2*i+1]; }
+  S.viewT = sn.t; uploadStars(); resetMap(); fluxDirty = true; lcDirty = true; updateTimeBadges(); $('zoomOut').hidden = false;
+}
+function backToLive(){
+  if(!live) return;
+  starData.set(live.pos); S.t = live.t; live = null; S.viewT = null;
+  uploadStars(); resetMap(); fluxDirty = true; lcDirty = true; updateTimeBadges();
+}
+function updateTimeBadges(){
+  const viewing = S.viewT != null, t = viewing ? S.viewT : S.t;
+  document.querySelectorAll('.tbadge').forEach(el => { el.textContent = `t = ${t.toFixed(1)}`; el.classList.toggle('viewing', viewing); });
+}
+function clearLC(){ snaps = []; snapFloats = 0; live = null; S.viewT = null; lc = []; S.lcZoom = null; const z = document.getElementById('zoomOut'); if(z) z.hidden = true; lcDirty = true; }
 function pushLC(){
   lc.push({t:S.t, s:cur.all.slice(), g:cur.g.slice()});
-  while(lc.length && lc[0].t < S.t - LC_WINDOW) lc.shift();
+  snapPush();
+  while(lc.length > 60000 || (lc.length && lc[0].t < S.t - 2000)) lc.shift();
   lcDirty = true;
 }
 const lcCv = $('lcCv'), lcx = lcCv.getContext('2d');
@@ -891,13 +970,18 @@ function drawLC(){
   const pl = 52, pr = 14, pt = 12, pb = 28, w = W-pl-pr, h = H-pt-pb;
   const mag = S.yMode === 'mag';
   const val = m => mag ? 2.5*Math.log10(Math.max(m,1e-6)/G.muMac) : m;
-  const t1 = Math.max(S.t, LC_WINDOW), t0 = t1 - LC_WINDOW;
+  const [t0, t1] = S.lcZoom || [Math.max(S.t, LC_WINDOW) - LC_WINDOW, Math.max(S.t, LC_WINDOW)];
+  lcGeom = {pl, w, t0, t1};
   const series = [];
-  for(let i=0;i<S.nSrc;i++) series.push({get:p => p.s[i], col:SRC_COL[i], lw:2.2, label:(S.nSrc > 1 ? SRC_NAMES[i] + ': ' : '') + srcLabel(i)});
+  for(const i of ACT()) series.push({get:p => p.s[i], col:SRC_COL[i], lw:2.2, label:(S.nSrc > 1 ? SRC_NAMES[i] + ': ' : '') + srcLabel(i)});
   if(S.compare) CMP_SIG.forEach((s,i) => series.push({get:p => p.g[i], col:CMP_COL[i], lw:1.3, label:`σ = ${s}`}));
   let lo = Infinity, hi = -Infinity;
   const base = val(G.muMac);
-  for(const p of lc) for(const s of series){ const v = val(s.get(p)); if(isFinite(v)){ lo=Math.min(lo,v); hi=Math.max(hi,v); } }
+  // first point just before the visible window (binary search), so long histories stay fast
+  const dtv = (t1 - t0)*0.01; let k0 = 0, kh = lc.length;
+  while(k0 < kh){ const m = (k0 + kh) >> 1; if(lc[m].t < t0 - dtv) k0 = m + 1; else kh = m; }
+  k0 = Math.max(0, k0 - 1);
+  for(const p of lc){ if(p.t < t0 || p.t > t1) continue; for(const s of series){ const v = val(s.get(p)); if(isFinite(v)){ lo=Math.min(lo,v); hi=Math.max(hi,v); } } }
   if(!isFinite(lo)){ lo = base*0.5; hi = base*1.5; }
   lo = Math.min(lo, base); hi = Math.max(hi, base);
   if(!mag) lo = Math.max(0, lo);
@@ -916,7 +1000,7 @@ function drawLC(){
   const xs = niceStep(t1-t0, 6); c.textAlign = 'center'; c.textBaseline = 'top';
   for(let t = Math.ceil(t0/xs)*xs; t <= t1+1e-9; t += xs){
     const x = Math.round(X(t))+0.5; c.beginPath(); c.moveTo(x,pt); c.lineTo(x,pt+h); c.stroke();
-    c.fillText(t.toFixed(0), x, pt+h+7);
+    c.fillText(t.toFixed(xs < 0.1 ? 2 : xs < 1 ? 1 : 0), x, pt+h+7);
   }
   // macro line
   c.setLineDash([4,4]); c.strokeStyle = '#5b6680'; c.beginPath(); c.moveTo(pl, Y(base)); c.lineTo(pl+w, Y(base)); c.stroke(); c.setLineDash([]);
@@ -931,21 +1015,33 @@ function drawLC(){
   for(const s of series.slice(nMain).concat(series.slice(0, nMain).reverse())){
     c.strokeStyle = s.col; c.lineWidth = s.lw; c.lineJoin = 'round'; c.beginPath();
     let started = false;
-    for(const p of lc){ const v = val(s.get(p)); if(!isFinite(v)) continue; const x=X(p.t), y=Y(v); if(started) c.lineTo(x,y); else { c.moveTo(x,y); started=true; } }
+    for(let k=k0;k<lc.length;k++){ const p = lc[k]; if(p.t > t1 + dtv) break; const v = val(s.get(p)); if(!isFinite(v)) continue; const x=X(p.t), y=Y(v); if(started) c.lineTo(x,y); else { c.moveTo(x,y); started=true; } }
     c.stroke();
   }
-  if(lc.length){ const p = lc[lc.length-1]; c.fillStyle = '#f2b45a'; c.beginPath(); c.arc(X(p.t), Y(val(p.s[0])), 3.5, 0, 7); c.fill(); }
+  if(lc.length){ const p = lc[lc.length-1]; c.fillStyle = '#f2b45a'; c.beginPath(); c.arc(X(p.t), Y(val(p.s[ACT()[0]])), 3.5, 0, 7); c.fill(); }
   c.restore();
-  // legend
-  c.textAlign = 'left'; c.textBaseline = 'middle'; let lx = pl + 10, ly = pt + 10;
-  c.fillStyle = 'rgba(13,17,26,0.82)';
-  const lw = series.reduce((m,s) => Math.max(m, c.measureText(s.label).width), 0) + 34;
-  c.fillRect(lx-6, ly-8, lw, series.length*16+2);
-  series.forEach((s,i) => { const y = ly + i*16; c.strokeStyle = s.col; c.lineWidth = s.lw; c.beginPath(); c.moveTo(lx, y); c.lineTo(lx+18, y); c.stroke(); c.fillStyle = '#c9d0e0'; c.fillText(s.label, lx+24, y); });
+  // legend lives outside the plot, as HTML above it
+  const lgHtml = series.map(s => `<span class="lgi"><i style="background:${s.col};height:${s.lw > 2 ? 3 : 2}px"></i>${s.label}</span>`).join('');
+  const lgEl = $('lcLegend'); if(lgEl.innerHTML !== lgHtml) lgEl.innerHTML = lgHtml;
+  // viewed moment (solid) and hover cursor (dashed), paused only
+  c.font = '11px "IBM Plex Mono", ui-monospace, monospace'; c.textBaseline = 'top';
+  if(S.viewT != null && S.viewT >= t0 && S.viewT <= t1){ const x = Math.round(X(S.viewT))+0.5; c.strokeStyle = '#c3c9d6'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x, pt); c.lineTo(x, pt+h); c.stroke(); c.fillStyle = '#c3c9d6'; c.textAlign = x > pl + w - 80 ? 'right' : 'left'; c.fillText(`t = ${S.viewT.toFixed(1)}`, x + (c.textAlign === 'left' ? 5 : -5), pt + 18); }
+  if(!S.playing && lcHover != null && !lcSel && lcHover >= pl && lcHover <= pl + w){ const x = Math.round(lcHover)+0.5, th = t0 + (lcHover - pl)/w*(t1 - t0); c.setLineDash([3,3]); c.strokeStyle = '#8790a6'; c.lineWidth = 1; c.beginPath(); c.moveTo(x, pt); c.lineTo(x, pt+h); c.stroke(); c.setLineDash([]); c.fillStyle = '#c9d0e0'; c.textAlign = x > pl + w - 80 ? 'right' : 'left'; c.fillText(`t = ${th.toFixed(1)}`, x + (c.textAlign === 'left' ? 5 : -5), pt + h - 16); }
+  // zoom selection and hint (zoom works while paused)
+  if(lcSel){ const a = Math.min(lcSel[0], lcSel[1]), b = Math.max(lcSel[0], lcSel[1]); c.fillStyle = 'rgba(242,180,90,0.14)'; c.fillRect(a, pt, b-a, h); c.strokeStyle = 'rgba(242,180,90,0.7)'; c.lineWidth = 1; c.strokeRect(a+0.5, pt+0.5, b-a, h); }
+  if(!S.playing && lc.length){ c.font = '11px "IBM Plex Sans", system-ui, sans-serif'; c.fillStyle = '#8790a6'; c.textAlign = 'right'; c.textBaseline = 'top'; c.fillText((S.viewT != null ? 'Drag the time line to move through time' : 'Click a time to view it') + ' · drag to zoom' + (S.lcZoom || S.viewT != null ? ' · double-click for latest' : ''), pl+w-4, pt+4); }
+  syncLcScroll(t0, t1);
 }
 
 // ---------- Colorbar & scale bars ----------
-const STOPS = [[0,[4,6,11]],[0.25,[12,23,51]],[0.45,[16,56,102]],[0.62,[27,112,148]],[0.78,[74,179,194]],[0.92,[168,230,232]],[1,[242,252,255]]];
+const CMAPS = {
+  ocean:   [[0,[4,6,11]],[0.25,[12,23,51]],[0.45,[16,56,102]],[0.62,[27,112,148]],[0.78,[74,179,194]],[0.92,[168,230,232]],[1,[242,252,255]]],
+  cosmic:  [[0,[4,6,11]],[0.25,[24,33,79]],[0.45,[59,63,153]],[0.62,[154,79,142]],[0.78,[224,137,78]],[0.92,[247,212,138]],[1,[255,250,240]]],
+  viridis: [[0,[68,1,84]],[0.17,[70,50,126]],[0.33,[54,92,141]],[0.5,[39,127,142]],[0.67,[31,161,135]],[0.83,[74,193,109]],[1,[253,231,37]]],
+  magma:   [[0,[0,0,4]],[0.17,[44,17,95]],[0.33,[114,31,129]],[0.5,[183,55,121]],[0.67,[241,96,93]],[0.83,[254,176,120]],[1,[252,253,191]]],
+  gray:    [[0,[6,6,8]],[0.17,[40,40,44]],[0.33,[78,78,84]],[0.5,[120,120,126]],[0.67,[164,164,170]],[0.83,[208,208,212]],[1,[252,252,252]]],
+};
+let STOPS = CMAPS.ocean;
 function cmapJS(t){ for(let i=1;i<STOPS.length;i++){ if(t<=STOPS[i][0]){ const [a,ca]=STOPS[i-1],[b,cb]=STOPS[i], f=(t-a)/(b-a); return ca.map((v,k)=>Math.round(v+(cb[k]-v)*f)); } } return STOPS[STOPS.length-1][1]; }
 function drawColorbar(){
   const c = $('cbar'), dpr = devicePixelRatio||1, W = c.clientWidth, H = c.clientHeight;
@@ -1034,14 +1130,14 @@ function srcSummary(i = 0){
 }
 function srcSummaryRaw(){
   if(S.srcMode === 'image' && S.img) return `${S.imgName || 'image'}, ${fmt(2*SRC[S.active].srcH, 2)} θE wide`;
-  if(S.srcMode === 'disk') return `disk ${fmt(S.srcScale, 2)}, ISCO ${fmt(S.isco, 3)}, BLR ${fmt(S.blr, 2)} θE`;
+  if(S.srcMode === 'disk') return `disk ${fmt(S.srcScale, 2)} θE, ${S.isco > 0 ? 'ISCO ' + fmt(S.isco, 3) : 'no ISCO'}, ${S.blr > 0 ? 'BLR ' + fmt(S.blr, 2) : 'no BLR'}`;
   return `Gaussian σ = ${fmt(S.srcScale, S.srcScale < 0.1 ? 3 : 2)} θE`;
 }
 function updateParams(){
   const el = $('params'); if(!el) return;
   const html = rows => rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
   el.innerHTML = html([
-    ...SRC.slice(0, S.nSrc).map((q, i) => [S.nSrc > 1 ? 'Source ' + SRC_NAMES[i] : 'Source', `${srcSummary(i)} at (${fmt(q.sx)}, ${fmt(q.sy)})`]),
+    ...ACT().map(i => [S.nSrc > 1 ? 'Source ' + SRC_NAMES[i] : 'Source', `${srcSummary(i)} at (${fmt(SRC[i].sx)}, ${fmt(SRC[i].sy)})`]),
     ['Map', `${fmt(2*S.Ls, 1)} θE across · ${G.rays ? (G.rays/1e6).toFixed(1) : '–'}M rays per frame`],
   ]);
   const le = $('lensParams');
@@ -1064,7 +1160,7 @@ function updateReadouts(){
 function resize(){
   const dpr = devicePixelRatio || 1;
   for(const cv of [srcCv, lensCv]){ const px = Math.max(64, Math.min(760, Math.round(cv.clientWidth*dpr))); if(cv.width !== px){ cv.width = px; cv.height = px; } }
-  updateScalebars(); drawColorbar(); drawMF(); lcDirty = true; viewDirty = true;
+  updateScalebars(); drawColorbar(); drawMF(); drawProf(); lcDirty = true; viewDirty = true;
 }
 new ResizeObserver(resize).observe(document.querySelector('.panels'));
 new ResizeObserver(() => { lcDirty = true; }).observe(lcCv);
@@ -1093,19 +1189,47 @@ const ctl = {
 function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 const sizeEl = $('srcSize');
 const sizeFromSlider = v => 10**(-2 + 2*v/100);
-const logSlider = (v, a, b) => 10**(a + (b-a)*v/100);
-const toSlider = (x, a, b) => Math.round((Math.log10(x)-a)/(b-a)*100);
+// log sliders whose leftmost position is exactly 0 (none)
+const logSlider = (v, a, b) => v <= 0 ? 0 : 10**(a + (b-a)*(v-1)/99);
+const toSlider = (x, a, b) => x <= 0 ? 0 : Math.max(1, Math.round((Math.log10(x)-a)/(b-a)*99 + 1));
 const ISCO_R = [-3, 0], BLR_R = [-1.7, 0.5];
 const iscoEl = $('isco'), blrEl = $('blr');
-function showDisk(){ $('iscoOut').textContent = fmt(S.isco, S.isco<0.1?3:2) + ' θE'; $('blrOut').textContent = fmt(S.blr, S.blr<0.1?3:2) + ' θE'; $('diskCtl').hidden = S.srcMode !== 'disk'; }
+function showDisk(){ $('iscoOut').textContent = S.isco > 0 ? fmt(S.isco, S.isco<0.1?3:2) + ' θE' : '0 (none)'; $('blrOut').textContent = S.blr > 0 ? fmt(S.blr, S.blr<0.1?3:2) + ' θE' : '0 (none)'; $('diskCtl').hidden = S.srcMode !== 'disk'; }
 iscoEl.value = toSlider(S.isco, ...ISCO_R); blrEl.value = toSlider(S.blr, ...BLR_R);
 iscoEl.addEventListener('input', () => { S.isco = logSlider(+iscoEl.value, ...ISCO_R); showDisk(); buildSource(); lcDirty = true; });
 blrEl.addEventListener('input', () => { S.blr = logSlider(+blrEl.value, ...BLR_R); showDisk(); buildSource(); lcDirty = true; });
-function showSize(){ showDisk(); $('srcSizeOut').textContent = fmt(S.srcScale, S.srcScale<0.1?3:2) + ' θE'; $('srcSizeLbl').textContent = S.srcMode==='image' ? 'Half-width / 3' : (S.srcMode==='disk' ? 'Disk scale' : 'Size σ'); }
+function drawProf(){
+  const c = $('profCv'); if(!c || !c.clientWidth) return;
+  const q = SRC[S.active], pr = q.prof; if(!pr) return;
+  const dpr = devicePixelRatio || 1, W = c.clientWidth, H = c.clientHeight;
+  c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
+  const x = c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
+  const pl = 4, pr_ = 4, pt = 16, pb = 16, w = W-pl-pr_, h = H-pt-pb;
+  const R = q.srcMode === 'image' && q.img ? q.srcH : Math.min(q.srcH, Math.max(3*(pr.half||0), 0.05));
+  const X = r => pl + r/R*w, Y = v => pt + h - v*h;
+  const n = pr.mean.length, col = SRC_COL[S.active];
+  x.beginPath(); x.moveTo(X(0), Y(0));
+  for(let b=0;b<n;b++){ const r = (b+0.5)/n*pr.Rm; if(r > R) break; x.lineTo(X(r), Y(pr.mean[b])); }
+  x.lineTo(X(Math.min(R, pr.Rm)), Y(0)); x.closePath();
+  x.globalAlpha = 0.22; x.fillStyle = col; x.fill(); x.globalAlpha = 1;
+  x.beginPath(); for(let b=0;b<n;b++){ const r = (b+0.5)/n*pr.Rm; if(r > R) break; b ? x.lineTo(X(r), Y(pr.mean[b])) : x.moveTo(X(r), Y(pr.mean[b])); }
+  x.strokeStyle = col; x.lineWidth = 1.5; x.stroke();
+  if(pr.half && pr.half < R){ x.setLineDash([3,3]); x.strokeStyle = '#c9d0e0'; x.lineWidth = 1; x.beginPath(); x.moveTo(X(pr.half)+0.5, pt); x.lineTo(X(pr.half)+0.5, pt+h); x.stroke(); x.setLineDash([]); }
+  x.strokeStyle = '#2a3346'; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
+  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.textBaseline = 'top'; x.fillStyle = '#8790a6';
+  x.textAlign = 'left'; x.fillText('0', pl, pt+h+4); x.textAlign = 'right'; x.fillText(`${fmt(R, R < 0.1 ? 3 : 2)} θE`, pl+w, pt+h+4);
+  x.textAlign = 'center'; x.fillText('radius', pl + w/2, pt+h+4);
+  x.textAlign = 'left'; x.fillText('light profile', pl, 1);
+  x.textAlign = 'right'; x.fillStyle = '#c9d0e0'; x.fillText(`r½ = ${fmt(pr.half, pr.half < 0.1 ? 3 : 2)} θE`, pl+w, 1);
+}
+function showSize(){ showDisk(); drawProf(); $('srcSizeOut').textContent = fmt(S.srcScale, S.srcScale<0.1?3:2) + ' θE'; $('srcSizeLbl').textContent = S.srcMode==='image' ? 'Half-width / 3' : (S.srcMode==='disk' ? 'Disk scale' : 'Size σ'); }
 sizeEl.value = Math.round((Math.log10(S.srcScale)+2)*50); showSize();
 sizeEl.addEventListener('input', () => { S.srcScale = sizeFromSlider(+sizeEl.value); showSize(); buildSource(); lcDirty = true; });
 $('fitField').addEventListener('click', () => { const el = $('Lv'); S.Lv = +el.max; el.value = S.Lv; $('LvOut').textContent = fmt(S.Lv,2)+' θE'; updateScalebars(); viewDirty = true; });
 $('zoomBack').addEventListener('click', () => { const el = $('Lv'); S.Lv = 5; el.value = 5; $('LvOut').textContent = fmt(5,2)+' θE'; updateScalebars(); viewDirty = true; });
+function mapSwatch(){ $('mapSw').style.background = `linear-gradient(90deg,${STOPS.map(([t, c]) => `rgb(${c}) ${Math.round(t*100)}%`).join(',')})`; }
+$('cmapSel').addEventListener('change', e => { STOPS = CMAPS[e.target.value]; drawColorbar(); mapSwatch(); viewDirty = true; });
+mapSwatch();
 $('edge').addEventListener('change', e => { S.edge = e.target.value; $('edgeNote').textContent = S.edge === 'bounce' ? 'A star reaching the edge turns back inward.' : 'A star leaving the edge reappears on the opposite side.'; });
 $('massFn').addEventListener('change', e => { S.massFn = e.target.value; genStars(); });
 $('showSeed').addEventListener('click', e => { const open = $('seedBox').hidden; $('seedBox').hidden = !open; e.currentTarget.setAttribute('aria-expanded', open); updateParams(); });
@@ -1116,6 +1240,7 @@ seedEl.addEventListener('change', () => { const v = Math.max(0, Math.min(999999,
 $('quality').addEventListener('change', e => { S.quality = +e.target.value; allocTargets(); fluxDirty = true; });
 for(const id of ['showMap','caust','showSrc','showImgs','starsSrc','starsLens','crit','rings','compare','showOrig','showField','showShoot']) $(id).addEventListener('change', e => { S[id] = e.target.checked; if(id === 'caust') cau.k = 0; viewDirty = true; lcDirty = true; });
 function syncSourceUI(){
+  $('srcSize').closest('.group').style.setProperty('--srcc', SRC_COL[S.active]);
   document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === S.srcMode));
   document.querySelectorAll('[data-src]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.src === S.active));
   sizeEl.value = Math.round((Math.log10(S.srcScale)+2)*50);
@@ -1124,8 +1249,9 @@ function syncSourceUI(){
 }
 function renderTabs(){
   const el = $('srcTabs'); let h = '';
-  for(let i=0;i<S.nSrc;i++) h += `<button data-src="${i}" aria-pressed="${i === S.active}"><i class="tabsw" style="background:${SRC_COL[i]}"></i>${S.nSrc > 1 ? SRC_NAMES[i] : 'Source A'}</button>`;
-  if(S.nSrc < MAX_SRC) h += `<button class="addsrc" data-act="add" title="Add another source">+ Add source</button>`;
+  for(const i of ACT()) h += `<button data-src="${i}" aria-pressed="${i === S.active}" style="${i === S.active ? 'border-color:' + SRC_COL[i] : ''}"><i class="tabsw" style="background:${SRC_COL[i]}"></i>${S.nSrc > 1 ? SRC_NAMES[i] : 'Source ' + SRC_NAMES[i]}</button>`;
+  const free = SRC.findIndex(q => !q.on);
+  if(free >= 0) h += `<button class="addsrc" data-act="add" title="Add source ${SRC_NAMES[free]}"><i class="tabsw" style="background:${SRC_COL[free]}"></i>+ Add ${SRC_NAMES[free]}</button>`;
   if(S.nSrc > 1) h += `<button class="rmsrc" data-act="rm" title="Remove source ${SRC_NAMES[S.active]}">Remove ${SRC_NAMES[S.active]}</button>`;
   el.innerHTML = h;
 }
@@ -1134,14 +1260,13 @@ function sourcesChanged(){ clearLC(); fluxDirty = true; viewDirty = true; render
 $('srcTabs').addEventListener('click', e => {
   const b = e.target.closest('button'); if(!b) return;
   if(b.dataset.src !== undefined){ setActive(+b.dataset.src); return; }
-  if(b.dataset.act === 'add' && S.nSrc < MAX_SRC){
-    const i = S.nSrc, tex = SRC[i].tex;
-    Object.assign(SRC[i], freshSrc(i), {tex, img: DEFAULT_IM, imgName: DEFAULT_IM ? 'FUTURELENS logo' : ''});
-    S.nSrc++; buildSource(i); S.active = i; sourcesChanged();
+  const free = SRC.findIndex(q => !q.on);
+  if(b.dataset.act === 'add' && free >= 0){
+    const tex = SRC[free].tex;
+    Object.assign(SRC[free], freshSrc(free), {on: true, tex, img: DEFAULT_IM, imgName: DEFAULT_IM ? 'FUTURELENS logo' : ''});
+    buildSource(free); S.active = free; sourcesChanged();
   } else if(b.dataset.act === 'rm' && S.nSrc > 1){
-    const [gone] = SRC.splice(S.active, 1);
-    Object.assign(gone, freshSrc(MAX_SRC-1), {tex: gone.tex}); SRC.push(gone);
-    S.nSrc--; S.active = Math.min(S.active, S.nSrc-1); sourcesChanged();
+    SRC[S.active].on = false; S.active = ACT()[0]; sourcesChanged();
   }
 });
 renderTabs();
@@ -1172,7 +1297,57 @@ document.querySelectorAll('[data-y]').forEach(b => b.addEventListener('click', (
 }));
 $('clearBtn').addEventListener('click', genStars);
 const playBtn = $('playBtn');
-function setPlaying(p){ S.playing = p; playBtn.textContent = p ? 'Pause' : 'Play'; acc.k = 0; cau.k = 0; viewDirty = true; }
+const lcT = clientX => { const r = lcCv.getBoundingClientRect(), g = lcGeom; return g.t0 + (clientX - r.left - g.pl)/g.w*(g.t1 - g.t0); };
+// grabbing the amber time line scrubs through time; anywhere else, click views a moment and drag zooms
+let scrubbing = false, scrubX = null;
+const markerX = () => { const g = lcGeom; return (S.viewT == null || !g) ? null : g.pl + (S.viewT - g.t0)/(g.t1 - g.t0)*g.w; };
+let scrubQueued = false;
+function scrubTo(x){ scrubX = x; if(scrubQueued) return; scrubQueued = true; requestAnimationFrame(() => { scrubQueued = false; if(scrubX != null) viewAt(lcT(lcCv.getBoundingClientRect().left + scrubX)); }); }
+lcCv.addEventListener('pointerdown', e => {
+  if(S.playing || !lcGeom || !lc.length) return;
+  const x = e.clientX - lcCv.getBoundingClientRect().left, mx = markerX();
+  lcCv.setPointerCapture(e.pointerId);
+  if(mx != null && Math.abs(x - mx) <= 8){ scrubbing = true; lcCv.style.cursor = 'ew-resize'; return; }
+  lcSel = [x, x];
+});
+lcCv.addEventListener('pointerleave', () => { lcHover = null; lcDirty = true; });
+lcCv.addEventListener('pointermove', e => {
+  const x = e.clientX - lcCv.getBoundingClientRect().left;
+  if(scrubbing){ scrubTo(Math.max(lcGeom.pl, Math.min(lcGeom.pl + lcGeom.w, x))); lcHover = null; return; }
+  if(!S.playing && lcGeom){ lcHover = x; lcDirty = true; const mx = markerX(); lcCv.style.cursor = mx != null && Math.abs(x - mx) <= 8 ? 'ew-resize' : 'crosshair'; }
+  if(!lcSel) return; lcSel[1] = Math.max(lcGeom.pl, Math.min(lcGeom.pl + lcGeom.w, e.clientX - lcCv.getBoundingClientRect().left)); lcDirty = true; });
+lcCv.addEventListener('pointerup', e => {
+  if(scrubbing){ scrubbing = false; scrubX = null; lcDirty = true; return; }
+  if(!lcSel) return; const r = lcCv.getBoundingClientRect();
+  if(Math.abs(lcSel[1] - lcSel[0]) > 8){ const a = lcT(r.left + Math.min(...lcSel)), b = lcT(r.left + Math.max(...lcSel)); S.lcZoom = [a, b]; $('zoomOut').hidden = false; }
+  else viewAt(lcT(e.clientX));
+  lcSel = null; lcDirty = true;
+});
+lcCv.addEventListener('pointercancel', () => { lcSel = null; scrubbing = false; scrubX = null; lcDirty = true; });
+function syncLcScroll(t0, t1){
+  const row = $('lcScrollRow'), el = $('lcScroll');
+  const span = t1 - t0, first = lc.length ? lc[0].t : 0, last = lc.length ? lc[lc.length-1].t : 0;
+  const show = !S.playing && lc.length > 1 && last - first > span*1.01;
+  row.hidden = !show; if(!show) return;
+  el.min = first + span; el.max = Math.max(last, first + span); if(document.activeElement !== el) el.value = t1;
+}
+$('lcScroll').addEventListener('input', e => {
+  const g = lcGeom; if(!g) return; const span = g.t1 - g.t0, t1 = +e.target.value;
+  S.lcZoom = [t1 - span, t1]; $('zoomOut').hidden = false; lcDirty = true;
+});
+lcCv.addEventListener('wheel', e => {
+  if(S.playing || !lcGeom || lc.length < 2) return;
+  const d = e.deltaX || (e.shiftKey ? e.deltaY : 0); if(!d) return;
+  e.preventDefault();
+  const g = lcGeom, span = g.t1 - g.t0, first = lc[0].t, last = lc[lc.length-1].t;
+  let t1 = g.t1 + d/g.w*span; t1 = Math.min(Math.max(t1, first + span), Math.max(last, first + span));
+  S.lcZoom = [t1 - span, t1]; $('zoomOut').hidden = false; lcDirty = true;
+}, {passive: false});
+function lcZoomOut(){ S.lcZoom = null; $('zoomOut').hidden = true; backToLive(); lcDirty = true; }
+lcCv.addEventListener('dblclick', lcZoomOut);
+$('zoomOut').addEventListener('click', lcZoomOut);
+$('zoomOut').textContent = 'Latest'; $('zoomOut').title = 'Return to the current time and the most recent part of the light curve';
+function setPlaying(p){ S.playing = p; if(p){ backToLive(); S.lcZoom = null; $('zoomOut').hidden = true; lcHover = null; } lcDirty = true; playBtn.textContent = p ? 'Pause' : 'Play'; acc.k = 0; cau.k = 0; viewDirty = true; }
 playBtn.addEventListener('click', () => setPlaying(!S.playing));
 setPlaying(S.playing);
 const PRESETS = {
@@ -1199,7 +1374,7 @@ srcCv.addEventListener('pointerdown', e => {
     const r = srcCv.getBoundingClientRect();
     const bx = ((e.clientX - r.left)/r.width*2 - 1)*S.Ls, by = (1 - (e.clientY - r.top)/r.height*2)*S.Ls;
     let near = 0, best = Infinity;
-    for(let i=0;i<S.nSrc;i++){ const d = Math.hypot(bx-SRC[i].sx, by-SRC[i].sy); if(d < best){ best = d; near = i; } }
+    for(const i of ACT()){ const d = Math.hypot(bx-SRC[i].sx, by-SRC[i].sy); if(d < best){ best = d; near = i; } }
     if(near !== S.active) setActive(near);
   }
   dragging = true; srcCv.setPointerCapture(e.pointerId); moveSrc(e);
@@ -1207,6 +1382,50 @@ srcCv.addEventListener('pointerdown', e => {
 srcCv.addEventListener('pointermove', e => { if(dragging) moveSrc(e); });
 srcCv.addEventListener('pointerup', () => { dragging = false; });
 srcCv.addEventListener('pointercancel', () => { dragging = false; });
+
+// ---------- Guided tour ----------
+const TOUR = [
+  {el: () => $('srcCv').closest('.cv'), t: 'Source plane', d: 'The magnification map behind the lens. Bright lines are caustics: a source sitting on one is strongly magnified. Drag a source to move it; with several sources, each is marked with its letter.'},
+  {el: () => $('cbar').closest('.opts'), t: 'Scale and layers', d: 'Colours show the magnification μ on a log scale, and the triangle marks μ₀, the value if all mass were smooth. Pick a colour scheme under Colours, and switch the sources, stars, caustic lines and map on or off.'},
+  {el: () => $('lensCv').closest('.cv'), t: 'Lens plane', d: 'What a telescope would see: the moving stars and the distorted micro-images of each source, in that source\u2019s colour. Cyan lines are critical curves; they map onto the caustics.'},
+  {el: () => document.querySelector('.opts.cols'), t: 'Lens plane layers', d: 'Show or hide lensed images, stars, critical curves, Einstein radii and the source field. Under Field, outline the star field and ray-shooting region, or zoom out to the whole star field.'},
+  {el: () => document.querySelector('.lc'), t: 'Light curve', d: 'Brightness over time for every source, in matching colours. Compare Gaussian sizes adds reference sources; Δmag shows the change in magnitudes; Restart replays the same run.'},
+  {el: () => $('lcCv'), t: 'Explore a moment', d: 'Pause, then click any time to see both planes at that moment, and drag the grey time line to move through time. Drag across the plot to zoom, use the slider below to look further back, and press Latest to return.'},
+  {el: () => $('srcTabs').closest('.group'), t: 'Sources', d: 'Add up to four sources, each with its own colour and light curve. For each, choose a Gaussian, an accretion disk (with ISCO and broad-line region) or an image, set its size, and check its light profile and half-light radius r½.'},
+  {el: () => $('kappa').closest('.group'), t: 'Lens model', d: 'Convergence κ, shear γ and the fraction of mass in stars set the caustic pattern. The mass plot compares this field with the chosen mass function. Random star field draws a new field; Seed lets you bring one back.'},
+  {el: () => $('vdisp').closest('.group'), t: 'Motion', d: 'Set the stars\u2019 random speeds, a common drift and what happens at the edge of the star field, then press Play above the light curve to watch the caustics sweep across the sources.'},
+  {el: () => $('Ls').closest('.group'), t: 'View', d: 'Set how much of each plane you see, and trade speed for detail with the ray-shooting setting. Fast suits slower computers.'},
+];
+let tourI = -1, tourHole = null, tourCard = null;
+function tourPlace(){
+  if(tourI < 0) return;
+  const r = TOUR[tourI].el().getBoundingClientRect(), pad = 6;
+  Object.assign(tourHole.style, {left: (r.left-pad)+'px', top: (r.top-pad)+'px', width: (r.width+2*pad)+'px', height: (r.height+2*pad)+'px'});
+  const cw = tourCard.offsetWidth, ch = tourCard.offsetHeight, vw = innerWidth, vh = innerHeight;
+  let top = r.bottom + 16; if(top + ch > vh - 12) top = r.top - ch - 16; if(top < 12) top = Math.max(12, vh - ch - 12);
+  let left = Math.min(Math.max(12, r.left), vw - cw - 12);
+  if(r.width > vw*0.5 && r.height > vh*0.5){ left = Math.min(r.left + 20, vw - cw - 12); top = Math.min(r.top + 20, vh - ch - 12); top = Math.max(12, top); }
+  Object.assign(tourCard.style, {left: left+'px', top: top+'px'});
+}
+function tourShow(i){
+  tourI = i; const s = TOUR[i];
+  tourCard.innerHTML = `<h4>${s.t}</h4><p>${s.d}</p><div class="tnav"><span class="tstep">${i+1} / ${TOUR.length}</span><button data-t="close">Close</button>${i ? '<button data-t="back">Back</button>' : ''}<button data-t="next" class="primary">${i === TOUR.length-1 ? 'Done' : 'Next'}</button></div>`;
+  const el = s.el(); const r = el.getBoundingClientRect();
+  if(r.top < 8 || r.bottom > innerHeight - 8) el.scrollIntoView({block: r.height > innerHeight*0.7 ? 'start' : 'center', behavior: 'instant'});
+  tourPlace(); requestAnimationFrame(tourPlace);
+  tourCard.querySelector('[data-t="next"]').focus({preventScroll:true});
+}
+function tourEnd(){ tourI = -1; tourHole?.remove(); tourCard?.remove(); tourHole = tourCard = null; $('tourBtn').focus({preventScroll:true}); }
+$('tourBtn').addEventListener('click', () => {
+  if(tourHole) return;
+  tourHole = document.createElement('div'); tourHole.className = 'tour-hole';
+  tourCard = document.createElement('div'); tourCard.className = 'tour-card'; tourCard.setAttribute('role', 'dialog'); tourCard.setAttribute('aria-label', 'Guided tour');
+  document.body.append(tourHole, tourCard);
+  tourCard.addEventListener('click', e => { const a = e.target.closest('[data-t]')?.dataset.t; if(a === 'close') tourEnd(); else if(a === 'back') tourShow(tourI-1); else if(a === 'next'){ if(tourI === TOUR.length-1) tourEnd(); else tourShow(tourI+1); } });
+  tourShow(0);
+});
+addEventListener('scroll', tourPlace, {passive:true}); addEventListener('resize', tourPlace);
+addEventListener('keydown', e => { if(tourI < 0) return; if(e.key === 'Escape') tourEnd(); else if(e.key === 'ArrowRight' && tourI < TOUR.length-1) tourShow(tourI+1); else if(e.key === 'ArrowLeft' && tourI > 0) tourShow(tourI-1); });
 
 // ---------- Main loop ----------
 const MAX_STILL = 160;
@@ -1221,8 +1440,9 @@ function frame(now){
   if(S.playing || fluxDirty){
     computeFlux(); fluxDirty = false;
     if(S.playing) pushLC(); else lcDirty = true;
-    $('muNow').textContent = (isFinite(cur.mu) ? cur.mu.toFixed(2) : '–') + cur.all.slice(1).map((v, i) => isFinite(v) ? ' · ' + SRC_NAMES[i+1] + ' ' + v.toFixed(2) : '').join('');
-    $('tNow').textContent = S.t.toFixed(1);
+    $('muNow').innerHTML = ACT().map(i => `<span style="color:${SRC_COL[i]}">${S.nSrc > 1 ? SRC_NAMES[i] + ' ' : ''}${isFinite(cur.all[i]) ? cur.all[i].toFixed(2) : '–'}</span>`).join(' · ');
+    $('tNow').textContent = (S.viewT != null ? S.viewT : S.t).toFixed(1);
+    updateTimeBadges();
     updateParams();
   }
   if(lcDirty){ drawLC(); lcDirty = false; }
