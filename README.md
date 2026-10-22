@@ -23,7 +23,7 @@ A recent desktop browser (Chrome, Edge, Firefox or Safari) with WebGL 2. A compu
 
 ## Note
 
-Built for education, not for scientific analysis. For research, please use [microcaustics](https://github.com/JFagin/microcaustics).
+This website is for demonstration and educational purposes. For scientific research, please use [microcaustics](https://github.com/JFagin/microcaustics).
 
 ## Sharing
 
