@@ -27,7 +27,7 @@ Built for education, not for scientific analysis. For research, please use [micr
 
 ## Sharing
 
-You're welcome to share the app. Link to it freely, and use screenshots or screen recordings in talks, teaching materials, papers and posts, with credit to "Quasar Microlensing Lab by James Chan" and a link to the website. Please don't copy or re-host the code without permission. See [LICENSE](LICENSE).
+You're welcome to share the app. Link to it freely, and use screenshots or screen recordings in talks, teaching materials, papers and posts, with credit to "Quasar Microlensing Lab by James Chan" and a link to the website. See [LICENSE](LICENSE).
 
 ## Contact
 
