@@ -29,6 +29,12 @@ This website is for demonstration and educational purposes. For scientific resea
 
 Please share the app, link to it freely, and use screenshots or screen recordings in talks, teaching materials, papers and posts, with credit to "Quasar Microlensing Lab by James Chan" and a link to the website. See [LICENSE](LICENSE).
 
+Scan to open the app:
+
+<img src="quasar-microlensing-qr.png" alt="QR code linking to jameshhchan.github.io/quasar-microlensing" width="180">
+
+Feel free to use this QR code on slides, posters and handouts. Download it as [PNG](https://raw.githubusercontent.com/jameshhchan/quasar-microlensing/main/quasar-microlensing-qr.png) or [SVG](https://raw.githubusercontent.com/jameshhchan/quasar-microlensing/main/quasar-microlensing-qr.svg) (SVG stays sharp at any size).
+
 ## Contact
 
 Created by [James Chan](https://sites.google.com/view/jameshhchan/home). If you have any questions, please reach out to me: [jchan@amnh.org](mailto:jchan@amnh.org)
