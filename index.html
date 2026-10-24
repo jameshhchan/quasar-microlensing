@@ -106,6 +106,8 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 #cbar,#cbarL{width:100%;height:32px;display:block}
 #mfCv{width:100%;height:96px;display:block;margin-top:6px}
 #profCv{width:100%;height:92px;display:block}
+.profbar{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:-14px;position:relative;z-index:1}
+.profseg button{font-size:10.5px;padding:1px 7px}
 .lc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .lchead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
 .lchead .left{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
@@ -117,6 +119,8 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 #lcCv{width:100%;height:230px;display:block;touch-action:pan-y}
 .lclegend{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:11.5px;color:#c9d0e0;padding-left:52px;margin-bottom:-4px}
 .lclegend .lgi{display:inline-flex;align-items:center;gap:7px}
+.lclegend em{font-style:normal;color:var(--muted);margin-left:2px}
+.lclegend em::before{content:'· ';}
 .lclegend i{display:inline-block;width:18px;border-radius:2px}
 .lcscroll{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--muted);padding-left:52px}
 .lcscroll input{flex:1;min-width:0;accent-color:#9ea6b8}
@@ -324,7 +328,8 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
           <div class="row"><div class="top"><label for="blr">BLR radius</label><output id="blrOut"></output></div>
             <input type="range" id="blr" min="0" max="100" step="1"></div>
         </div>
-        <canvas id="profCv" aria-label="Radial light profile of the selected source"></canvas>
+        <div class="profbar"><span>Light profile</span><div class="seg profseg" role="group" aria-label="Radius axis"><button data-pscale="lin" aria-pressed="true">lin</button><button data-pscale="log" aria-pressed="false">log</button></div></div>
+        <canvas id="profCv" title="Dashed line: half-light radius, the radius that encloses half of the source’s light" aria-label="Radial light profile of the selected source"></canvas>
         <dl class="readouts"><dt>Position β</dt><dd id="srcPos">(0.00, 0.00)</dd></dl>
       </div>
 
@@ -366,7 +371,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 
       <div class="group">
         <h3>View</h3>
-        <div class="row"><div class="top"><label for="Ls">Source field half-width</label><output id="LsOut"></output></div>
+        <div class="row"><div class="top"><label for="Ls">Magnification map half-width</label><output id="LsOut"></output></div>
           <input type="range" id="Ls" min="0.3" max="4" step="0.1" value="1.5"></div>
         <div class="row"><div class="top"><label for="Lv">Lens view half-width</label><output id="LvOut"></output></div>
           <input type="range" id="Lv" min="1.5" max="26" step="0.05" value="5"></div>
@@ -380,7 +385,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
       <div class="group eq">
         <p>β₁ = (1−κ<sub>s</sub>−γ) θ₁ − Σ mᵢ (θ−θᵢ)₁ / |θ−θᵢ|²<br>β₂ = (1−κ<sub>s</sub>+γ) θ₂ − Σ mᵢ (θ−θᵢ)₂ / |θ−θᵢ|²</p>
         <p>Lengths in θ<sub>E</sub> of a 1 M☉ star. The map is built by inverse ray shooting on the GPU; μ is the lensed flux over the unlensed flux.</p>
-        <p>Set how much of each plane you see under View, or use Whole field below each plane. Stars fill a circle of radius R⋆ = max(1.2√(L<sub>x</sub>² + L<sub>y</sub>²), 8√2) + 3, which encloses the ray-shooting region L<sub>x,y</sub> = 1.25 L<sub>s</sub>/|1 − κ ∓ γ| + 3.5 (L<sub>s</sub> = source field half-width).</p>
+        <p>Set how much of each plane you see under View, or use Whole field below each plane. Stars fill a circle of radius R⋆ = max(1.2√(L<sub>x</sub>² + L<sub>y</sub>²), 8√2) + 3, which encloses the ray-shooting region L<sub>x,y</sub> = 1.25 L<sub>s</sub>/|1 − κ ∓ γ| + 3.5 (L<sub>s</sub> = magnification map half-width).</p>
       </div>
     </aside>
   </div>
@@ -406,7 +411,7 @@ const S = {
   kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
   vdisp:0.3, drift:0.4, driftAng:90, rate:1,
   seed:Math.floor(Math.random()*1000000), active:0,
-  Ls:1.5, Lv:5, quality:1, lcZoom:null, viewT:null, vs:0, lensMag:false, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:false, yMode:'mu',
+  Ls:1.5, Lv:5, quality:1, lcZoom:null, viewT:null, vs:0, lensMag:false, profLog:false, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:false, yMode:'mu',
   playing:!reduceMotion, t:0,
 };
 // two independent sources; S.srcMode, S.sx, ... read and write the one being edited (S.active)
@@ -414,12 +419,12 @@ const MAX_SRC = 4, SRC_NAMES = 'ABCD', SRC_COL = ['#f2b45a', '#7ee07a', '#ff6b5c
 // each source's colour on the planes: [edge, core] RGB, matching SRC_COL
 const SRC_PAL = [[[1,0.54,0.24],[1,0.96,0.86]], [[0.38,0.9,0.35],[0.88,1,0.85]], [[1,0.32,0.26],[1,0.88,0.84]], [[0.74,0.77,0.84],[1,1,1]]];
 const SRC_POS = [[0,0],[0.6,0.5],[-0.6,0.5],[0,-0.6]];
-function freshSrc(i){ return {on:false, srcMode:'gauss', srcScale:i ? 0.2 : 0.1, isco:0.035, blr:0.26, sx:SRC_POS[i][0], sy:SRC_POS[i][1], img:null, imgName:'', srcH:0.4, flux:1, tex:null}; }
+function freshSrc(i){ return {on:false, srcMode:'gauss', srcScale:i ? 0.2 : 0.1, isco:0.035, blr:0.26, sx:SRC_POS[i][0], sy:SRC_POS[i][1], img:null, imgName:'', noDisk:false, srcH:0.4, flux:1, tex:null}; }
 const SRC = [0,1,2,3].map(freshSrc); SRC[0].on = true;
 // letters and colours belong to slots, so removing B leaves C and D unchanged
 const ACT = () => SRC.map((q, i) => q.on ? i : -1).filter(i => i >= 0);
 Object.defineProperty(S, 'nSrc', {get(){ return ACT().length; }});
-for(const k of ['srcMode','srcScale','isco','blr','sx','sy','img','imgName'])
+for(const k of ['srcMode','srcScale','isco','blr','sx','sy','img','imgName','noDisk'])
   Object.defineProperty(S, k, {get(){ return SRC[S.active][k]; }, set(v){ SRC[S.active][k] = v; }, enumerable:true});
 
 // ---------- WebGL setup ----------
@@ -791,17 +796,18 @@ function buildSource(idx = S.active){
       srcPix[i*4+3] = 0.2126*r + 0.7152*g + 0.0722*b;
     }
   } else {
-    src.srcH = S.srcMode === 'disk' ? Math.max(5*s, 1.5*S.blr, 1.3*S.isco) : 4*s;
+    const disk = S.srcMode === 'disk', noDisk = disk && S.noDisk;
+    src.srcH = disk ? Math.max(noDisk ? 0 : 5*s, 1.5*S.blr, 1.3*S.isco, 0.05) : 4*s;
     const h = src.srcH, bw = 0.15*S.blr;
     // normalise the disk to its brightest pixel (without an ISCO the thin-disk profile keeps rising toward r = 0)
     let dmax = 1;
-    if(S.srcMode === 'disk'){ dmax = 0; for(let j=0;j<n;j++) for(let i=0;i<n;i++){ const r = Math.hypot(((i+0.5)/n*2-1)*h, ((j+0.5)/n*2-1)*h); dmax = Math.max(dmax, diskRaw(r, s, S.isco)); } dmax = dmax || 1; }
+    if(disk && !noDisk){ dmax = 0; for(let j=0;j<n;j++) for(let i=0;i<n;i++){ const r = Math.hypot(((i+0.5)/n*2-1)*h, ((j+0.5)/n*2-1)*h); dmax = Math.max(dmax, diskRaw(r, s, S.isco)); } dmax = dmax || 1; }
     for(let j=0;j<n;j++) for(let i=0;i<n;i++){
       const x = ((i+0.5)/n*2-1)*h, y = ((j+0.5)/n*2-1)*h, r = Math.hypot(x,y);
       let R,Gc,B,A;
       if(S.srcMode === 'disk'){
         // thin disk seen face-on at one wavelength, with an empty hole inside the ISCO
-        const ad = diskRaw(r, s, S.isco)/dmax;
+        const ad = noDisk ? 0 : diskRaw(r, s, S.isco)/dmax;
         const ar = S.blr > 0 ? 0.28*Math.exp(-((r-S.blr)**2)/(2*bw*bw)) : 0;
         A = Math.min(1, ad+ar);
         const w = ad*ad, [e, k] = SRC_PAL[idx];
@@ -826,7 +832,16 @@ function buildSource(idx = S.active){
     let mx = 0; for(let b=0;b<NB;b++){ mean[b] = cnt[b] ? mean[b]/cnt[b] : 0; mx = Math.max(mx, mean[b]); }
     let acc2 = 0, half = 0; const tot = fl.reduce((a,v) => a+v, 0);
     for(let b=0;b<NB;b++){ const prev = acc2; acc2 += fl[b]; if(!half && acc2 >= tot/2){ half = (b + (tot/2 - prev)/Math.max(fl[b],1e-9))/NB*Rm; } }
-    src.prof = {mean: Array.from(mean, v => mx ? v/mx : 0), Rm, half};
+    // log-spaced bins from about one texture pixel out to Rm
+    const LB = 70, r0 = 1.5*2*src.srcH/n, lr0 = Math.log(r0), lr1 = Math.log(Rm), lmean = new Float32Array(LB), lcnt = new Float32Array(LB);
+    for(let j=0;j<n;j++) for(let i=0;i<n;i++){
+      const x = ((i+0.5)/n*2-1)*src.srcH, y = ((j+0.5)/n*2-1)*src.srcH, r = Math.hypot(x,y);
+      if(r < r0) continue;
+      const b = Math.min(LB-1, Math.floor((Math.log(r)-lr0)/(lr1-lr0)*LB));
+      lmean[b] += srcPix[((n-1-j)*n+i)*4+3]; lcnt[b]++;
+    }
+    const lm = []; for(let b=0;b<LB;b++) if(lcnt[b]) lm.push([Math.exp(lr0 + (b+0.5)/LB*(lr1-lr0)), mx ? lmean[b]/lcnt[b]/mx : 0]);
+    src.prof = {mean: Array.from(mean, v => mx ? v/mx : 0), Rm, half, r0, logPts: lm};
   }
   src.flux = Math.max(1e-12, sum/255 * (2*src.srcH/n)**2);
   gl.bindTexture(gl.TEXTURE_2D, src.tex);
@@ -967,9 +982,10 @@ function computeFlux(){
   const act = ACT(), first = act[0];
   const [a,b,c,d] = fluxPass(first);
   cur.all = [NaN, NaN, NaN, NaN];
-  cur.all[first] = cur.mu = a*blk/SRC[first].flux;
+  const fl = i => SRC[i].flux > 1e-9 ? SRC[i].flux : NaN;
+  cur.all[first] = cur.mu = a*blk/fl(first);
   cur.g = [b,c,d].map((v,i) => v*blk/(2*Math.PI*CMP_SIG[i]**2));
-  for(const i of act.slice(1)) cur.all[i] = fluxPass(i)[0]*blk/SRC[i].flux;
+  for(const i of act.slice(1)) cur.all[i] = fluxPass(i)[0]*blk/fl(i);
 }
 
 // ---------- Light curve ----------
@@ -1068,7 +1084,7 @@ function drawLC(){
   if(lc.length){ const p = lc[lc.length-1]; c.fillStyle = '#f2b45a'; c.beginPath(); c.arc(X(p.t), Y(val(p.s[ACT()[0]])), 3.5, 0, 7); c.fill(); }
   c.restore();
   // legend lives outside the plot, as HTML above it
-  const lgHtml = series.map(s => `<span class="lgi"><i style="background:${s.col};height:${s.lw > 2 ? 3 : 2}px"></i>${s.label}</span>`).join('');
+  const lgHtml = series.map(s => `<span class="lgi"><i style="background:${s.col};height:${s.lw > 2 ? 3 : 2}px"></i>${s.label}${s.sub ? `<em>${s.sub}</em>` : ''}</span>`).join('');
   const lgEl = $('lcLegend'); if(lgEl.innerHTML !== lgHtml) lgEl.innerHTML = lgHtml;
   // viewed moment (solid) and hover cursor (dashed), paused only
   c.font = '11px "IBM Plex Mono", ui-monospace, monospace'; c.textBaseline = 'top';
@@ -1173,13 +1189,13 @@ function drawMF(){
   x.fillStyle = 'rgba(242,180,90,0.8)'; x.fillRect(dx - dw - 13, 3, 8, 8);
 }
 const MASS_LABEL = {equal:'equal, 1 M☉', salpeter:'Salpeter 0.1–1 M☉', salpeter10:'Salpeter 0.1–10 M☉', log10:'log-uniform 0.1–10 M☉'};
-function srcLabel(i){ const q = SRC[i]; return q.srcMode==='image'&&q.img ? (q.imgName||'image') : (q.srcMode==='disk' ? `disk + BLR, s = ${q.srcScale.toFixed(2)}` : `Gaussian σ = ${q.srcScale.toFixed(2)}`); }
+function srcLabel(i){ const q = SRC[i]; return q.srcMode==='image'&&q.img ? (q.imgName||'image') : (q.srcMode==='disk' ? (q.noDisk ? 'BLR only' : `disk + BLR, s = ${q.srcScale.toFixed(2)}`) : `Gaussian σ = ${q.srcScale.toFixed(2)}`); }
 function srcSummary(i = 0){
   const keep = S.active; S.active = i; const out = srcSummaryRaw(); S.active = keep; return out;
 }
 function srcSummaryRaw(){
   if(S.srcMode === 'image' && S.img) return `${S.imgName || 'image'}, ${fmt(2*SRC[S.active].srcH, 2)} θE wide`;
-  if(S.srcMode === 'disk') return `disk ${fmt(S.srcScale, 2)} θE, ${S.isco > 0 ? 'ISCO ' + fmt(S.isco, 3) : 'no ISCO'}, ${S.blr > 0 ? 'BLR ' + fmt(S.blr, 2) : 'no BLR'}`;
+  if(S.srcMode === 'disk') return `${S.noDisk ? 'no disk' : 'disk ' + fmt(S.srcScale, 2) + ' θE'}, ${S.isco > 0 ? 'ISCO ' + fmt(S.isco, 3) : 'no ISCO'}, ${S.blr > 0 ? 'BLR ' + fmt(S.blr, 2) : 'no BLR'}`;
   return `Gaussian σ = ${fmt(S.srcScale, S.srcScale < 0.1 ? 3 : 2)} θE`;
 }
 function updateParams(){
@@ -1254,26 +1270,32 @@ function drawProf(){
   c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
   const x = c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
   const pl = 4, pr_ = 4, pt = 16, pb = 16, w = W-pl-pr_, h = H-pt-pb;
-  const R = q.srcMode === 'image' && q.img ? q.srcH : Math.min(q.srcH, Math.max(3*(pr.half||0), 0.05));
-  const X = r => pl + r/R*w, Y = v => pt + h - v*h;
+  const logR = S.profLog;
+  const R = logR ? pr.Rm/1.415 : (q.srcMode === 'image' && q.img ? q.srcH : Math.min(q.srcH, Math.max(3*(pr.half||0), 0.05)));
+  const R0 = logR ? pr.r0 : 0;
+  const X = logR ? r => pl + Math.log(Math.max(r, R0)/R0)/Math.log(R/R0)*w : r => pl + r/R*w, Y = v => pt + h - v*h;
   const n = pr.mean.length, col = SRC_COL[S.active];
-  x.beginPath(); x.moveTo(X(0), Y(0));
-  for(let b=0;b<n;b++){ const r = (b+0.5)/n*pr.Rm; if(r > R) break; x.lineTo(X(r), Y(pr.mean[b])); }
-  x.lineTo(X(Math.min(R, pr.Rm)), Y(0)); x.closePath();
-  x.globalAlpha = 0.22; x.fillStyle = col; x.fill(); x.globalAlpha = 1;
-  x.beginPath(); for(let b=0;b<n;b++){ const r = (b+0.5)/n*pr.Rm; if(r > R) break; b ? x.lineTo(X(r), Y(pr.mean[b])) : x.moveTo(X(r), Y(pr.mean[b])); }
-  x.strokeStyle = col; x.lineWidth = 1.5; x.stroke();
+  const pts = logR ? pr.logPts.filter(([r]) => r <= R) : Array.from({length: n}, (_, b) => [(b+0.5)/n*pr.Rm, pr.mean[b]]).filter(([r]) => r <= R);
+  if(pts.length){
+    x.beginPath(); x.moveTo(X(pts[0][0]), Y(0)); for(const [r, v] of pts) x.lineTo(X(r), Y(v)); x.lineTo(X(pts[pts.length-1][0]), Y(0)); x.closePath();
+    x.globalAlpha = 0.22; x.fillStyle = col; x.fill(); x.globalAlpha = 1;
+    x.beginPath(); pts.forEach(([r, v], k) => k ? x.lineTo(X(r), Y(v)) : x.moveTo(X(r), Y(v)));
+    x.strokeStyle = col; x.lineWidth = 1.5; x.stroke();
+  }
   if(pr.half && pr.half < R){ x.setLineDash([3,3]); x.strokeStyle = '#c9d0e0'; x.lineWidth = 1; x.beginPath(); x.moveTo(X(pr.half)+0.5, pt); x.lineTo(X(pr.half)+0.5, pt+h); x.stroke(); x.setLineDash([]); }
   x.strokeStyle = '#2a3346'; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
   x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.textBaseline = 'top'; x.fillStyle = '#8790a6';
-  x.textAlign = 'left'; x.fillText('0', pl, pt+h+4); x.textAlign = 'right'; x.fillText(`${fmt(R, R < 0.1 ? 3 : 2)} θE`, pl+w, pt+h+4);
-  x.textAlign = 'center'; x.fillText('radius', pl + w/2, pt+h+4);
-  x.textAlign = 'left'; x.fillText('light profile', pl, 1);
-  x.textAlign = 'right'; x.fillStyle = '#c9d0e0'; x.fillText(`r½ = ${fmt(pr.half, pr.half < 0.1 ? 3 : 2)} θE`, pl+w, 1);
+  x.textAlign = 'left'; x.fillText(logR ? fmt(R0, R0 < 0.01 ? 4 : 3) : '0', pl, pt+h+4); x.textAlign = 'right'; x.fillText(`${fmt(R, R < 0.1 ? 3 : 2)} θE`, pl+w, pt+h+4);
+  x.textAlign = 'center'; x.fillText(logR ? 'radius (log)' : 'radius', pl + w/2, pt+h+4);
+  if(pr.half){ const hx = Math.min(X(pr.half), pl+w); x.fillStyle = '#c9d0e0'; x.textBaseline = 'top'; const lab = `half-light ${fmt(pr.half, pr.half < 0.1 ? 3 : 2)} θE`; const right = hx > pl + w*0.6; x.textAlign = right ? 'right' : 'left'; x.fillText(lab, hx + (right ? -5 : 5), pt + 2); }
 }
-function showSize(){ showDisk(); drawProf(); $('srcSizeOut').textContent = fmt(S.srcScale, S.srcScale<0.1?3:2) + ' θE'; $('srcSizeLbl').textContent = S.srcMode==='image' ? 'Half-width / 3' : (S.srcMode==='disk' ? 'Disk scale' : 'Size σ'); }
+function showSize(){ showDisk(); drawProf(); $('srcSizeOut').textContent = S.srcMode === 'disk' && S.noDisk ? '0 (none)' : fmt(S.srcScale, S.srcScale<0.1?3:2) + ' θE'; $('srcSizeLbl').textContent = S.srcMode==='image' ? 'Half-width / 3' : (S.srcMode==='disk' ? 'Disk scale' : 'Size σ'); }
 sizeEl.value = Math.round((Math.log10(S.srcScale)+2)*50); showSize();
-sizeEl.addEventListener('input', () => { S.srcScale = sizeFromSlider(+sizeEl.value); showSize(); buildSource(); lcDirty = true; });
+sizeEl.addEventListener('input', () => {
+  const v = +sizeEl.value;
+  if(S.srcMode === 'disk' && v <= 0) S.noDisk = true; else { S.noDisk = false; S.srcScale = sizeFromSlider(Math.max(v, 1)); }
+  showSize(); buildSource(); lcDirty = true;
+});
 function mapSwatch(){ document.querySelectorAll('.lensmapsw').forEach(e => e.style.background = `linear-gradient(90deg,${LSTOPS.map(([t, c]) => `rgb(${c}) ${Math.round(t*100)}%`).join(',')})`); $('mapSw').style.background = `linear-gradient(90deg,${STOPS.map(([t, c]) => `rgb(${c}) ${Math.round(t*100)}%`).join(',')})`; }
 function updateViewRead(){
   $('LvOut').textContent = `${fmt(S.Lv, 2)} θE`;
@@ -1297,6 +1319,9 @@ document.querySelectorAll('.wholebtn').forEach(b => b.addEventListener('click', 
   else { if(whole){ viewBefore.src = S.vs; setSrcView(+$('srcZoom').max); } else setSrcView(viewBefore.src); }
   b.setAttribute('aria-pressed', whole); b.textContent = whole ? 'Zoom back' : 'Whole field';
 }));
+document.querySelectorAll('[data-pscale]').forEach(b => b.addEventListener('click', () => {
+  S.profLog = b.dataset.pscale === 'log'; document.querySelectorAll('[data-pscale]').forEach(o => o.setAttribute('aria-pressed', o === b)); drawProf();
+}));
 $('lensCmap').addEventListener('change', e => { LSTOPS = CMAPS[e.target.value]; mapSwatch(); drawColorbar(); viewDirty = true; });
 $('cmapSel').addEventListener('change', e => { STOPS = CMAPS[e.target.value]; drawColorbar(); mapSwatch(); viewDirty = true; });
 mapSwatch();
@@ -1313,7 +1338,7 @@ function syncSourceUI(){
   $('srcSize').closest('.group').style.setProperty('--srcc', SRC_COL[S.active]);
   document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === S.srcMode));
   document.querySelectorAll('[data-src]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.src === S.active));
-  sizeEl.value = Math.round((Math.log10(S.srcScale)+2)*50);
+  sizeEl.value = S.srcMode === 'disk' && S.noDisk ? 0 : Math.max(1, Math.round((Math.log10(S.srcScale)+2)*50));
   iscoEl.value = toSlider(S.isco, ...ISCO_R); blrEl.value = toSlider(S.blr, ...BLR_R);
   showSize(); $('srcPos').textContent = `(${fmt(S.sx)}, ${fmt(S.sy)})`; upMsg('');
 }
@@ -1344,6 +1369,7 @@ function setMode(m){
   if(m === 'image' && !S.img){ upMsg('Choose a picture with the Upload image button, or drag one onto the source plane.'); try{ $('fileIn').click(); }catch(e){} return; }
   S.srcMode = m;
   document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+  sizeEl.value = S.srcMode === 'disk' && S.noDisk ? 0 : Math.max(1, Math.round((Math.log10(S.srcScale)+2)*50));
   showSize(); buildSource(); lcDirty = true;
 }
 document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
