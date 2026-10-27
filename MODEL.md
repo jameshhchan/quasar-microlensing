@@ -31,9 +31,10 @@ shown as ▼ on the colour bars. The image is a minimum if both $`1-\kappa\mp\ga
 
 ## Magnification
 
-**Source-plane map:** built by inverse ray shooting on the GPU. Rays are fired from a grid on the lens plane through the lens equation and counted where they land; $`\mu`$ in each pixel is the ray density there divided by the density with no lensing. Choose 1M, 4M or 16M rays per frame under Ray shooting. While paused, frames keep adding up and the map gets smoother.
+**Source-plane map:** made on the GPU from the ray-shooting region of the lens plane, by either of two methods (Map method):
 
-**Polygon mapping (IPM):** an alternative under Map method. The lens plane is cut into a grid of small triangles, and each triangle's corners are mapped through the lens equation. Each triangle's area is then spread over its image on the source plane, so a pixel gets $`\mu = A_{\rm lens}/A_{\rm image}`$ from every triangle that covers it; images smaller than a pixel are dropped into that pixel whole. It covers the source plane without gaps, so the map is smooth with far fewer samples than ray shooting, which helps most while the stars move. It uses the same lens-plane region as ray shooting.
+- **Inverse ray shooting (IRS):** rays are fired from a grid of points on the lens plane, mapped through the lens equation, and counted where they land. $`\mu`$ in each pixel is the number of rays there divided by the number with no lensing. Simple and robust, but noisy unless many rays are used. Choose 1M, 4M or 16M rays per frame; while paused, frames add up and the map gets smoother.
+- **Inverse polygon mapping (IPM):** the lens plane is cut into small triangles instead of points, and each triangle's corners are mapped through the lens equation. Each triangle's area is spread over its image, so a pixel gets $`\mu = A_{\rm lens}/A_{\rm image}`$ from every image that covers it (images smaller than a pixel go into that pixel whole). Because the triangles cover the source plane without gaps, the map is smooth with far fewer samples, which helps most while the stars move.
 
 **Lens-plane map:** the point-source magnification at each position, computed directly with no ray shooting:
 
