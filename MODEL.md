@@ -75,7 +75,7 @@ where $`L_s`$ is the magnification map half-width. The region is stretched along
 N = \frac{\kappa_\star R_\star^2}{\langle m \rangle}.
 ```
 
-Positions are uniform in the circle. Set how much of each plane you see under **View**, or use **Whole field** below each plane.
+Positions are uniform in the circle. Scroll to zoom into either plane, or use **Whole field** below each plane to see all of it.
 
 ## Stellar mass function
 

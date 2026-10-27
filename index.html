@@ -57,6 +57,7 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .cv{position:relative;aspect-ratio:1;width:100%;max-width:100%;background:#000;border-radius:6px;overflow:hidden}
 .cv canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #srcCv{cursor:crosshair;touch-action:none}
+#lensCv{cursor:grab;touch-action:none}
 .scalebar{position:absolute;left:12px;bottom:10px;display:flex;flex-direction:column;gap:3px;font-family:var(--mono);font-size:11px;color:#dfe5f2;pointer-events:none;text-shadow:0 0 4px #000}
 .scalebar span.bar{height:2px;background:#dfe5f2;box-shadow:0 0 3px #000}
 .hint{position:absolute;right:10px;top:8px;font-size:11px;color:#c9d0e0;background:rgba(6,8,14,.6);padding:2px 7px;border-radius:4px;pointer-events:none}
@@ -176,6 +177,8 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .disclaimer a.mono{font-family:var(--mono)}
 .disclaimer a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(147,226,240,.35)}
 .tourbtn{border-color:var(--amber);color:var(--amber);background:transparent}
+.headbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.aboutbtn{text-decoration:none;color:var(--fg);background:transparent}
 .tour-hole{position:fixed;z-index:50;border-radius:10px;box-shadow:0 0 0 9999px rgba(3,5,10,.72);outline:2px solid var(--amber);outline-offset:3px;pointer-events:none}
 .tour-card{position:fixed;z-index:51;width:min(340px,calc(100vw - 32px));background:var(--raise);border:1px solid #33405a;border-radius:10px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:8px}
 .tour-card h4{margin:0;font-family:var(--display);font-weight:500;font-size:18px}
@@ -215,7 +218,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
       <h1>Quasar Microlensing <em>Lab</em></h1>
       <p class="lede">Visualizing microlensing light curves of lensed quasars</p>
     </div>
-    <button id="tourBtn" class="tourbtn">Take the tour</button>
+    <div class="headbtns"><a class="btn aboutbtn" href="https://github.com/jameshhchan/quasar-microlensing" target="_blank" rel="noopener" title="Project page on GitHub: what the app shows, its features and how to share it">About ↗</a><button id="tourBtn" class="tourbtn">Take the tour</button></div>
   </header>
 
   <div id="err"></div>
@@ -228,7 +231,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
           <div class="cv"><canvas id="srcCv" aria-label="Source plane magnification map with the source overlaid. Drag to move the source."></canvas>
             <span class="tbadge">t = 0.0</span>
             <div class="scalebar" id="sbSrc"><span class="bar"></span><span class="t"></span></div>
-            <div class="hint">Drag to move the source</div>
+            <div class="hint">Scroll to zoom · drag to pan</div>
             <span class="srclab"></span><span class="srclab"></span><span class="srclab"></span><span class="srclab"></span>
           </div>
           <div class="opts stack">
@@ -249,7 +252,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         </figure>
         <figure class="panel">
           <div class="ph"><h2>Lens plane <i>θ</i></h2></div>
-          <div class="cv"><canvas id="lensCv" aria-label="Lens plane with moving stars, critical curves and lensed images"></canvas>
+          <div class="cv"><canvas id="lensCv" aria-label="Lens plane with moving stars, critical curves and lensed images"></canvas><div class="hint">Scroll to zoom · drag to pan</div>
             <span class="tbadge">t = 0.0</span>
             <div class="scalebar" id="sbLens"><span class="bar"></span><span class="t"></span></div>
           </div>
@@ -373,19 +376,13 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <h3>View</h3>
         <div class="row"><div class="top"><label for="Ls">Magnification map half-width</label><output id="LsOut"></output></div>
           <input type="range" id="Ls" min="0.3" max="4" step="0.1" value="1.5"></div>
-        <div class="row"><div class="top"><label for="Lv">Lens view half-width</label><output id="LvOut"></output></div>
-          <input type="range" id="Lv" min="1.5" max="26" step="0.05" value="5"></div>
-        <div class="row"><div class="top"><label for="srcZoom">Source view half-width</label><output id="srcZoomOut"></output></div>
-          <input type="range" id="srcZoom" min="1.5" max="26" step="0.05" value="1.5"></div>
         <dl class="readouts"><dt>Star field radius R⋆</dt><dd id="frRead">–</dd></dl>
         <div class="row"><label for="quality">Ray shooting</label>
           <select id="quality"><option value="0">Fast · 1M rays</option><option value="1" selected>Standard · 4M rays</option><option value="2">Fine · 16M rays</option></select></div>
       </div>
 
       <div class="group eq">
-        <p>β₁ = (1−κ<sub>s</sub>−γ) θ₁ − Σ mᵢ (θ−θᵢ)₁ / |θ−θᵢ|²<br>β₂ = (1−κ<sub>s</sub>+γ) θ₂ − Σ mᵢ (θ−θᵢ)₂ / |θ−θᵢ|²</p>
-        <p>Lengths in θ<sub>E</sub> of a 1 M☉ star. The map is built by inverse ray shooting on the GPU; μ is the lensed flux over the unlensed flux.</p>
-        <p>Set how much of each plane you see under View, or use Whole field below each plane. Stars fill a circle of radius R⋆ = max(1.2√(L<sub>x</sub>² + L<sub>y</sub>²), 8√2) + 3, which encloses the ray-shooting region L<sub>x,y</sub> = 1.25 L<sub>s</sub>/|1 − κ ∓ γ| + 3.5 (L<sub>s</sub> = magnification map half-width).</p>
+        <p>The lens equation, how the magnification and light curves are computed, the star field, mass functions and source profiles are described in the <a href="https://github.com/jameshhchan/quasar-microlensing/blob/main/MODEL.md" target="_blank" rel="noopener">model notes ↗</a>.</p>
       </div>
     </aside>
   </div>
@@ -411,7 +408,7 @@ const S = {
   kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
   vdisp:0.3, drift:0.4, driftAng:90, rate:1,
   seed:Math.floor(Math.random()*1000000), active:0,
-  Ls:1.5, Lv:5, quality:1, lcZoom:null, viewT:null, vs:0, lensMag:false, profLog:false, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:false, yMode:'mu',
+  Ls:1.5, Lv:5, quality:1, lcZoom:null, viewT:null, vs:0, vc:[0,0], lc:[0,0], lensMag:false, profLog:false, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:false, yMode:'mu',
   playing:!reduceMotion, t:0,
 };
 // two independent sources; S.srcMode, S.sx, ... read and write the one being edited (S.active)
@@ -451,32 +448,32 @@ const FULL_VS = HEAD + `out vec2 vUv;
 void main(){ vec2 p=vec2(float((gl_VertexID<<1)&2), float(gl_VertexID&2)); vUv=p; gl_Position=vec4(p*2.0-1.0,0.0,1.0); }`;
 
 const RAY_VS = HEAD + LENS_GLSL + `
-uniform vec2 uShoot; uniform int uG; uniform uint uSeed; uniform float uLs;
+uniform vec2 uShoot; uniform vec2 uShootC; uniform vec2 uMc; uniform int uG; uniform uint uSeed; uniform float uLs;
 uint hsh(uint x){ x^=x>>16; x*=0x7feb352du; x^=x>>15; x*=0x846ca68bu; x^=x>>16; return x; }
 void main(){
   int i=gl_VertexID; int ix=i%uG; int iy=i/uG;
   uint a=hsh(uint(i)^uSeed); uint b=hsh(a+0x9e3779b9u);
   vec2 j=vec2(float(a>>8),float(b>>8))/16777216.0;
-  vec2 x=((vec2(float(ix),float(iy))+j)/float(uG)*2.0-1.0)*uShoot;
+  vec2 x=uShootC+((vec2(float(ix),float(iy))+j)/float(uG)*2.0-1.0)*uShoot;
   vec2 y=lensEq(x);
-  gl_Position=vec4(y/uLs,0.0,1.0); gl_PointSize=1.0;
+  gl_Position=vec4((y-uMc)/uLs,0.0,1.0); gl_PointSize=1.0;
 }`;
 const RAY_FS = HEAD + `out vec4 o; void main(){ o=vec4(1.0); }`;
 // caustics: rays whose lens-plane point lies on a critical curve (|det A| small), deposited where they land
 const CAU_VS = HEAD + `
 uniform sampler2D uStars; uniform int uN; uniform float uKs; uniform float uGam;
-uniform vec2 uShoot; uniform int uG; uniform uint uSeed; uniform float uLs; uniform float uEps;
+uniform vec2 uShoot; uniform vec2 uShootC; uniform vec2 uMc; uniform int uG; uniform uint uSeed; uniform float uLs; uniform float uEps;
 uint hsh(uint x){ x^=x>>16; x*=0x7feb352du; x^=x>>15; x*=0x846ca68bu; x^=x>>16; return x; }
 void main(){
   int i=gl_VertexID; int ix=i%uG; int iy=i/uG;
   uint a=hsh(uint(i)^uSeed); uint b=hsh(a+0x9e3779b9u);
   vec2 j=vec2(float(a>>8),float(b>>8))/16777216.0;
-  vec2 x=((vec2(float(ix),float(iy))+j)/float(uG)*2.0-1.0)*uShoot;
+  vec2 x=uShootC+((vec2(float(ix),float(iy))+j)/float(uG)*2.0-1.0)*uShoot;
   vec2 al=vec2(0.0); float Sx=0.0, Tx=0.0;
   for(int k=0;k<uN;k++){ vec4 s=texelFetch(uStars,ivec2(k,0),0); vec2 r=x-s.xy; float r2=dot(r,r)+1e-9; float inv=s.z/r2; al+=r*inv; float i2=inv/r2; Sx+=(r.x*r.x-r.y*r.y)*i2; Tx+=2.0*r.x*r.y*i2; }
   float det=(1.0-uKs)*(1.0-uKs)-(uGam-Sx)*(uGam-Sx)-Tx*Tx;
   vec2 y=vec2((1.0-uKs-uGam)*x.x,(1.0-uKs+uGam)*x.y)-al;
-  gl_Position = abs(det)<uEps ? vec4(y/uLs,0.0,1.0) : vec4(2.0,2.0,2.0,1.0);
+  gl_Position = abs(det)<uEps ? vec4((y-uMc)/uLs,0.0,1.0) : vec4(2.0,2.0,2.0,1.0);
   gl_PointSize=1.0;
 }`;
 
@@ -491,7 +488,7 @@ vec3 cmap(float t){
 }`;
 const SRC_FS = HEAD + CMAP_GLSL + `
 in vec2 vUv; out vec4 o;
-uniform sampler2D uMap; uniform int uRes; uniform float uNorm; uniform float uLs; uniform float uVs; uniform vec2 uLog;
+uniform sampler2D uMap; uniform int uRes; uniform float uNorm; uniform float uLs; uniform float uVs; uniform vec2 uVc; uniform vec2 uMc; uniform vec2 uLog;
 uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH; uniform int uSrcMode;
 uniform sampler2D uSrc2; uniform vec2 uSrcC2; uniform float uSrcH2; uniform int uSrcMode2;
 uniform sampler2D uSrc3; uniform vec2 uSrcC3; uniform float uSrcH3; uniform int uSrcMode3;
@@ -512,8 +509,8 @@ vec3 overlay(vec3 col, sampler2D tx, vec2 c, float h, int mode, vec2 beta, float
 uniform sampler2D uStars; uniform int uN; uniform float uDots; uniform float uPx; uniform float uSrcOn; uniform float uMapOn; uniform sampler2D uCau; uniform float uCauOn;
 float tf(ivec2 p){ p=clamp(p,ivec2(0),ivec2(uRes-1)); return texelFetch(uMap,p,0).r; }
 void main(){
-  vec2 beta=(vUv*2.0-1.0)*uVs;
-  vec2 muv=beta/(2.0*uLs)+0.5;
+  vec2 beta=uVc+(vUv*2.0-1.0)*uVs;
+  vec2 muv=(beta-uMc)/(2.0*uLs)+0.5;
   float inMap=step(0.0,muv.x)*step(muv.x,1.0)*step(0.0,muv.y)*step(muv.y,1.0);
   vec2 p=muv*float(uRes)-0.5; vec2 f=fract(p); ivec2 i=ivec2(floor(p));
   float c=mix(mix(tf(i),tf(i+ivec2(1,0)),f.x), mix(tf(i+ivec2(0,1)),tf(i+ivec2(1,1)),f.x), f.y);
@@ -522,8 +519,8 @@ void main(){
   vec3 col=mix(vec3(0.027,0.035,0.058),cmap(clamp((l-uLog.x)/(uLog.y-uLog.x),0.0,1.0)),uMapOn*inMap);
   if(uVs>uLs*1.01){
     // outline of the magnification map when zoomed out
-    vec2 sd=abs(abs(beta)-vec2(uLs))/uPx;
-    float sq=max((1.0-smoothstep(0.15,0.65,sd.x))*step(abs(beta.y),uLs+uPx),(1.0-smoothstep(0.15,0.65,sd.y))*step(abs(beta.x),uLs+uPx));
+    vec2 bm=beta-uMc, sd=abs(abs(bm)-vec2(uLs))/uPx;
+    float sq=max((1.0-smoothstep(0.15,0.65,sd.x))*step(abs(bm.y),uLs+uPx),(1.0-smoothstep(0.15,0.65,sd.y))*step(abs(bm.x),uLs+uPx));
     col=mix(col,vec3(0.62,0.65,0.72),sq*0.75);
   }
   col=overlay(col,uSrc,uSrcC,uSrcH,uSrcMode,beta,uSrcOn);
@@ -550,7 +547,7 @@ void main(){
 const LENSVIEW_FS = HEAD + CMAP_GLSL + `
 in vec2 vUv; out vec4 o;
 uniform sampler2D uStars; uniform int uN; uniform float uKs; uniform float uGam;
-uniform float uLv; uniform float uPx; uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH;
+uniform float uLv; uniform vec2 uLc; uniform vec2 uSvc; uniform float uPx; uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH;
 uniform sampler2D uSrc2; uniform vec2 uSrcC2; uniform float uSrcH2;
 uniform sampler2D uSrc3; uniform vec2 uSrcC3; uniform float uSrcH3;
 uniform sampler2D uSrc4; uniform vec2 uSrcC4; uniform float uSrcH4; uniform int uNS;
@@ -569,7 +566,7 @@ float frame(vec2 x, vec2 h, float px, float dash){
   return max(vx*dv,vy*dh);
 }
 void main(){
-  vec2 x=(vUv*2.0-1.0)*uLv;
+  vec2 x=uLc+(vUv*2.0-1.0)*uLv;
   vec2 al=vec2(0.0); float Sx=0.0, Tx=0.0, dotA=0.0, ringA=0.0;
   for(int k=0;k<uN;k++){
     vec4 s=texelFetch(uStars,ivec2(k,0),0);
@@ -600,8 +597,8 @@ void main(){
     if(uNS>1){ vec4 q=samp(uSrc2,x,uSrcC2,uSrcH2); col=col*(1.0-q.a)+q.rgb; }
     if(uNS>2){ vec4 q=samp(uSrc3,x,uSrcC3,uSrcH3); col=col*(1.0-q.a)+q.rgb; }
     if(uNS>3){ vec4 q=samp(uSrc4,x,uSrcC4,uSrcH4); col=col*(1.0-q.a)+q.rgb; }
-    vec2 sd=abs(abs(x)-vec2(uSrcLs))/uPx;
-    float sq=max((1.0-smoothstep(0.15,0.65,sd.x))*step(abs(x.y),uSrcLs+uPx),(1.0-smoothstep(0.15,0.65,sd.y))*step(abs(x.x),uSrcLs+uPx));
+    vec2 xv=x-uSvc, sd=abs(abs(xv)-vec2(uSrcLs))/uPx;
+    float sq=max((1.0-smoothstep(0.15,0.65,sd.x))*step(abs(xv.y),uSrcLs+uPx),(1.0-smoothstep(0.15,0.65,sd.y))*step(abs(xv.x),uSrcLs+uPx));
     col=mix(col,vec3(0.62,0.65,0.72),sq*0.75);
   }
   // a real crossing of det A = 0; the |det| cap removes a false ring at each star's centre, where det diverges
@@ -742,10 +739,9 @@ function genStars(){
   rnd = Math.random;
   S.t = 0;
   G.kstar = Math.PI*msum/area;
-  { const mx = Math.ceil(G.FR*1.08), el = $('Lv'), zs = $('srcZoom');
-    for(const r of [el, zs]){ r.min = S.Ls; r.max = Math.max(mx, S.Ls + 1); }
-    S.Lv = clamp(S.Lv, S.Ls, +el.max); el.value = S.Lv;
-    S.vs = Math.min(S.vs, +zs.max); zs.value = VS();
+  { G.VMAX = Math.max(Math.ceil(G.FR*1.08), S.Ls + 1); // widest view: the whole star field
+    S.Lv = clamp(S.Lv, ZMIN, G.VMAX);
+    S.vs = Math.min(S.vs, G.VMAX);
     if(typeof updateViewRead === 'function') updateViewRead(); updateScalebars(); }
   uploadStars(); resetMap(); clearLC(); fluxDirty = true; updateReadouts();
 }
@@ -769,7 +765,17 @@ function stepStars(dt){
   uploadStars();
 }
 const WIDE = 3;
-const VS = () => Math.max(S.Ls, S.vs); // half-width shown on the source panel; the map fills ±Ls, caustics continue beyond
+const VS = () => S.vs > 0 ? S.vs : S.Ls;
+const ZMIN = 0.05;
+// map region: the source view when zoomed in (re-shot at full resolution), else the ±Ls field
+const MAPW = () => Math.min(VS(), S.Ls), MAPC = () => VS() < S.Ls ? S.vc : [0, 0];
+// lens-plane patch whose rays land in a source-plane box of half-width w around c
+function shootFor(c, w){
+  const dx = 1-S.kappa-S.gamma, dy = 1-S.kappa+S.gamma;
+  const ax = Math.min(G.FR, 1.25*w/Math.max(Math.abs(dx),1e-3) + 3.5), ay = Math.min(G.FR, 1.25*w/Math.max(Math.abs(dy),1e-3) + 3.5);
+  const cx = Math.abs(dx) > 0.05 ? clamp(c[0]/dx, -G.FR, G.FR) : 0, cy = Math.abs(dy) > 0.05 ? clamp(c[1]/dy, -G.FR, G.FR) : 0;
+  return [cx, cy, ax, ay];
+} // half-width shown on the source panel; the map fills ±Ls, caustics continue beyond
 function resetMap(){ acc.k = 0; cau.k = 0; viewDirty = true; }
 
 // ---------- Source texture ----------
@@ -867,8 +873,10 @@ function rayPass(){
   gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
   const pr = P.ray; gl.useProgram(pr.p); lensUniforms(pr);
-  gl.uniform2f(U(pr,'uShoot'), G.Lx, G.Ly); gl.uniform1i(U(pr,'uG'), Gn);
-  gl.uniform1ui(U(pr,'uSeed'), S.playing ? 0x2545F491 : (Math.random()*4294967295)>>>0); gl.uniform1f(U(pr,'uLs'), S.Ls);
+  const mw = MAPW(), mc = MAPC(), sh = VS() < S.Ls ? shootFor(mc, mw) : [0, 0, G.Lx, G.Ly];
+  G.mw = mw; G.mc = [mc[0], mc[1]];
+  gl.uniform2f(U(pr,'uShoot'), sh[2], sh[3]); gl.uniform2f(U(pr,'uShootC'), sh[0], sh[1]); gl.uniform2f(U(pr,'uMc'), mc[0], mc[1]); gl.uniform1i(U(pr,'uG'), Gn);
+  gl.uniform1ui(U(pr,'uSeed'), S.playing ? 0x2545F491 : (Math.random()*4294967295)>>>0); gl.uniform1f(U(pr,'uLs'), mw);
   gl.drawArrays(gl.POINTS, 0, Gn*Gn);
   gl.disable(gl.BLEND);
   // accumulate
@@ -882,7 +890,7 @@ function rayPass(){
   gl.uniform1f(U(pa,'uW'), w);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   acc.cur = dst;
-  G.norm = (4*G.Lx*G.Ly) / (G.rays * (2*S.Ls/T.R)**2);
+  G.norm = (4*sh[2]*sh[3]) / (G.rays * (2*mw/T.R)**2);
 }
 function causticPass(){
   const Gn = rayG();
@@ -890,16 +898,12 @@ function causticPass(){
   if(S.playing || cau.k === 0){ gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); }
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
   const pr = P.cau; gl.useProgram(pr.p); lensUniforms(pr);
-  let sx = G.Lx, sy = G.Ly, gn = Gn;
-  if(VS() > S.Ls*1.001){
-    // shoot from a larger patch so caustics fill the zoomed-out view (stars only exist inside the star field)
-    const V = VS(), lx = Math.abs(1-S.kappa-S.gamma), ly = Math.abs(1-S.kappa+S.gamma);
-    sx = Math.min(G.FR, 1.25*V/Math.max(lx,1e-3) + 3.5); sy = Math.min(G.FR, 1.25*V/Math.max(ly,1e-3) + 3.5);
-    gn = Math.round(Gn*Math.min(2, Math.sqrt((sx*sy)/(G.Lx*G.Ly))));
-  }
-  gl.uniform2f(U(pr,'uShoot'), sx, sy); gl.uniform1i(U(pr,'uG'), gn);
-  gl.uniform1ui(U(pr,'uSeed'), S.playing ? 0x6a09e667 : (Math.random()*4294967295)>>>0); gl.uniform1f(U(pr,'uLs'), VS());
-  gl.uniform1f(U(pr,'uEps'), VS() > S.Ls*1.001 ? 0.03 : 0.016);
+  // shoot the lens-plane patch that maps onto the current source view (stars only exist inside the star field)
+  const V = VS(), sh = shootFor(S.vc, V);
+  const gn = Math.round(Gn*Math.min(2, Math.max(1, Math.sqrt((sh[2]*sh[3])/(G.Lx*G.Ly)))));
+  gl.uniform2f(U(pr,'uShoot'), sh[2], sh[3]); gl.uniform2f(U(pr,'uShootC'), sh[0], sh[1]); gl.uniform2f(U(pr,'uMc'), S.vc[0], S.vc[1]); gl.uniform1i(U(pr,'uG'), gn);
+  gl.uniform1ui(U(pr,'uSeed'), S.playing ? 0x6a09e667 : (Math.random()*4294967295)>>>0); gl.uniform1f(U(pr,'uLs'), V);
+  gl.uniform1f(U(pr,'uEps'), V > S.Ls*1.001 ? 0.03 : Math.max(0.002, 0.016*V/S.Ls));
   gl.drawArrays(gl.POINTS, 0, gn*gn);
   gl.disable(gl.BLEND);
   cau.k++;
@@ -928,7 +932,8 @@ function renderSource(){
   const pr = P.src; gl.useProgram(pr.p);
   gl.uniform1i(U(pr,'uMap'), 0); bindTex(0, acc.cur ? T.acc1 : T.acc0);
   gl.uniform1i(U(pr,'uRes'), T.R); gl.uniform1f(U(pr,'uNorm'), G.norm || 0);
-  gl.uniform1f(U(pr,'uLs'), S.Ls); gl.uniform1f(U(pr,'uVs'), VS()); gl.uniform2f(U(pr,'uLog'), LOGR[0], LOGR[1]);
+  const mc = G.mc || [0, 0]; gl.uniform1f(U(pr,'uLs'), G.mw || S.Ls); gl.uniform1f(U(pr,'uVs'), VS());
+  gl.uniform2f(U(pr,'uVc'), S.vc[0], S.vc[1]); gl.uniform2f(U(pr,'uMc'), mc[0], mc[1]); gl.uniform2f(U(pr,'uLog'), LOGR[0], LOGR[1]);
   gl.uniform3fv(U(pr,'uCm[0]') ?? U(pr,'uCm'), STOPS.flatMap(([, c]) => c.map(v => v/255))); gl.uniform1fv(U(pr,'uCp[0]') ?? U(pr,'uCp'), STOPS.map(([t]) => t));
   setAllSrc(pr);
   gl.uniform1i(U(pr,'uStars'), 2); bindTex(2, starTex); gl.uniform1i(U(pr,'uN'), N);
@@ -944,20 +949,20 @@ function renderSource(){
     const vis = q.srcMode === 'image' && q.img ? q.srcH*1.41 : q.srcMode === 'disk' ? Math.max(1.25*q.blr, 1.6*q.srcScale) : 1.6*q.srcScale;
     const V = VS(), off = (vis + 0.05*V)/1.41;
     el.textContent = SRC_NAMES[i]; el.style.color = SRC_COL[i];
-    el.style.left = clamp(((q.sx + off)/V + 1)/2*100, 3, 97) + '%';
-    el.style.top = clamp((1 - ((q.sy + off)/V + 1)/2)*100, 3, 97) + '%';
+    el.style.left = clamp(((q.sx + off - S.vc[0])/V + 1)/2*100, 3, 97) + '%';
+    el.style.top = clamp((1 - ((q.sy + off - S.vc[1])/V + 1)/2)*100, 3, 97) + '%';
   });
 }
 function renderLens(){
   const w = lensCv.width; prepareDefault(w);
   const pr = P.lens; gl.useProgram(pr.p); lensUniforms(pr);
-  gl.uniform1f(U(pr,'uLv'), S.Lv); gl.uniform1f(U(pr,'uPx'), 2*S.Lv/w);
+  gl.uniform1f(U(pr,'uLv'), S.Lv); gl.uniform2f(U(pr,'uLc'), S.lc[0], S.lc[1]); gl.uniform2f(U(pr,'uSvc'), S.vc[0], S.vc[1]); gl.uniform1f(U(pr,'uPx'), 2*S.Lv/w);
   setAllSrc(pr);
   gl.uniform1f(U(pr,'uDots'), S.starsLens ? 1 : 0);
   gl.uniform1f(U(pr,'uFieldR'), G.FR); gl.uniform2f(U(pr,'uShootR'), G.Lx, G.Ly);
   gl.uniform1f(U(pr,'uMagOn'), S.lensMag ? 1 : 0); gl.uniform2f(U(pr,'uLog'), LOGR[0], LOGR[1]);
   gl.uniform3fv(U(pr,'uCm[0]') ?? U(pr,'uCm'), LSTOPS.flatMap(([, c]) => c.map(v => v/255))); gl.uniform1fv(U(pr,'uCp[0]') ?? U(pr,'uCp'), LSTOPS.map(([t]) => t));
-  gl.uniform1f(U(pr,'uImgs'), S.showImgs ? 1 : 0); gl.uniform1f(U(pr,'uOrig'), S.showOrig ? 1 : 0); gl.uniform1f(U(pr,'uSrcLs'), S.Ls);
+  gl.uniform1f(U(pr,'uImgs'), S.showImgs ? 1 : 0); gl.uniform1f(U(pr,'uOrig'), S.showOrig ? 1 : 0); gl.uniform1f(U(pr,'uSrcLs'), VS());
   gl.uniform1f(U(pr,'uFieldOn'), S.showField ? 1 : 0); gl.uniform1f(U(pr,'uShootOn'), S.showShoot ? 1 : 0);
   gl.uniform1f(U(pr,'uCrit'), S.crit ? 1 : 0); gl.uniform1f(U(pr,'uRings'), S.rings ? 1 : 0);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -990,27 +995,30 @@ function computeFlux(){
 
 // ---------- Light curve ----------
 let lc = [], lcGeom = null, lcSel = null, lcHover = null;
-// star positions recorded every SNAP_DT so a paused light curve can be clicked to view any past moment
+// star and source positions recorded every SNAP_DT so a paused light curve can be clicked to view any past moment
 const SNAP_DT = 0.1, SNAP_BUDGET = 2e6; // at most ~8 MB of positions
 let snaps = [], snapFloats = 0, live = null;
 function snapPush(){
   if(snaps.length && S.t - snaps[snaps.length-1].t < SNAP_DT) return;
   const pos = new Float32Array(2*N); for(let i=0;i<N;i++){ pos[2*i] = starData[i*4]; pos[2*i+1] = starData[i*4+1]; }
-  snaps.push({t:S.t, pos}); snapFloats += pos.length;
+  snaps.push({t:S.t, pos, src:srcPos()}); snapFloats += pos.length;
   while(snapFloats > SNAP_BUDGET && snaps.length > 1){ snapFloats -= snaps.shift().pos.length; }
 }
+function srcPos(){ return SRC.map(q => [q.sx, q.sy]); }
+function setSrcPos(a){ a.forEach(([x, y], i) => { SRC[i].sx = x; SRC[i].sy = y; }); viewDirty = true; $('srcPos').textContent = `(${fmt(S.sx)}, ${fmt(S.sy)})`; }
 function viewAt(t){
   if(!snaps.length) return;
-  if(!live) live = {t:S.t, pos:starData.slice()};
+  if(!live) live = {t:S.t, pos:starData.slice(), src:srcPos()};
   let lo = 0, hi = snaps.length - 1;
   while(lo < hi){ const m = (lo + hi) >> 1; if(snaps[m].t < t) lo = m + 1; else hi = m; }
   if(lo > 0 && Math.abs(snaps[lo-1].t - t) < Math.abs(snaps[lo].t - t)) lo--;
   const sn = snaps[lo]; for(let i=0;i<N;i++){ starData[i*4] = sn.pos[2*i]; starData[i*4+1] = sn.pos[2*i+1]; }
+  setSrcPos(sn.src);
   S.viewT = sn.t; uploadStars(); resetMap(); fluxDirty = true; lcDirty = true; updateTimeBadges(); $('zoomOut').hidden = false;
 }
 function backToLive(){
   if(!live) return;
-  starData.set(live.pos); S.t = live.t; live = null; S.viewT = null;
+  starData.set(live.pos); setSrcPos(live.src); S.t = live.t; live = null; S.viewT = null;
   uploadStars(); resetMap(); fluxDirty = true; lcDirty = true; updateTimeBadges();
 }
 function updateTimeBadges(){
@@ -1249,7 +1257,6 @@ const ctl = {
   driftAng: bindRange('driftAng','driftAng', v=>v+'°'),
   rate: bindRange('rate','rate', v=>fmt(v,1)+'×'),
   Ls: bindRange('Ls','Ls', v=>fmt(v,1)+' θE', () => { for(const q of SRC){ q.sx = clamp(q.sx,-S.Ls,S.Ls); q.sy = clamp(q.sy,-S.Ls,S.Ls); } genStars(); updateScalebars(); }),
-  Lv: bindRange('Lv','Lv', v=>fmt(v,2)+' θE', () => updateScalebars()),
 };
 function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 const sizeEl = $('srcSize');
@@ -1298,25 +1305,21 @@ sizeEl.addEventListener('input', () => {
 });
 function mapSwatch(){ document.querySelectorAll('.lensmapsw').forEach(e => e.style.background = `linear-gradient(90deg,${LSTOPS.map(([t, c]) => `rgb(${c}) ${Math.round(t*100)}%`).join(',')})`); $('mapSw').style.background = `linear-gradient(90deg,${STOPS.map(([t, c]) => `rgb(${c}) ${Math.round(t*100)}%`).join(',')})`; }
 function updateViewRead(){
-  $('LvOut').textContent = `${fmt(S.Lv, 2)} θE`;
-  $('srcZoomOut').textContent = `${fmt(VS(), 2)} θE`;
   $('frRead').textContent = G.FR ? `${fmt(G.FR, 1)} θE` : '–';
 }
 function setSrcView(v){
-  const wasWide = VS() > S.Ls*1.001; S.vs = v; $('srcZoom').value = VS();
+  const wasWide = VS() > S.Ls*1.001; S.vs = v;
   if(!wasWide && VS() > S.Ls*1.001 && !S.caust){ S.caust = true; $('caust').checked = true; }
-  cau.k = 0; updateScalebars(); updateViewRead(); viewDirty = true;
+  resetMap(); updateScalebars(); updateViewRead();
 }
-function setLensView(v){ S.Lv = v; $('Lv').value = v; updateScalebars(); updateViewRead(); viewDirty = true; }
+function setLensView(v){ S.Lv = v; updateScalebars(); updateViewRead(); viewDirty = true; }
 function resetWholeBtn(plane){ const b = document.querySelector(`.wholebtn[data-plane="${plane}"]`); b.setAttribute('aria-pressed', 'false'); b.textContent = 'Whole field'; }
-$('srcZoom').addEventListener('input', e => { setSrcView(+e.target.value); resetWholeBtn('src'); });
-$('Lv').addEventListener('input', () => { updateViewRead(); resetWholeBtn('lens'); });
 // one button per plane: zoom out to the whole field, then back to the previous view
 const viewBefore = {src: 0, lens: 5};
 document.querySelectorAll('.wholebtn').forEach(b => b.addEventListener('click', () => {
   const plane = b.dataset.plane, whole = b.getAttribute('aria-pressed') !== 'true';
-  if(plane === 'lens'){ if(whole){ viewBefore.lens = S.Lv; setLensView(+$('Lv').max); } else setLensView(clamp(viewBefore.lens, S.Ls, +$('Lv').max)); }
-  else { if(whole){ viewBefore.src = S.vs; setSrcView(+$('srcZoom').max); } else setSrcView(viewBefore.src); }
+  if(plane === 'lens'){ if(whole){ viewBefore.lens = S.Lv; viewBefore.lc = S.lc; S.lc = [0, 0]; setLensView(G.VMAX); } else { S.lc = viewBefore.lc || [0, 0]; setLensView(clamp(viewBefore.lens, ZMIN, G.VMAX)); } }
+  else { if(whole){ viewBefore.src = S.vs; viewBefore.vc = S.vc; S.vc = [0, 0]; setSrcView(G.VMAX); } else { S.vc = viewBefore.vc || [0, 0]; setSrcView(viewBefore.src); } }
   b.setAttribute('aria-pressed', whole); b.textContent = whole ? 'Zoom back' : 'Whole field';
 }));
 document.querySelectorAll('[data-pscale]').forEach(b => b.addEventListener('click', () => {
@@ -1457,40 +1460,69 @@ document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('clic
   for(const k of ['kappa','gamma','fstar']){ ctl[k].el.value = S[k]; ctl[k].show(); }
   genStars();
 }));
-// drag source
-let dragging = false;
+// source plane: drag a source to move it, drag empty space to pan, scroll to zoom, double-click to reset
+let dragging = false, pan = null;
+function srcAt(e){ const r = srcCv.getBoundingClientRect(), V = VS(); return [S.vc[0] + ((e.clientX - r.left)/r.width*2 - 1)*V, S.vc[1] + (1 - (e.clientY - r.top)/r.height*2)*V]; }
+function lensAt(e){ const r = lensCv.getBoundingClientRect(); return [S.lc[0] + ((e.clientX - r.left)/r.width*2 - 1)*S.Lv, S.lc[1] + (1 - (e.clientY - r.top)/r.height*2)*S.Lv]; }
 function moveSrc(e){
-  const r = srcCv.getBoundingClientRect();
-  S.sx = clamp(((e.clientX - r.left)/r.width*2 - 1)*VS(), -S.Ls, S.Ls);
-  S.sy = clamp((1 - (e.clientY - r.top)/r.height*2)*VS(), -S.Ls, S.Ls);
+  const b = srcAt(e);
+  S.sx = clamp(b[0], -S.Ls, S.Ls);
+  S.sy = clamp(b[1], -S.Ls, S.Ls);
   fluxDirty = true; viewDirty = true; $('srcPos').textContent = `(${fmt(S.sx)}, ${fmt(S.sy)})`;
 }
+function visR(q){ return q.srcMode === 'image' && q.img ? q.srcH*1.41 : q.srcMode === 'disk' ? Math.max(1.25*q.blr, 1.6*q.srcScale) : 1.6*q.srcScale; }
+const VC_MAX = () => G.VMAX, LC_MAX = () => G.VMAX;
+function setVc(c){ const m = VC_MAX(); S.vc = [clamp(c[0], -m, m), clamp(c[1], -m, m)]; resetMap(); }
+function setLc(c){ const m = LC_MAX(); S.lc = [clamp(c[0], -m, m), clamp(c[1], -m, m)]; viewDirty = true; }
 srcCv.addEventListener('pointerdown', e => {
-  if(S.nSrc > 1){
-    const r = srcCv.getBoundingClientRect();
-    const bx = ((e.clientX - r.left)/r.width*2 - 1)*VS(), by = (1 - (e.clientY - r.top)/r.height*2)*VS();
-    let near = 0, best = Infinity;
-    for(const i of ACT()){ const d = Math.hypot(bx-SRC[i].sx, by-SRC[i].sy); if(d < best){ best = d; near = i; } }
+  const [bx, by] = srcAt(e);
+  let near = -1, best = Infinity;
+  if(S.showSrc) for(const i of ACT()){ const d = Math.hypot(bx-SRC[i].sx, by-SRC[i].sy) - visR(SRC[i]); if(d < best){ best = d; near = i; } }
+  srcCv.setPointerCapture(e.pointerId);
+  if(near >= 0 && best < 0.06*VS()){
     if(near !== S.active) setActive(near);
-  }
-  dragging = true; srcCv.setPointerCapture(e.pointerId); moveSrc(e);
+    dragging = true; moveSrc(e);
+  } else { pan = {x: e.clientX, y: e.clientY, c: S.vc}; srcCv.style.cursor = 'grabbing'; }
 });
-srcCv.addEventListener('pointermove', e => { if(dragging) moveSrc(e); });
-srcCv.addEventListener('pointerup', () => { dragging = false; });
-srcCv.addEventListener('pointercancel', () => { dragging = false; });
+srcCv.addEventListener('pointermove', e => {
+  if(dragging) moveSrc(e);
+  else if(pan){ const r = srcCv.getBoundingClientRect(), k = 2*VS()/r.width; setVc([pan.c[0] - (e.clientX - pan.x)*k, pan.c[1] + (e.clientY - pan.y)*k]); resetWholeBtn('src'); }
+});
+for(const t of ['pointerup','pointercancel']) srcCv.addEventListener(t, () => { dragging = false; pan = null; srcCv.style.cursor = ''; });
+function wheelZoom(e, at, w, wmax){
+  e.preventDefault();
+  const f = Math.exp(clamp(e.deltaY*(e.deltaMode === 1 ? 40 : 1), -200, 200)*(e.ctrlKey ? 0.01 : 0.0015));
+  const w2 = clamp(w*f, ZMIN, wmax), p = at(e), s = w2/w;
+  return [w2, [p[0] - (p[0] - (at === srcAt ? S.vc : S.lc)[0])*s, p[1] - (p[1] - (at === srcAt ? S.vc : S.lc)[1])*s]];
+}
+srcCv.addEventListener('wheel', e => {
+  const [w, c] = wheelZoom(e, srcAt, VS(), VC_MAX());
+  setVc(w >= VC_MAX() ? [0, 0] : c); setSrcView(w); resetWholeBtn('src');
+}, {passive: false});
+srcCv.addEventListener('dblclick', () => { S.vc = [0, 0]; setSrcView(0); resetWholeBtn('src'); });
+// lens plane: drag to pan, scroll to zoom, double-click to reset
+let lpan = null;
+lensCv.addEventListener('pointerdown', e => { lensCv.setPointerCapture(e.pointerId); lpan = {x: e.clientX, y: e.clientY, c: S.lc}; lensCv.style.cursor = 'grabbing'; });
+lensCv.addEventListener('pointermove', e => { if(!lpan) return; const r = lensCv.getBoundingClientRect(), k = 2*S.Lv/r.width; setLc([lpan.c[0] - (e.clientX - lpan.x)*k, lpan.c[1] + (e.clientY - lpan.y)*k]); resetWholeBtn('lens'); });
+for(const t of ['pointerup','pointercancel']) lensCv.addEventListener(t, () => { lpan = null; lensCv.style.cursor = ''; });
+lensCv.addEventListener('wheel', e => {
+  const [w, c] = wheelZoom(e, lensAt, S.Lv, LC_MAX());
+  setLc(w >= LC_MAX() ? [0, 0] : c); setLensView(w); resetWholeBtn('lens');
+}, {passive: false});
+lensCv.addEventListener('dblclick', () => { S.lc = [0, 0]; setLensView(5); resetWholeBtn('lens'); });
 
 // ---------- Guided tour ----------
 const TOUR = [
-  {el: () => $('srcCv').closest('.cv'), t: 'Source plane', d: 'The magnification map behind the lens. Bright lines are caustics: a source sitting on one is strongly magnified. Drag a source to move it; with several sources, each is marked with its letter.'},
+  {el: () => $('srcCv').closest('.cv'), t: 'Source plane', d: 'The magnification map behind the lens. Bright lines are caustics: a source sitting on one is strongly magnified. Drag a source to move it; with several sources, each is marked with its letter. Scroll to zoom into any region, drag empty space to pan, and double-click to reset.'},
   {el: () => $('cbar').closest('.opts'), t: 'Scale and layers', d: 'Colours show the magnification μ on a log scale, and the triangle marks μ₀, the value if all mass were smooth. Pick a colour scheme under Colours, and switch the sources, stars, caustic lines and map on or off. Whole field zooms out to show the caustic network beyond the map.'},
-  {el: () => $('lensCv').closest('.cv'), t: 'Lens plane', d: 'What a telescope would see: the moving stars and the distorted micro-images of each source, in that source\u2019s colour. Cyan lines are critical curves; they map onto the caustics.'},
+  {el: () => $('lensCv').closest('.cv'), t: 'Lens plane', d: 'What a telescope would see: the moving stars and the distorted micro-images of each source, in that source\u2019s colour. Cyan lines are critical curves; they map onto the caustics. Scroll to zoom, drag to pan, double-click to reset.'},
   {el: () => document.querySelector('.opts.cols'), t: 'Lens plane layers', d: 'Show or hide lensed images, stars, critical curves, Einstein radii and the source field. Outline the star field and ray-shooting region, and use Whole field to zoom out to the whole star field.'},
   {el: () => document.querySelector('.lc'), t: 'Light curve', d: 'Brightness over time for every source, in matching colours. Compare Gaussian sizes adds reference sources; Δmag shows the change in magnitudes; Restart replays the same run.'},
   {el: () => $('lcCv'), t: 'Explore a moment', d: 'Pause, then click any time to see both planes at that moment, and drag the grey time line to move through time. Drag across the plot to zoom, use the slider below to look further back, and press Latest to return.'},
   {el: () => $('srcTabs').closest('.group'), t: 'Sources', d: 'Add up to four sources, each with its own colour and light curve. For each, choose a Gaussian, an accretion disk (with ISCO and broad-line region) or an image, set its size, and check its light profile and half-light radius r½.'},
   {el: () => $('kappa').closest('.group'), t: 'Lens model', d: 'Convergence κ, shear γ and the fraction of mass in stars set the caustic pattern. The mass plot compares this field with the chosen mass function. Random star field draws a new field; Seed lets you bring one back.'},
   {el: () => $('vdisp').closest('.group'), t: 'Motion', d: 'Set the stars\u2019 random speeds, a common drift and what happens at the edge of the star field, then press Play above the light curve to watch the caustics sweep across the sources.'},
-  {el: () => $('Ls').closest('.group'), t: 'View', d: 'Set the size of the magnification map and how much of each plane you see, check the star field radius R\u22c6, and trade speed for detail with the ray-shooting setting. Fast suits slower computers.'},
+  {el: () => $('Ls').closest('.group'), t: 'View', d: 'Set the size of the magnification map, check the star field radius R\u22c6, and trade speed for detail with the ray-shooting setting. Fast suits slower computers.'},
 ];
 let tourI = -1, tourHole = null, tourCard = null;
 function tourPlace(){
@@ -1555,6 +1587,7 @@ genStars();
 resize();
 if(document.fonts) document.fonts.ready.then(() => { drawColorbar(); lcDirty = true; });
 requestAnimationFrame(frame);
+
 })();
 </script>
 </body>
