@@ -29,22 +29,25 @@ shown as ▼ on the colour bars, and the image is a minimum (both 1 − κ ∓ �
 
 ## Magnification
 
-- **Source-plane map:** built by inverse ray shooting on the GPU. Rays are fired from a grid on the lens plane through the lens equation and counted where they land; μ in each pixel is the ray density there divided by the density with no lensing. Choose 1M, 4M or 16M rays per frame under Ray shooting. While paused, frames keep adding up and the map gets smoother.
-- **Lens-plane map:** the point-source magnification at each position, computed directly with no ray shooting:
+**Source-plane map:** built by inverse ray shooting on the GPU. Rays are fired from a grid on the lens plane through the lens equation and counted where they land; μ in each pixel is the ray density there divided by the density with no lensing. Choose 1M, 4M or 16M rays per frame under Ray shooting. While paused, frames keep adding up and the map gets smoother.
 
-  ```math
-  \mu(\theta) = \frac{1}{|\det A|},\qquad \det A = (1-\kappa_s)^2 - (\gamma - S_1)^2 - S_2^2,
-  ```
+**Lens-plane map:** the point-source magnification at each position, computed directly with no ray shooting:
 
-  with S<sub>1</sub> = Σ m<sub>i</sub> (Δθ₁² − Δθ₂²)/|Δθ|⁴ and S<sub>2</sub> = Σ 2 m<sub>i</sub> Δθ₁ Δθ₂/|Δθ|⁴, where Δθ = θ − θ<sub>i</sub>.
-- **Critical curves** are where det A = 0 on the lens plane; **caustics** are where they land on the source plane.
-- **Light curves:** for each source, μ is its total lensed flux divided by its unlensed flux,
+```math
+\mu(\theta) = \frac{1}{|\det A|},\qquad \det A = (1-\kappa_s)^2 - (\gamma - S_1)^2 - S_2^2,
+```
 
-  ```math
-  \mu = \frac{\int I(\beta(\theta))\,d^2\theta}{\int I(\beta)\,d^2\beta},
-  ```
+with S<sub>1</sub> = Σ m<sub>i</sub> (Δθ₁² − Δθ₂²)/|Δθ|⁴ and S<sub>2</sub> = Σ 2 m<sub>i</sub> Δθ₁ Δθ₂/|Δθ|⁴, where Δθ = θ − θ<sub>i</sub>.
 
-  computed every frame by sampling the source through the lens equation over the ray-shooting region. In magnitudes, Δm = −2.5 log₁₀(μ/μ₀), so negative is brighter than the smooth-mass prediction.
+**Critical curves** are where det A = 0 on the lens plane; **caustics** are where they land on the source plane.
+
+**Light curves:** for each source, μ is its total lensed flux divided by its unlensed flux,
+
+```math
+\mu = \frac{\int I(\beta(\theta))\,d^2\theta}{\int I(\beta)\,d^2\beta},
+```
+
+computed every frame by sampling the source through the lens equation over the ray-shooting region. In magnitudes, Δm = −2.5 log₁₀(μ/μ₀), so negative is brighter than the smooth-mass prediction.
 
 ## Star field and ray-shooting region
 
@@ -88,16 +91,19 @@ where **u**<sub>i</sub> is drawn from a 2D unit Gaussian. Velocities are in θ<s
 
 ## Source profiles
 
-- **Gaussian:** $`I(r) \propto \exp\left(-r^2/2\sigma^2\right)`$, with half-light radius $`r_{1/2} = \sqrt{2\ln 2}\,\sigma \approx 1.18\,\sigma`$.
-- **Accretion disk:** a face-on thin disk at a single wavelength,
+**Gaussian:** $`I(r) \propto \exp\left(-r^2/2\sigma^2\right)`$, with half-light radius $`r_{1/2} = \sqrt{2\ln 2}\,\sigma \approx 1.18\,\sigma`$.
 
-  ```math
-  I(r) \propto \frac{1}{e^{\xi}-1},\qquad \xi = \left(\frac{r}{s}\right)^{3/4}\left(1-\sqrt{\frac{r_{\rm in}}{r}}\right)^{-1/4},
-  ```
+**Accretion disk:** a face-on thin disk at a single wavelength,
 
-  where s is the disk scale and r<sub>in</sub> is the ISCO radius; there is no light inside the ISCO. Setting the disk scale to 0 removes the disk.
-- **Broad-line region (BLR):** a ring at radius R<sub>BLR</sub>, with a Gaussian cross-section of width 0.15 R<sub>BLR</sub> and peak brightness 0.28 of the disk's peak. Setting R<sub>BLR</sub> to 0 removes it.
-- **Image:** any picture, using its brightness (luminance) as the source's light.
+```math
+I(r) \propto \frac{1}{e^{\xi}-1},\qquad \xi = \left(\frac{r}{s}\right)^{3/4}\left(1-\sqrt{\frac{r_{\rm in}}{r}}\right)^{-1/4},
+```
+
+where s is the disk scale and r<sub>in</sub> is the ISCO radius; there is no light inside the ISCO. Setting the disk scale to 0 removes the disk.
+
+**Broad-line region (BLR):** a ring at radius R<sub>BLR</sub>, with a Gaussian cross-section of width 0.15 R<sub>BLR</sub> and peak brightness 0.28 of the disk's peak. Setting R<sub>BLR</sub> to 0 removes it.
+
+**Image:** any picture, using its brightness (luminance) as the source's light.
 
 The light profile plot shows the mean brightness against radius (linear or log), with the **half-light radius**, the radius that encloses half of the light, marked by a dashed line.
 
