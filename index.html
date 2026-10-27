@@ -233,7 +233,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
             <span class="tbadge">t = 0.0</span>
             <div class="scalebar" id="sbSrc"><span class="bar"></span><span class="t"></span></div>
             <div class="hint">Scroll to zoom · drag to pan</div>
-            <span class="srclab"></span><span class="srclab"></span><span class="srclab"></span><span class="srclab"></span>
+            <span class="srclab"></span><span class="srclab"></span><span class="srclab"></span><span class="srclab"></span><span class="srclab"></span>
           </div>
           <div class="opts stack">
             <div class="optrow"><span class="lab">Scale</span>
@@ -423,12 +423,12 @@ const S = {
   playing:!reduceMotion, t:0,
 };
 // two independent sources; S.srcMode, S.sx, ... read and write the one being edited (S.active)
-const MAX_SRC = 4, SRC_NAMES = 'ABCD', SRC_COL = ['#f2b45a', '#7ee07a', '#ff6b5c', '#f2f2f2'];
+const MAX_SRC = 5, SRC_NAMES = 'ABCDE', SRC_COL = ['#f2b45a', '#7ee07a', '#ff6b5c', '#f2f2f2', '#6aa8ff'];
 // each source's colour on the planes: [edge, core] RGB, matching SRC_COL
-const SRC_PAL = [[[1,0.54,0.24],[1,0.96,0.86]], [[0.38,0.9,0.35],[0.88,1,0.85]], [[1,0.32,0.26],[1,0.88,0.84]], [[0.74,0.77,0.84],[1,1,1]]];
-const SRC_POS = [[0,0],[0.6,0.5],[-0.6,0.5],[0,-0.6]];
+const SRC_PAL = [[[1,0.54,0.24],[1,0.96,0.86]], [[0.38,0.9,0.35],[0.88,1,0.85]], [[1,0.32,0.26],[1,0.88,0.84]], [[0.74,0.77,0.84],[1,1,1]], [[0.25,0.5,1],[0.84,0.92,1]]];
+const SRC_POS = [[0,0],[0.6,0.5],[-0.6,0.5],[0,-0.6],[0.6,-0.5]];
 function freshSrc(i){ return {on:false, srcMode:'gauss', srcScale:i ? 0.2 : 0.1, isco:0.035, blr:0.26, sx:SRC_POS[i][0], sy:SRC_POS[i][1], img:null, imgName:'', noDisk:false, srcH:0.4, flux:1, tex:null}; }
-const SRC = [0,1,2,3].map(freshSrc); SRC[0].on = true;
+const SRC = [0,1,2,3,4].map(freshSrc); SRC[0].on = true;
 // letters and colours belong to slots, so removing B leaves C and D unchanged
 const ACT = () => SRC.map((q, i) => q.on ? i : -1).filter(i => i >= 0);
 Object.defineProperty(S, 'nSrc', {get(){ return ACT().length; }});
@@ -541,7 +541,8 @@ uniform sampler2D uMap; uniform int uRes; uniform float uNorm; uniform float uLs
 uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH; uniform int uSrcMode;
 uniform sampler2D uSrc2; uniform vec2 uSrcC2; uniform float uSrcH2; uniform int uSrcMode2;
 uniform sampler2D uSrc3; uniform vec2 uSrcC3; uniform float uSrcH3; uniform int uSrcMode3;
-uniform sampler2D uSrc4; uniform vec2 uSrcC4; uniform float uSrcH4; uniform int uSrcMode4; uniform int uNS;
+uniform sampler2D uSrc4; uniform vec2 uSrcC4; uniform float uSrcH4; uniform int uSrcMode4;
+uniform sampler2D uSrc5; uniform vec2 uSrcC5; uniform float uSrcH5; uniform int uSrcMode5; uniform int uNS;
 vec3 overlay(vec3 col, sampler2D tx, vec2 c, float h, int mode, vec2 beta, float on){
   vec2 suv=(beta-c)/(2.0*h)+0.5;
   float inside=step(0.0,suv.x)*step(suv.x,1.0)*step(0.0,suv.y)*step(suv.y,1.0)*on;
@@ -584,6 +585,7 @@ void main(){
   if(uNS>1) col=overlay(col,uSrc2,uSrcC2,uSrcH2,uSrcMode2,beta,uSrcOn);
   if(uNS>2) col=overlay(col,uSrc3,uSrcC3,uSrcH3,uSrcMode3,beta,uSrcOn);
   if(uNS>3) col=overlay(col,uSrc4,uSrcC4,uSrcH4,uSrcMode4,beta,uSrcOn);
+  if(uNS>4) col=overlay(col,uSrc5,uSrcC5,uSrcH5,uSrcMode5,beta,uSrcOn);
   if(uCauOn>0.5){
     float cc=texture(uCau,vUv).r;
     col=mix(col,vec3(0.576,0.886,0.941),smoothstep(0.04,0.5,cc)*0.9);
@@ -610,7 +612,8 @@ uniform sampler2D uStars; uniform int uN; uniform float uKs; uniform float uGam;
 uniform float uLv; uniform vec2 uLc; uniform vec2 uSvc; uniform float uPx; uniform sampler2D uSrc; uniform vec2 uSrcC; uniform float uSrcH;
 uniform sampler2D uSrc2; uniform vec2 uSrcC2; uniform float uSrcH2;
 uniform sampler2D uSrc3; uniform vec2 uSrcC3; uniform float uSrcH3;
-uniform sampler2D uSrc4; uniform vec2 uSrcC4; uniform float uSrcH4; uniform int uNS;
+uniform sampler2D uSrc4; uniform vec2 uSrcC4; uniform float uSrcH4;
+uniform sampler2D uSrc5; uniform vec2 uSrcC5; uniform float uSrcH5; uniform int uNS;
 vec4 samp(sampler2D tx, vec2 p, vec2 c, float h){
   vec2 uv=(p-c)/(2.0*h)+0.5;
   float inside=step(0.0,uv.x)*step(uv.x,1.0)*step(0.0,uv.y)*step(uv.y,1.0);
@@ -651,12 +654,14 @@ void main(){
   if(uNS>1) col+=samp(uSrc2,y,uSrcC2,uSrcH2).rgb*uImgs;
   if(uNS>2) col+=samp(uSrc3,y,uSrcC3,uSrcH3).rgb*uImgs;
   if(uNS>3) col+=samp(uSrc4,y,uSrcC4,uSrcH4).rgb*uImgs;
+  if(uNS>4) col+=samp(uSrc5,y,uSrcC5,uSrcH5).rgb*uImgs;
   if(uOrig>0.5){
     vec4 os=samp(uSrc,x,uSrcC,uSrcH);
     col=col*(1.0-os.a)+os.rgb;
     if(uNS>1){ vec4 q=samp(uSrc2,x,uSrcC2,uSrcH2); col=col*(1.0-q.a)+q.rgb; }
     if(uNS>2){ vec4 q=samp(uSrc3,x,uSrcC3,uSrcH3); col=col*(1.0-q.a)+q.rgb; }
     if(uNS>3){ vec4 q=samp(uSrc4,x,uSrcC4,uSrcH4); col=col*(1.0-q.a)+q.rgb; }
+    if(uNS>4){ vec4 q=samp(uSrc5,x,uSrcC5,uSrcH5); col=col*(1.0-q.a)+q.rgb; }
     vec2 xv=x-uSvc, sd=abs(abs(xv)-vec2(uSrcLs))/uPx;
     float sq=max((1.0-smoothstep(0.15,0.65,sd.x))*step(abs(xv.y),uSrcLs+uPx),(1.0-smoothstep(0.15,0.65,sd.y))*step(abs(xv.x),uSrcLs+uPx));
     col=mix(col,vec3(0.62,0.65,0.72),sq*0.75);
@@ -1007,7 +1012,7 @@ function setSrcUniforms(pr, unit, i = 0, suffix = ''){
   gl.uniform1i(U(pr,'uSrc'+suffix), unit); bindTex(unit, q.tex);
   gl.uniform2f(U(pr,'uSrcC'+suffix), q.sx, q.sy); gl.uniform1f(U(pr,'uSrcH'+suffix), q.srcH);
 }
-const SRC_UNIT = [1, 4, 5, 6], SRC_SUF = ['', '2', '3', '4'];
+const SRC_UNIT = [1, 4, 5, 6, 7], SRC_SUF = ['', '2', '3', '4', '5'];
 function setAllSrc(pr){
   const act = ACT();
   for(let k=0;k<MAX_SRC;k++){ const i = act[k] ?? act[0]; setSrcUniforms(pr, SRC_UNIT[k], i, SRC_SUF[k]); gl.uniform1i(U(pr,'uSrcMode'+SRC_SUF[k]), srcModeId(i)); }
@@ -1063,7 +1068,7 @@ function renderLens(){
   gl.drawArrays(gl.TRIANGLES, 0, 3);
   lctx.drawImage(glc, 0, glc.height - w, w, w, 0, 0, w, w);
 }
-const cur = {mu:NaN, all:[NaN,NaN,NaN,NaN], g:[NaN,NaN,NaN]};
+const cur = {mu:NaN, all:[NaN,NaN,NaN,NaN,NaN], g:[NaN,NaN,NaN]};
 function fluxPass(i){
   gl.bindFramebuffer(gl.FRAMEBUFFER, T.fluxFB); gl.viewport(0,0,T.F,T.F);
   const pr = P.flux; gl.useProgram(pr.p); lensUniforms(pr);
@@ -1081,7 +1086,7 @@ function computeFlux(){
   const blk = (2*G.Lx/16)*(2*G.Ly/16);
   const act = ACT(), first = act[0];
   const [a,b,c,d] = fluxPass(first);
-  cur.all = [NaN, NaN, NaN, NaN];
+  cur.all = [NaN, NaN, NaN, NaN, NaN];
   const fl = i => SRC[i].flux > 1e-9 ? SRC[i].flux : NaN;
   cur.all[first] = cur.mu = a*blk/fl(first);
   cur.g = [b,c,d].map((v,i) => v*blk/(2*Math.PI*CMP_SIG[i]**2));
@@ -1615,7 +1620,7 @@ const TOUR = [
   {el: () => $('lensCv').closest('.panel').querySelector('.opts.cols'), t: 'Lens plane layers', d: 'Show or hide lensed images, the magnification, critical curves and Einstein radii. On the right: stars, the star field, the ray region (the ray-shooting region) and the source field, and Whole field to zoom out to the whole star field.'},
   {el: () => document.querySelector('.lc'), t: 'Light curve', d: 'Brightness over time for every source, in matching colours. Compare Gaussian sizes adds reference sources; Δmag shows the change in magnitudes; Restart replays the same run.'},
   {el: () => $('lcCv'), t: 'Explore a moment', d: 'Pause, then click any time to see both planes at that moment, and drag the grey time line to move through time. Drag across the plot to zoom, use the slider below to look further back, and press Latest to return.'},
-  {el: () => $('srcTabs').closest('.group'), t: 'Sources', d: 'Add up to four sources, each with its own colour and light curve. For each, choose a Gaussian, an accretion disk (with ISCO and broad-line region) or an image, set its size, and check its light profile and half-light radius r½.'},
+  {el: () => $('srcTabs').closest('.group'), t: 'Sources', d: 'Add up to five sources, each with its own colour and light curve. For each, choose a Gaussian, an accretion disk (with ISCO and broad-line region) or an image, set its size, and check its light profile and half-light radius r½.'},
   {el: () => $('kappa').closest('.group'), t: 'Lens model', d: 'Convergence κ, shear γ and the fraction of mass in stars set the caustic pattern. The mass plot compares this field with the chosen mass function. Random star field draws a new field; Seed lets you bring one back.'},
   {el: () => $('vdisp').closest('.group'), t: 'Motion', d: 'Set the stars\u2019 random speeds, a common drift and what happens at the edge of the star field, then press Play above the light curve to watch the caustics sweep across the sources.'},
   {el: () => $('Ls').closest('.group'), t: 'View', d: 'Set the size of the magnification map, check the star field radius R\u22c6, choose how the map is made (ray shooting, or polygon mapping for a smoother map), and trade speed for detail with the ray-shooting setting. Fast suits slower computers.'},

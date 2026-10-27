@@ -13,7 +13,7 @@ New here? Click **Take the tour** at the top of the page for a guided walk-throu
 - **Source plane:** see the magnification map and its caustics, drag sources across it, and choose a colour scheme (Ocean, Magma, Grey, Viridis or Cosmic).
 - **Lens plane:** watch the stars move, with their critical curves and the distorted micro-images of each source. Outline the star field and the ray-shooting region, or zoom out to see the whole star field.
 - **Zoom:** scroll to zoom into any region of either plane and drag to pan; double-click to reset. Zooming in on the source plane recomputes the map at full resolution.
-- **Sources:** add up to four sources, each with its own colour and light curve. Choose a Gaussian, an accretion disk with an ISCO hole and a broad-line region, or an image of your own. A small plot shows each source's light profile and half-light radius.
+- **Sources:** add up to five sources, each with its own colour and light curve. Choose a Gaussian, an accretion disk with an ISCO hole and a broad-line region, or an image of your own. A small plot shows each source's light profile and half-light radius.
 - **Lens model:** set the convergence κ, shear γ, fraction of mass in stars and stellar mass function (equal, Salpeter or log-uniform). Compare the stars drawn with the expected mass distribution, and use a seed to bring back a star field.
 - **Light curve:** follow each source's magnification over time, in μ or in Δm = −2.5 log(μ/μ₀), with reference curves for Gaussian sources of different sizes.
 - **Explore a moment:** pause, then click any time on the light curve to see both planes at that moment, or drag the time line to move through time. Drag across the plot to zoom in and use the slider to look further back.
