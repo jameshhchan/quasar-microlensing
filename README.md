@@ -20,7 +20,7 @@ New here? Click **Take the tour** at the top of the page for a guided walk-throu
 
 ## How it works
 
-The app solves the lens equation for a field of moving stars embedded in smooth matter with external shear, maps the magnification by inverse ray shooting on the GPU, and integrates each source's light through the lens to get its light curve. For the equations, the star field and ray-shooting setup, the stellar mass functions and the source profiles, see the **[model notes](MODEL.md)**.
+The app solves the lens equation for a field of moving stars embedded in smooth matter with external shear, maps the magnification on the GPU by inverse ray shooting or polygon mapping, and integrates each source's light through the lens to get its light curve. For the equations, the star field and ray-shooting setup, the stellar mass functions and the source profiles, see the **[model notes](MODEL.md)**.
 
 ## Requirements
 
