@@ -899,7 +899,7 @@ function buildSource(idx = S.active){
     }
   } else {
     const disk = S.srcMode === 'disk', noDisk = disk && S.noDisk;
-    src.srcH = disk ? Math.max(noDisk ? 0 : 5*s, 1.5*S.blr, 1.3*S.isco, 0.05) : 4*s;
+    src.srcH = disk ? Math.max(noDisk ? 0 : 12*s, 1.5*S.blr, 1.3*S.isco, 0.05) : 4*s;
     const h = src.srcH, bw = 0.15*S.blr;
     // normalise the disk to its brightest pixel (without an ISCO the thin-disk profile keeps rising toward r = 0)
     let dmax = 1;
