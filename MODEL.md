@@ -84,6 +84,12 @@ Positions are uniform in the circle. Scroll to zoom into either plane, or use **
 
 - **Equal:** every star has $`m = 1\,M_\odot`$.
 - **Salpeter:** $`dN/dm \propto m^{-2.35}`$, between $`0.1`$ and $`1\,M_\odot`$ ($`\langle m \rangle \approx 0.22\,M_\odot`$) or $`0.1`$ and $`10\,M_\odot`$ ($`\langle m \rangle \approx 0.31\,M_\odot`$).
+- **Chabrier:** the Chabrier (2003) single-star function, log-normal below $`1\,M_\odot`$ and a power law above, joined smoothly at $`1\,M_\odot`$, between $`0.1`$ and $`1\,M_\odot`$ ($`\langle m \rangle \approx 0.31\,M_\odot`$) or $`0.1`$ and $`10\,M_\odot`$ ($`\langle m \rangle \approx 0.54\,M_\odot`$). The $`0.1`$–$`1\,M_\odot`$ range suits the old stellar populations of typical lens galaxies, where heavier stars have already burned out:
+
+```math
+\frac{dN}{d\log m} \propto \begin{cases} \exp\!\left[-\dfrac{(\log m - \log 0.079)^2}{2\,(0.69)^2}\right], & m \le 1\,M_\odot \\[6pt] m^{-1.3}, & m > 1\,M_\odot \end{cases}
+```
+
 - **Log-uniform:** $`dN/d\log m = \text{constant}`$ between $`0.1`$ and $`10\,M_\odot`$ ($`\langle m \rangle \approx 2.15\,M_\odot`$).
 
 The small plot under the menu compares the stars drawn in this field with the expected distribution, with the mean $`\langle m \rangle`$ and standard deviation $`\sigma`$ of both.
@@ -96,7 +102,7 @@ Each star moves with its own random velocity plus a common drift:
 \mathbf{v}_i = \sigma_v\,\mathbf{u}_i + \mathbf{v}_{\rm drift},
 ```
 
-where $`\mathbf{u}_i`$ is drawn from a 2D unit Gaussian. Velocities are in $`\theta_E`$ per time unit. At the edge of the star field, stars either bounce back inward or wrap around to the opposite side. Positions, masses and velocities all come from the random seed, so the same seed and settings give the same star field.
+where $`\mathbf{u}_i`$ is drawn from a 2D unit Gaussian. Velocities are in $`\theta_E`$ per time unit. At the edge of the star field, stars either reflect elastically like a ball off a wall ($`\mathbf{v} \to \mathbf{v} - 2(\mathbf{v}\cdot\hat{\mathbf{n}})\,\hat{\mathbf{n}}`$, with $`\hat{\mathbf{n}}`$ the outward normal of the edge; the default), wrap around to the opposite side, or simply leave the field, which then slowly empties. Positions, masses and velocities all come from the random seed, so the same seed and settings give the same star field.
 
 ## Source profiles
 

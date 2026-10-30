@@ -72,6 +72,9 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .labrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .wholebtn{font-size:11.5px;padding:2px 9px;line-height:1.3}
 .wholebtn[aria-pressed="true"]{border-color:#9ea6b8}
+.resetbtn{font-size:11.5px;padding:2px 9px;line-height:1.3}
+.resetbtn:disabled{opacity:.4;cursor:default}
+.labrow .btns{display:flex;gap:6px}
 .zoomrow input{flex:1;min-width:0;accent-color:#9ea6b8}
 .zoomrow output{font-family:var(--mono);font-size:11.5px;color:#c9d0e0;min-width:62px;text-align:right}
 .viewnote{margin:0;font-size:11.5px;line-height:1.55;color:var(--muted)}
@@ -107,6 +110,8 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .legendrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff2d6;vertical-align:middle;margin-right:6px}
 #cbar,#cbarL{width:100%;height:32px;display:block}
 #mfCv{width:100%;height:96px;display:block;margin-top:6px}
+.profbar.mfbar{margin:8px 0 0}
+.mfbar + #mfCv{margin-top:2px}
 #profCv{width:100%;height:92px;display:block}
 .profbar{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:-14px;position:relative;z-index:1}
 .profseg button{font-size:10.5px;padding:1px 7px}
@@ -249,7 +254,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
                 <label class="mtog"><input type="checkbox" id="caust"><span class="sw" style="background:var(--cyan)"></span>Caustics</label>
               </div>
             </div>
-            <div class="optrow"><div class="labrow" style="justify-content:flex-end"><button class="wholebtn" data-plane="src" aria-pressed="false" title="Zoom the source plane out to cover the whole star field; the map stays inside the grey square">Whole field</button></div>
+            <div class="optrow"><div class="labrow" style="justify-content:flex-end"><span class="btns"><button class="resetbtn" data-plane="src" disabled title="Back to the starting view (or double-click the plane)">Reset view</button><button class="wholebtn" data-plane="src" aria-pressed="false" title="Zoom the source plane out to cover the whole star field; the map stays inside the grey square">Whole field</button></span></div>
               <div class="items">
                 <label class="mtog"><input type="checkbox" id="starsSrc"><span class="dot"></span>Stars</label>
                 <label class="mtog" title="Drawn at lens-plane positions, like the stars"><input type="checkbox" id="srcField"><span class="sw" style="background:#9ea6b8"></span>Star field</label>
@@ -280,7 +285,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
                 <label class="mtog"><input type="checkbox" id="rings"><span class="ring"></span>Einstein radii</label>
               </div>
             </div>
-            <div class="optrow"><div class="labrow" style="justify-content:flex-end"><button class="wholebtn" data-plane="lens" aria-pressed="false" title="Zoom the lens plane out to the whole star field">Whole field</button></div>
+            <div class="optrow"><div class="labrow" style="justify-content:flex-end"><span class="btns"><button class="resetbtn" data-plane="lens" disabled title="Back to the starting view (or double-click the plane)">Reset view</button><button class="wholebtn" data-plane="lens" aria-pressed="false" title="Zoom the lens plane out to the whole star field">Whole field</button></span></div>
               <div class="items">
                 <label class="mtog"><input type="checkbox" id="starsLens" checked><span class="dot"></span>Stars</label>
                 <label class="mtog"><input type="checkbox" id="showField"><span class="sw" style="background:#9ea6b8"></span>Star field</label>
@@ -354,7 +359,8 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <div class="row"><div class="top"><label for="fstar">Fraction in stars<span class="sym">κ⋆/κ</span></label><output id="fstarOut"></output></div>
           <input type="range" id="fstar" min="0" max="1" step="0.01" value="0.3"></div>
         <div class="row"><label for="massFn">Stellar masses</label>
-          <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select>
+          <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="chabrier">Chabrier, 0.1–1 M☉</option><option value="chabrier10">Chabrier, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select>
+          <div class="profbar mfbar"><span>Mass distribution</span><div class="seg profseg" role="group" aria-label="Count axis"><button data-mscale="lin" aria-pressed="true">lin</button><button data-mscale="log" aria-pressed="false">log</button></div></div>
           <canvas id="mfCv" aria-label="Histogram of stellar masses in the current star field"></canvas>
           <p class="mfstats" id="mfStats"></p></div>
         <div class="seedrow"><button id="regen">Random star field</button><button id="showSeed" class="seedbtn" aria-expanded="false" aria-controls="seedBox" title="Show the random seed. The same seed and settings give the same star field.">Seed</button><span id="seedBox" hidden><input type="number" id="seed" min="0" max="999999" step="1" inputmode="numeric" aria-label="Random seed"></span></div>
@@ -377,8 +383,8 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <div class="row"><div class="top"><label for="rate">Time per second</label><output id="rateOut"></output></div>
           <input type="range" id="rate" min="0.1" max="4" step="0.1" value="1"></div>
         <div class="row"><label for="edge">At the edge of the star field</label>
-          <select id="edge"><option value="bounce" selected>Stars bounce back</option><option value="wrap">Stars wrap around</option></select>
-          <p class="upmsg" id="edgeNote">A star reaching the edge turns back inward.</p></div>
+          <select id="edge"><option value="elastic" selected>Stars reflect</option><option value="wrap">Stars wrap around</option><option value="free">Stars leave the field</option></select>
+          <p class="upmsg" id="edgeNote">A star reflects off the edge like a ball off a wall: same speed, angle out equals angle in.</p></div>
       </div>
 
       <div class="group">
@@ -419,7 +425,7 @@ const S = {
   kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
   vdisp:0.3, drift:0.4, driftAng:90, rate:1,
   seed:Math.floor(Math.random()*1000000), active:0,
-  Ls:1.5, Lv:5, quality:1, method:'irs', lcZoom:null, viewT:null, vs:0, vc:[0,0], lc:[0,0], lensMag:false, profLog:false, edge:'bounce', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, srcField:false, srcShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:false, yMode:'mu',
+  Ls:1.5, Lv:5, quality:1, method:'irs', lcZoom:null, viewT:null, vs:0, vc:[0,0], lc:[0,0], lensMag:false, profLog:false, mfLog:false, edge:'elastic', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, srcField:false, srcShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:false, yMode:'mu',
   playing:!reduceMotion, t:0,
 };
 // two independent sources; S.srcMode, S.sx, ... read and write the one being edited (S.active)
@@ -761,14 +767,29 @@ const readBuf = new Float32Array(16*16*4);
 // ---------- Geometry & stars ----------
 const G = {};
 let N = 0, ux = new Float32Array(NMAX), uy = new Float32Array(NMAX);
-const bx = new Float32Array(NMAX).fill(1), by = new Float32Array(NMAX).fill(1);
+// each star's velocity is Q·(σ_v u + v_drift); Q starts as the identity and records every turn at the edge
+const qa = new Float32Array(NMAX).fill(1), qb = new Float32Array(NMAX), qc = new Float32Array(NMAX), qd = new Float32Array(NMAX).fill(1);
 function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 let rnd = Math.random;
 function salpeterSample(m1=1){ const a=-1.35, m0=0.1; const u=rnd(); return Math.pow(Math.pow(m0,a)+u*(Math.pow(m1,a)-Math.pow(m0,a)), 1/a); }
+// Chabrier (2003) single-star IMF per log mass: log-normal below 1 M☉, power law dN/dlog m ∝ m^-1.3 above, continuous at 1 M☉
+const CHAB_C = Math.exp(-(Math.log10(1/0.079)**2)/(2*0.69*0.69));
+function chabrierLog(m){ return m <= 1 ? Math.exp(-((Math.log10(m) - Math.log10(0.079))**2)/(2*0.69*0.69)) : CHAB_C*Math.pow(m, -1.3); }
+function chabrierSample(m1){ const pmax = chabrierLog(0.1), l1 = Math.log10(m1) + 1; for(;;){ const m = 10**(rnd()*l1 - 1); if(rnd()*pmax <= chabrierLog(m)) return m; } }
+// expected dN/dlog m and mass range for each mass function (equal is a single mass)
+const MF_PDF = {
+  salpeter: [m => Math.pow(m, -1.35), 1],
+  salpeter10: [m => Math.pow(m, -1.35), 10],
+  chabrier: [chabrierLog, 1],
+  chabrier10: [chabrierLog, 10],
+  log10: [() => 1, 10],
+};
 const MASS_FN = {
   equal: () => 1,
   salpeter: () => salpeterSample(1),
   salpeter10: () => salpeterSample(10),
+  chabrier: () => chabrierSample(1),
+  chabrier10: () => chabrierSample(10),
   log10: () => 10**(rnd()*2 - 1),
 };
 const MASS_MEAN = Object.fromEntries(Object.entries(MASS_FN).map(([k,f]) => { let s=0; for(let i=0;i<40000;i++) s+=f(); return [k, s/40000]; }));
@@ -799,7 +820,7 @@ function genStars(){
     starData[i*4] = rr*Math.cos(ph);
     starData[i*4+1] = rr*Math.sin(ph);
     starData[i*4+2] = m; starData[i*4+3] = 0;
-    ux[i] = gauss(); uy[i] = gauss(); bx[i] = 1; by[i] = 1; msum += m;
+    ux[i] = gauss(); uy[i] = gauss(); qa[i] = 1; qb[i] = 0; qc[i] = 0; qd[i] = 1; msum += m;
   }
   rnd = Math.random;
   S.t = 0;
@@ -818,12 +839,22 @@ function stepStars(dt){
   const a = S.driftAng*Math.PI/180, dx = S.drift*Math.cos(a), dy = S.drift*Math.sin(a);
   const R = G.FR;
   for(let i=0;i<N;i++){
-    let x = starData[i*4] + bx[i]*(S.vdisp*ux[i] + dx)*dt;
-    let y = starData[i*4+1] + by[i]*(S.vdisp*uy[i] + dy)*dt;
+    const wx = S.vdisp*ux[i] + dx, wy = S.vdisp*uy[i] + dy;
+    const vx = qa[i]*wx + qb[i]*wy, vy = qc[i]*wx + qd[i]*wy;
+    let x = starData[i*4] + vx*dt, y = starData[i*4+1] + vy*dt;
     const r = Math.hypot(x, y);
-    if(r > R){
-      if(S.edge === 'bounce'){ const s = (2*R - r)/r; x *= s; y *= s; bx[i] = -bx[i]; by[i] = -by[i]; }
-      else { const s = -(2*R - r)/r; x *= s; y *= s; }
+    if(r > R && S.edge !== 'free'){
+      if(S.edge === 'wrap'){ const s = -(2*R - r)/r; x *= s; y *= s; }
+      else {
+        const s = (2*R - r)/r; x *= s; y *= s;
+        if(vx*x + vy*y > 0){
+          // elastic: reflect the velocity off the edge, v -> v - 2(v·n)n, as a ball off a wall (x, y now points inward after the mirror step)
+          const nx = x/Math.hypot(x, y), ny = y/Math.hypot(x, y);
+          const m00 = 1 - 2*nx*nx, m01 = -2*nx*ny, m11 = 1 - 2*ny*ny;
+          const a = qa[i], b = qb[i], c = qc[i], d = qd[i];
+          qa[i] = m00*a + m01*c; qb[i] = m00*b + m01*d; qc[i] = m01*a + m11*c; qd[i] = m01*b + m11*d;
+        }
+      }
     }
     starData[i*4] = x; starData[i*4+1] = y;
   }
@@ -1014,7 +1045,8 @@ function setSrcUniforms(pr, unit, i = 0, suffix = ''){
 }
 const SRC_UNIT = [1, 4, 5, 6, 7], SRC_SUF = ['', '2', '3', '4', '5'];
 function setAllSrc(pr){
-  const act = ACT();
+  // largest first, so smaller sources sitting on top of larger ones stay visible
+  const act = ACT().sort((i, j) => visR(SRC[j]) - visR(SRC[i]));
   for(let k=0;k<MAX_SRC;k++){ const i = act[k] ?? act[0]; setSrcUniforms(pr, SRC_UNIT[k], i, SRC_SUF[k]); gl.uniform1i(U(pr,'uSrcMode'+SRC_SUF[k]), srcModeId(i)); }
   gl.uniform1i(U(pr,'uNS'), act.length);
 }
@@ -1244,8 +1276,8 @@ function mfModel(){
   // expected fraction of stars per log-mass bin
   const out = new Array(MF_NB).fill(0);
   if(S.massFn === 'equal'){ out[Math.round((0 - MF_LO)/MF_W - 0.5)] = 1; return out; }
-  const m1 = S.massFn === 'salpeter' ? 1 : 10, flat = S.massFn === 'log10';
-  const pdf = lm => { const m = 10**lm; return (m < 0.1 || m > m1) ? 0 : (flat ? 1 : Math.pow(m, -1.35)); };
+  const [f, m1] = MF_PDF[S.massFn];
+  const pdf = lm => { const m = 10**lm; return (m < 0.1 || m > m1) ? 0 : f(m); };
   let tot = 0;
   for(let b=0;b<MF_NB;b++){ let s = 0; for(let k=0;k<40;k++){ s += pdf(MF_LO + (b + (k+0.5)/40)*MF_W); } out[b] = s; tot += s; }
   return out.map(v => v/tot);
@@ -1253,9 +1285,9 @@ function mfModel(){
 function mfMoments(){
   // expected mean and standard deviation of m for the chosen mass function
   if(S.massFn === 'equal') return [1, 0];
-  const m1 = S.massFn === 'salpeter' ? 1 : 10, flat = S.massFn === 'log10';
+  const [f, m1] = MF_PDF[S.massFn];
   let w0 = 0, w1 = 0, w2 = 0; const n = 4000, a = Math.log(0.1), bnd = Math.log(m1);
-  for(let i=0;i<n;i++){ const lm = a + (bnd - a)*(i + 0.5)/n, m = Math.exp(lm), p = flat ? 1 : Math.pow(m, -1.35); w0 += p; w1 += p*m; w2 += p*m*m; }
+  for(let i=0;i<n;i++){ const lm = a + (bnd - a)*(i + 0.5)/n, m = Math.exp(lm), p = f(m); w0 += p; w1 += p*m; w2 += p*m*m; }
   const mean = w1/w0; return [mean, Math.sqrt(Math.max(0, w2/w0 - mean*mean))];
 }
 function mfStats(){
@@ -1277,8 +1309,11 @@ function drawMF(){
   const counts = new Array(MF_NB).fill(0);
   for(let i=0;i<N;i++){ const b = Math.floor((Math.log10(starData[i*4+2]) - MF_LO)/MF_W); if(b >= 0 && b < MF_NB) counts[b]++; }
   const model = mfModel().map(v => v*N);
-  const ymax = Math.max(1, ...counts, ...model)*1.1;
-  const X = lm => pl + (lm - MF_LO)/(MF_NB*MF_W)*w, Y = v => pt + h - v/ymax*h;
+  const ymax = Math.max(1, ...counts, ...model)*(S.mfLog ? 1.6 : 1.1);
+  // log axis: from 0.3 stars (so a single star still shows as a bar) up to the top
+  const ylo = Math.log10(0.3), yhi = Math.log10(ymax);
+  const X = lm => pl + (lm - MF_LO)/(MF_NB*MF_W)*w,
+        Y = v => S.mfLog ? pt + h - Math.max(0, Math.min(1, (Math.log10(Math.max(v, 1e-9)) - ylo)/(yhi - ylo)))*h : pt + h - v/ymax*h;
   x.fillStyle = 'rgba(242,180,90,0.55)';
   for(let b=0;b<MF_NB;b++){ if(!counts[b]) continue; const x0 = X(MF_LO + b*MF_W), x1 = X(MF_LO + (b+1)*MF_W); x.fillRect(x0+0.5, Y(counts[b]), x1-x0-1, pt+h-Y(counts[b])); }
   x.strokeStyle = '#e6e9f2'; x.lineWidth = 1.2; x.beginPath();
@@ -1296,7 +1331,7 @@ function drawMF(){
   x.fillStyle = '#8790a6'; x.fillText(dl, dx, 1);
   x.fillStyle = 'rgba(242,180,90,0.8)'; x.fillRect(dx - dw - 13, 3, 8, 8);
 }
-const MASS_LABEL = {equal:'equal, 1 M☉', salpeter:'Salpeter 0.1–1 M☉', salpeter10:'Salpeter 0.1–10 M☉', log10:'log-uniform 0.1–10 M☉'};
+const MASS_LABEL = {equal:'equal, 1 M☉', salpeter:'Salpeter 0.1–1 M☉', salpeter10:'Salpeter 0.1–10 M☉', chabrier:'Chabrier 0.1–1 M☉', chabrier10:'Chabrier 0.1–10 M☉', log10:'log-uniform 0.1–10 M☉'};
 function srcLabel(i){ const q = SRC[i]; return q.srcMode==='image'&&q.img ? (q.imgName||'image') : (q.srcMode==='disk' ? (q.noDisk ? 'BLR only' : `disk + BLR, s = ${q.srcScale.toFixed(2)}`) : `Gaussian σ = ${q.srcScale.toFixed(2)}`); }
 function srcSummary(i = 0){
   const keep = S.active; S.active = i; const out = srcSummaryRaw(); S.active = keep; return out;
@@ -1410,9 +1445,18 @@ function updateViewRead(){
 function setSrcView(v){
   const wasWide = VS() > S.Ls*1.001; S.vs = v;
   if(!wasWide && VS() > S.Ls*1.001 && !S.caust){ S.caust = true; $('caust').checked = true; }
-  resetMap(); updateScalebars(); updateViewRead();
+  resetMap(); updateScalebars(); updateViewRead(); updateResetBtns();
 }
-function setLensView(v){ S.Lv = v; updateScalebars(); updateViewRead(); viewDirty = true; }
+function setLensView(v){ S.Lv = v; updateResetBtns(); updateScalebars(); updateViewRead(); viewDirty = true; }
+function updateResetBtns(){
+  const src = Math.abs(VS() - S.Ls) < 1e-6 && !S.vc[0] && !S.vc[1], lens = Math.abs(S.Lv - 5) < 1e-6 && !S.lc[0] && !S.lc[1];
+  for(const b of document.querySelectorAll('.resetbtn')) b.disabled = b.dataset.plane === 'src' ? src : lens;
+}
+function resetView(plane){
+  if(plane === 'src'){ S.vc = [0, 0]; setSrcView(0); } else { S.lc = [0, 0]; setLensView(5); }
+  resetWholeBtn(plane);
+}
+document.querySelectorAll('.resetbtn').forEach(b => b.addEventListener('click', () => resetView(b.dataset.plane)));
 function resetWholeBtn(plane){ const b = document.querySelector(`.wholebtn[data-plane="${plane}"]`); b.setAttribute('aria-pressed', 'false'); b.textContent = 'Whole field'; }
 // one button per plane: zoom out to the whole field, then back to the previous view
 const viewBefore = {src: 0, lens: 5};
@@ -1422,13 +1466,16 @@ document.querySelectorAll('.wholebtn').forEach(b => b.addEventListener('click', 
   else { if(whole){ viewBefore.src = S.vs; viewBefore.vc = S.vc; S.vc = [0, 0]; setSrcView(G.VMAX); } else { S.vc = viewBefore.vc || [0, 0]; setSrcView(viewBefore.src); } }
   b.setAttribute('aria-pressed', whole); b.textContent = whole ? 'Zoom back' : 'Whole field';
 }));
+document.querySelectorAll('[data-mscale]').forEach(b => b.addEventListener('click', () => {
+  S.mfLog = b.dataset.mscale === 'log'; document.querySelectorAll('[data-mscale]').forEach(o => o.setAttribute('aria-pressed', o === b)); drawMF();
+}));
 document.querySelectorAll('[data-pscale]').forEach(b => b.addEventListener('click', () => {
   S.profLog = b.dataset.pscale === 'log'; document.querySelectorAll('[data-pscale]').forEach(o => o.setAttribute('aria-pressed', o === b)); drawProf();
 }));
 $('lensCmap').addEventListener('change', e => { LSTOPS = CMAPS[e.target.value]; mapSwatch(); drawColorbar(); viewDirty = true; });
 $('cmapSel').addEventListener('change', e => { STOPS = CMAPS[e.target.value]; drawColorbar(); mapSwatch(); viewDirty = true; });
 mapSwatch();
-$('edge').addEventListener('change', e => { S.edge = e.target.value; $('edgeNote').textContent = S.edge === 'bounce' ? 'A star reaching the edge turns back inward.' : 'A star leaving the edge reappears on the opposite side.'; });
+$('edge').addEventListener('change', e => { S.edge = e.target.value; $('edgeNote').textContent = {free: 'Stars keep going and leave the field, so the field slowly empties. Restart or change the seed to refill it.', elastic: 'A star reflects off the edge like a ball off a wall: same speed, angle out equals angle in.', wrap: 'A star leaving the edge reappears on the opposite side.'}[S.edge]; });
 $('massFn').addEventListener('change', e => { S.massFn = e.target.value; genStars(); });
 $('showSeed').addEventListener('click', e => { const open = $('seedBox').hidden; $('seedBox').hidden = !open; e.currentTarget.setAttribute('aria-expanded', open); updateParams(); });
 const seedEl = $('seed');
@@ -1573,8 +1620,8 @@ function moveSrc(e){
 }
 function visR(q){ return q.srcMode === 'image' && q.img ? q.srcH*1.41 : q.srcMode === 'disk' ? Math.max(1.25*q.blr, 1.6*q.srcScale) : 1.6*q.srcScale; }
 const VC_MAX = () => G.VMAX, LC_MAX = () => G.VMAX;
-function setVc(c){ const m = VC_MAX(); S.vc = [clamp(c[0], -m, m), clamp(c[1], -m, m)]; resetMap(); }
-function setLc(c){ const m = LC_MAX(); S.lc = [clamp(c[0], -m, m), clamp(c[1], -m, m)]; viewDirty = true; }
+function setVc(c){ const m = VC_MAX(); S.vc = [clamp(c[0], -m, m), clamp(c[1], -m, m)]; resetMap(); updateResetBtns(); }
+function setLc(c){ const m = LC_MAX(); S.lc = [clamp(c[0], -m, m), clamp(c[1], -m, m)]; viewDirty = true; updateResetBtns(); }
 srcCv.addEventListener('pointerdown', e => {
   const [bx, by] = srcAt(e);
   let near = -1, best = Infinity;
@@ -1600,7 +1647,7 @@ srcCv.addEventListener('wheel', e => {
   const [w, c] = wheelZoom(e, srcAt, VS(), VC_MAX());
   setVc(w >= VC_MAX() ? [0, 0] : c); setSrcView(w); resetWholeBtn('src');
 }, {passive: false});
-srcCv.addEventListener('dblclick', () => { S.vc = [0, 0]; setSrcView(0); resetWholeBtn('src'); });
+srcCv.addEventListener('dblclick', () => resetView('src'));
 // lens plane: drag to pan, scroll to zoom, double-click to reset
 let lpan = null;
 lensCv.addEventListener('pointerdown', e => { lensCv.setPointerCapture(e.pointerId); lpan = {x: e.clientX, y: e.clientY, c: S.lc}; lensCv.style.cursor = 'grabbing'; });
@@ -1610,7 +1657,7 @@ lensCv.addEventListener('wheel', e => {
   const [w, c] = wheelZoom(e, lensAt, S.Lv, LC_MAX());
   setLc(w >= LC_MAX() ? [0, 0] : c); setLensView(w); resetWholeBtn('lens');
 }, {passive: false});
-lensCv.addEventListener('dblclick', () => { S.lc = [0, 0]; setLensView(5); resetWholeBtn('lens'); });
+lensCv.addEventListener('dblclick', () => resetView('lens'));
 
 // ---------- Guided tour ----------
 const TOUR = [
