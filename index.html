@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quasar Microlensing Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +23,22 @@
   --display:'Spectral', 'Iowan Old Style', Georgia, serif;
   --body:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono:'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --fg2:#c9d0e0;
+  --hover:#3a4560;
   color-scheme: dark;
 }
+:root[data-theme="daylight"]{
+  --ink:#f3f4f8; --panel:#ffffff; --raise:#eceff5; --line:#d3d8e3; --fg:#1b2030; --muted:#5d6680; --fg2:#2f3646; --hover:#9aa4b8;
+  --amber:#c96f12; --cyan:#0f8aa0; --violet:#5f45d0; --rose:#d23b67;
+  color-scheme: light;
+}
+:root[data-theme="daylight"] button.primary{color:#fff}
+:root[data-theme="daylight"] .mtog .dot,:root[data-theme="daylight"] .legendrow .dot{box-shadow:0 0 0 1px #a8916a}
+:root[data-theme="daylight"] .mtog input::after{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+:root[data-theme="daylight"] .mtog input:checked::after{background:#fff}
+:root[data-theme="daylight"] .tour-hole{box-shadow:0 0 0 9999px rgba(20,24,34,.45)}
+.themesel{font-size:12px}
+.themesel select{font-size:12px;padding:4px 6px}
 *{box-sizing:border-box}
 body{background:var(--ink);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.5;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 32px}
@@ -37,7 +50,7 @@ h1 em{font-style:italic;font-weight:400;color:var(--amber)}
 .presets{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .presets .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
 button,.btn{font:inherit;font-size:13px;color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:6px 11px;cursor:pointer;line-height:1.2}
-button:hover,.btn:hover{border-color:#3a4560}
+button:hover,.btn:hover{border-color:var(--hover)}
 button:focus-visible,.btn:focus-within,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);font-weight:600}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
@@ -76,7 +89,7 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .resetbtn:disabled{opacity:.4;cursor:default}
 .labrow .btns{display:flex;gap:6px}
 .zoomrow input{flex:1;min-width:0;accent-color:#9ea6b8}
-.zoomrow output{font-family:var(--mono);font-size:11.5px;color:#c9d0e0;min-width:62px;text-align:right}
+.zoomrow output{font-family:var(--mono);font-size:11.5px;color:var(--fg2);min-width:62px;text-align:right}
 .viewnote{margin:0;font-size:11.5px;line-height:1.55;color:var(--muted)}
 .fieldrow .zoombtns{margin-left:auto;display:inline-flex;gap:6px}
 .fieldrow .zoombtns button{font-size:12px;padding:4px 9px}
@@ -124,7 +137,7 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .lchead .right .mtog{margin-right:8px}
 .lchead .right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 #lcCv{width:100%;height:230px;display:block;touch-action:pan-y}
-.lclegend{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:11.5px;color:#c9d0e0;padding-left:52px;margin-bottom:-4px}
+.lclegend{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--mono);font-size:11.5px;color:var(--fg2);padding-left:52px;margin-bottom:-4px}
 .lclegend .lgi{display:inline-flex;align-items:center;gap:7px}
 .lclegend em{font-style:normal;color:var(--muted);margin-left:2px}
 .lclegend em::before{content:'· ';}
@@ -161,7 +174,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .mfstats{display:flex;justify-content:space-between;gap:12px;margin:4px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .mfstats b{font-weight:500;margin-left:4px}
 .mfstats b.f{color:var(--amber)}
-.mfstats b.e{color:#e6e9f2}
+.mfstats b.e{color:var(--fg)}
 .srcgrp input[type=range]{accent-color:var(--srcc,var(--amber))}
 .srcgrp output{color:var(--srcc,var(--amber))}
 .tbadge{position:absolute;left:10px;top:8px;font-family:var(--mono);font-size:11.5px;color:#dfe5f2;background:rgba(6,8,14,.6);padding:2px 7px;border-radius:4px;pointer-events:none}
@@ -186,9 +199,9 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .headbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .aboutbtn{text-decoration:none;color:var(--fg);background:transparent}
 .tour-hole{position:fixed;z-index:50;border-radius:10px;box-shadow:0 0 0 9999px rgba(3,5,10,.72);outline:2px solid var(--amber);outline-offset:3px;pointer-events:none}
-.tour-card{position:fixed;z-index:51;width:min(340px,calc(100vw - 32px));background:var(--raise);border:1px solid #33405a;border-radius:10px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:8px}
+.tour-card{position:fixed;z-index:51;width:min(340px,calc(100vw - 32px));background:var(--raise);border:1px solid var(--line);border-radius:10px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:8px}
 .tour-card h4{margin:0;font-family:var(--display);font-weight:500;font-size:18px}
-.tour-card p{margin:0;font-size:13px;color:#c9d0e0;line-height:1.5}
+.tour-card p{margin:0;font-size:13px;color:var(--fg2);line-height:1.5}
 .tour-card .tnav{display:flex;align-items:center;gap:6px;margin-top:4px}
 .tour-card .tstep{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-right:auto}
 @media (prefers-reduced-motion:reduce){.tour-hole{transition:none}}
@@ -224,7 +237,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
       <h1>Quasar Microlensing <em>Lab</em></h1>
       <p class="lede">Visualizing microlensing light curves of lensed quasars</p>
     </div>
-    <div class="headbtns"><a class="btn aboutbtn" href="https://github.com/jameshhchan/quasar-microlensing" target="_blank" rel="noopener" title="Project page on GitHub: what the app shows, its features and how to share it">About ↗</a><button id="tourBtn" class="tourbtn">Take the tour</button></div>
+    <div class="headbtns"><label class="cmsel themesel">Theme <select id="themeSel" aria-label="Page colour theme"><option value="lab">Lab</option><option value="daylight">Daylight</option></select></label><a class="btn aboutbtn" href="https://github.com/jameshhchan/quasar-microlensing" target="_blank" rel="noopener" title="Project page on GitHub: what the app shows, its features and how to share it">About ↗</a><button id="tourBtn" class="tourbtn">Take the tour</button></div>
   </header>
 
   <div id="err"></div>
@@ -243,7 +256,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
           <div class="opts stack">
             <div class="optrow"><span class="lab">Scale</span>
               <div class="scalebox"><canvas id="cbar" aria-label="Magnification color scale"></canvas>
-                <div class="cbnote"><span><span class="tri" title="Macro magnification: the value if all the mass were smooth"></span>μ₀ = 1 / |(1−κ)² − γ²| = <b id="macroNote">–</b></span><label class="cmsel">Colours <select id="cmapSel" aria-label="Colour map for the magnification map"><option value="ocean">Ocean</option><option value="magma">Magma</option><option value="gray">Grey</option><option value="viridis">Viridis</option><option value="cosmic">Cosmic</option></select></label></div></div>
+                <div class="cbnote"><span><span class="tri" title="Macro magnification: the value if all the mass were smooth"></span>μ₀ = 1 / |(1−κ)² − γ²| = <b id="macroNote">–</b></span><label class="cmsel">Colours <select id="cmapSel" aria-label="Colour map for the magnification map"><option value="ocean">Ocean</option><option value="magma">Magma</option><option value="gray">Grey</option><option value="viridis">Viridis</option><option value="rainbow">Rainbow</option><option value="cosmic">Cosmic</option></select></label></div></div>
             </div>
           </div>
           <div class="opts cols">
@@ -273,7 +286,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
           <div class="opts stack" id="lensScale">
             <div class="optrow"><span class="lab">Scale</span>
               <div class="scalebox"><canvas id="cbarL" class="cbarc" aria-label="Lens-plane magnification color scale"></canvas>
-                <div class="cbnote"><span><span class="tri"></span>μ₀ = <b id="macroNoteL">–</b></span><label class="cmsel">Colours <select id="lensCmap" aria-label="Colour map for the lens-plane magnification"><option value="ocean">Ocean</option><option value="magma">Magma</option><option value="gray">Grey</option><option value="viridis">Viridis</option><option value="cosmic">Cosmic</option></select></label></div></div>
+                <div class="cbnote"><span><span class="tri"></span>μ₀ = <b id="macroNoteL">–</b></span><label class="cmsel">Colours <select id="lensCmap" aria-label="Colour map for the lens-plane magnification"><option value="ocean">Ocean</option><option value="magma">Magma</option><option value="gray">Grey</option><option value="viridis">Viridis</option><option value="rainbow">Rainbow</option><option value="cosmic">Cosmic</option></select></label></div></div>
             </div>
           </div>
           <div class="opts cols">
@@ -429,6 +442,11 @@ const S = {
   playing:!reduceMotion, t:0,
 };
 // two independent sources; S.srcMode, S.sx, ... read and write the one being edited (S.active)
+const TH_LAB = {day:false, muted:'#8790a6', grid:'#1b2232', base:'#5b6680', marker:'#c3c9d6', axis:'#2a3346', fg:'#e6e9f2', fg2:'#c9d0e0'};
+const TH_DAY = {day:true, muted:'#5b6376', grid:'#e3e7ee', base:'#8a93a6', marker:'#3d4558', axis:'#c3cad6', fg:'#161b27', fg2:'#343b4c'};
+let TH = TH_LAB;
+const SRC_COL_DAY = ['#c47a10', '#2f9a2c', '#d8402f', '#454b5a', '#2f74d6'];
+const SCOL = i => TH.day ? SRC_COL_DAY[i] : SRC_COL[i];
 const MAX_SRC = 5, SRC_NAMES = 'ABCDE', SRC_COL = ['#f2b45a', '#7ee07a', '#ff6b5c', '#f2f2f2', '#6aa8ff'];
 // each source's colour on the planes: [edge, core] RGB, matching SRC_COL
 const SRC_PAL = [[[1,0.54,0.24],[1,0.96,0.86]], [[0.38,0.9,0.35],[0.88,1,0.85]], [[1,0.32,0.26],[1,0.88,0.84]], [[0.74,0.77,0.84],[1,1,1]], [[0.25,0.5,1],[0.84,0.92,1]]];
@@ -1176,7 +1194,7 @@ function drawLC(){
   const [t0, t1] = S.lcZoom || [Math.max(S.t, LC_WINDOW) - LC_WINDOW, Math.max(S.t, LC_WINDOW)];
   lcGeom = {pl, w, t0, t1};
   const series = [];
-  for(const i of ACT()) series.push({get:p => p.s[i], col:SRC_COL[i], lw:2.2, label:(S.nSrc > 1 ? SRC_NAMES[i] + ': ' : '') + srcLabel(i)});
+  for(const i of ACT()) series.push({get:p => p.s[i], col:SCOL(i), lw:2.2, label:(S.nSrc > 1 ? SRC_NAMES[i] + ': ' : '') + srcLabel(i)});
   if(S.compare) CMP_SIG.forEach((s,i) => series.push({get:p => p.g[i], col:CMP_COL[i], lw:1.3, label:`σ = ${s}`}));
   let lo = Infinity, hi = -Infinity;
   const base = val(G.muMac);
@@ -1194,7 +1212,7 @@ function drawLC(){
   c.font = '11px "IBM Plex Mono", ui-monospace, monospace'; c.textBaseline = 'middle';
   // grid
   const ys = niceStep(hi-lo, 5);
-  c.strokeStyle = '#1b2232'; c.lineWidth = 1; c.fillStyle = '#8790a6'; c.textAlign = 'right';
+  c.strokeStyle = TH.grid; c.lineWidth = 1; c.fillStyle = TH.muted; c.textAlign = 'right';
   for(let v = Math.ceil(lo/ys)*ys; v <= hi+1e-9; v += ys){
     const y = Math.round(Y(v))+0.5; c.beginPath(); c.moveTo(pl,y); c.lineTo(pl+w,y); c.stroke();
     const lab = mag ? (-v).toFixed(ys<0.1?2:1) : (v>=100?v.toFixed(0):v.toPrecision(3).replace(/\.?0+$/,''));
@@ -1206,8 +1224,8 @@ function drawLC(){
     c.fillText(t.toFixed(xs < 0.1 ? 2 : xs < 1 ? 1 : 0), x, pt+h+7);
   }
   // macro line
-  c.setLineDash([4,4]); c.strokeStyle = '#5b6680'; c.beginPath(); c.moveTo(pl, Y(base)); c.lineTo(pl+w, Y(base)); c.stroke(); c.setLineDash([]);
-  c.fillStyle = '#8790a6'; c.textAlign = 'right'; c.textBaseline = 'bottom';
+  c.setLineDash([4,4]); c.strokeStyle = TH.base; c.beginPath(); c.moveTo(pl, Y(base)); c.lineTo(pl+w, Y(base)); c.stroke(); c.setLineDash([]);
+  c.fillStyle = TH.muted; c.textAlign = 'right'; c.textBaseline = 'bottom';
   c.fillText(mag ? 'μ₀' : `μ₀ = ${G.muMac.toFixed(2)}`, pl+w-4, Y(base)-3);
   // axis titles
   c.save(); c.translate(13, pt+h/2); c.rotate(-Math.PI/2); c.textAlign='center'; c.textBaseline='middle';
@@ -1228,11 +1246,11 @@ function drawLC(){
   const lgEl = $('lcLegend'); if(lgEl.innerHTML !== lgHtml) lgEl.innerHTML = lgHtml;
   // viewed moment (solid) and hover cursor (dashed), paused only
   c.font = '11px "IBM Plex Mono", ui-monospace, monospace'; c.textBaseline = 'top';
-  if(S.viewT != null && S.viewT >= t0 && S.viewT <= t1){ const x = Math.round(X(S.viewT))+0.5; c.strokeStyle = '#c3c9d6'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x, pt); c.lineTo(x, pt+h); c.stroke(); c.fillStyle = '#c3c9d6'; c.textAlign = x > pl + w - 80 ? 'right' : 'left'; c.fillText(`t = ${S.viewT.toFixed(1)}`, x + (c.textAlign === 'left' ? 5 : -5), pt + 18); }
-  if(!S.playing && lcHover != null && !lcSel && lcHover >= pl && lcHover <= pl + w){ const x = Math.round(lcHover)+0.5, th = t0 + (lcHover - pl)/w*(t1 - t0); c.setLineDash([3,3]); c.strokeStyle = '#8790a6'; c.lineWidth = 1; c.beginPath(); c.moveTo(x, pt); c.lineTo(x, pt+h); c.stroke(); c.setLineDash([]); c.fillStyle = '#c9d0e0'; c.textAlign = x > pl + w - 80 ? 'right' : 'left'; c.fillText(`t = ${th.toFixed(1)}`, x + (c.textAlign === 'left' ? 5 : -5), pt + h - 16); }
+  if(S.viewT != null && S.viewT >= t0 && S.viewT <= t1){ const x = Math.round(X(S.viewT))+0.5; c.strokeStyle = TH.marker; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x, pt); c.lineTo(x, pt+h); c.stroke(); c.fillStyle = TH.marker; c.textAlign = x > pl + w - 80 ? 'right' : 'left'; c.fillText(`t = ${S.viewT.toFixed(1)}`, x + (c.textAlign === 'left' ? 5 : -5), pt + 18); }
+  if(!S.playing && lcHover != null && !lcSel && lcHover >= pl && lcHover <= pl + w){ const x = Math.round(lcHover)+0.5, th = t0 + (lcHover - pl)/w*(t1 - t0); c.setLineDash([3,3]); c.strokeStyle = TH.muted; c.lineWidth = 1; c.beginPath(); c.moveTo(x, pt); c.lineTo(x, pt+h); c.stroke(); c.setLineDash([]); c.fillStyle = TH.fg2; c.textAlign = x > pl + w - 80 ? 'right' : 'left'; c.fillText(`t = ${th.toFixed(1)}`, x + (c.textAlign === 'left' ? 5 : -5), pt + h - 16); }
   // zoom selection and hint (zoom works while paused)
   if(lcSel){ const a = Math.min(lcSel[0], lcSel[1]), b = Math.max(lcSel[0], lcSel[1]); c.fillStyle = 'rgba(242,180,90,0.14)'; c.fillRect(a, pt, b-a, h); c.strokeStyle = 'rgba(242,180,90,0.7)'; c.lineWidth = 1; c.strokeRect(a+0.5, pt+0.5, b-a, h); }
-  if(!S.playing && lc.length){ c.font = '11px "IBM Plex Sans", system-ui, sans-serif'; c.fillStyle = '#8790a6'; c.textAlign = 'right'; c.textBaseline = 'top'; c.fillText((S.viewT != null ? 'Drag the time line to move through time' : 'Click a time to view it') + ' · drag to zoom' + (S.lcZoom || S.viewT != null ? ' · double-click for latest' : ''), pl+w-4, pt+4); }
+  if(!S.playing && lc.length){ c.font = '11px "IBM Plex Sans", system-ui, sans-serif'; c.fillStyle = TH.muted; c.textAlign = 'right'; c.textBaseline = 'top'; c.fillText((S.viewT != null ? 'Drag the time line to move through time' : 'Click a time to view it') + ' · drag to zoom' + (S.lcZoom || S.viewT != null ? ' · double-click for latest' : ''), pl+w-4, pt+4); }
   syncLcScroll(t0, t1);
 }
 
@@ -1242,6 +1260,7 @@ const CMAPS = {
   cosmic:  [[0,[4,6,11]],[0.25,[24,33,79]],[0.45,[59,63,153]],[0.62,[154,79,142]],[0.78,[224,137,78]],[0.92,[247,212,138]],[1,[255,250,240]]],
   viridis: [[0,[68,1,84]],[0.17,[70,50,126]],[0.33,[54,92,141]],[0.5,[39,127,142]],[0.67,[31,161,135]],[0.83,[74,193,109]],[1,[253,231,37]]],
   magma:   [[0,[0,0,4]],[0.17,[44,17,95]],[0.33,[114,31,129]],[0.5,[183,55,121]],[0.67,[241,96,93]],[0.83,[254,176,120]],[1,[252,253,191]]],
+  rainbow: [[0,[48,18,59]],[0.17,[70,134,251]],[0.33,[26,228,182]],[0.5,[162,252,60]],[0.67,[250,191,55]],[0.83,[228,70,10]],[1,[122,4,3]]],
   gray:    [[0,[6,6,8]],[0.17,[40,40,44]],[0.33,[78,78,84]],[0.5,[120,120,126]],[0.67,[164,164,170]],[0.83,[208,208,212]],[1,[252,252,252]]],
 };
 let STOPS = CMAPS.ocean, LSTOPS = CMAPS.ocean;
@@ -1253,9 +1272,9 @@ function drawBar(c, st){
   c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
   const x = c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
   for(let i=0;i<W;i++){ const [r,g,b] = cmapJS(i/W, st); x.fillStyle = `rgb(${r},${g},${b})`; x.fillRect(i,4,1.5,8); }
-  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.fillStyle = '#8790a6'; x.textBaseline = 'top';
+  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.fillStyle = TH.muted; x.textBaseline = 'top';
   const pos = v => (Math.log10(v)-LOGR[0])/(LOGR[1]-LOGR[0])*W;
-  for(const v of [0.3,1,3,10,30,100]){ const p = pos(v); x.fillStyle='#8790a6'; x.fillRect(Math.round(p),12,1,3); x.textAlign = p<12?'left':(p>W-14?'right':'center'); x.fillText(String(v), p, 17); }
+  for(const v of [0.3,1,3,10,30,100]){ const p = pos(v); x.fillStyle=TH.muted; x.fillRect(Math.round(p),12,1,3); x.textAlign = p<12?'left':(p>W-14?'right':'center'); x.fillText(String(v), p, 17); }
   const pm = Math.max(0, Math.min(W, pos(G.muMac||1)));
   x.fillStyle = '#f2b45a'; x.beginPath(); x.moveTo(pm-4,0); x.lineTo(pm+4,0); x.lineTo(pm,5); x.fill();
 }
@@ -1316,19 +1335,19 @@ function drawMF(){
         Y = v => S.mfLog ? pt + h - Math.max(0, Math.min(1, (Math.log10(Math.max(v, 1e-9)) - ylo)/(yhi - ylo)))*h : pt + h - v/ymax*h;
   x.fillStyle = 'rgba(242,180,90,0.55)';
   for(let b=0;b<MF_NB;b++){ if(!counts[b]) continue; const x0 = X(MF_LO + b*MF_W), x1 = X(MF_LO + (b+1)*MF_W); x.fillRect(x0+0.5, Y(counts[b]), x1-x0-1, pt+h-Y(counts[b])); }
-  x.strokeStyle = '#e6e9f2'; x.lineWidth = 1.2; x.beginPath();
+  x.strokeStyle = TH.fg; x.lineWidth = 1.2; x.beginPath();
   let started = false;
   for(let b=0;b<MF_NB;b++){ const x0 = X(MF_LO + b*MF_W), x1 = X(MF_LO + (b+1)*MF_W), y = Y(model[b]); if(!started){ x.moveTo(x0, Y(0)); started = true; } x.lineTo(x0, y); x.lineTo(x1, y); }
   x.lineTo(X(MF_LO + MF_NB*MF_W), Y(0)); x.stroke();
-  x.strokeStyle = '#2a3346'; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
-  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.fillStyle = '#8790a6'; x.textBaseline = 'top';
+  x.strokeStyle = TH.axis; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
+  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.fillStyle = TH.muted; x.textBaseline = 'top';
   for(const [lm, lab] of [[-1,'0.1'],[0,'1'],[1,'10 M☉']]){ const px = X(lm); x.fillRect(Math.round(px), pt+h, 1, 3); x.textAlign = lm < 0 ? 'left' : (lm > 0 ? 'right' : 'center'); x.fillText(lab, lm < 0 ? px - 2 : (lm > 0 ? px + 4 : px), pt+h+4); }
-  x.textBaseline = 'top'; x.textAlign = 'left'; x.fillStyle = '#8790a6';
+  x.textBaseline = 'top'; x.textAlign = 'left'; x.fillStyle = TH.muted;
   x.fillText(`${N} stars`, pl, 1);
-  x.textAlign = 'right'; x.fillStyle = '#c9d0e0'; x.fillText('— expected', pl+w, 1);
+  x.textAlign = 'right'; x.fillStyle = TH.fg2; x.fillText('— expected', pl+w, 1);
   const tw = x.measureText('— expected').width, dl = 'this field', dw = x.measureText(dl).width;
   const dx = pl + w - tw - 14;
-  x.fillStyle = '#8790a6'; x.fillText(dl, dx, 1);
+  x.fillStyle = TH.muted; x.fillText(dl, dx, 1);
   x.fillStyle = 'rgba(242,180,90,0.8)'; x.fillRect(dx - dw - 13, 3, 8, 8);
 }
 const MASS_LABEL = {equal:'equal, 1 M☉', salpeter:'Salpeter 0.1–1 M☉', salpeter10:'Salpeter 0.1–10 M☉', chabrier:'Chabrier 0.1–1 M☉', chabrier10:'Chabrier 0.1–10 M☉', log10:'log-uniform 0.1–10 M☉'};
@@ -1416,7 +1435,7 @@ function drawProf(){
   const R = logR ? pr.Rm/1.415 : (q.srcMode === 'image' && q.img ? q.srcH : Math.min(q.srcH, Math.max(3*(pr.half||0), 0.05)));
   const R0 = logR ? pr.r0 : 0;
   const X = logR ? r => pl + Math.log(Math.max(r, R0)/R0)/Math.log(R/R0)*w : r => pl + r/R*w, Y = v => pt + h - v*h;
-  const n = pr.mean.length, col = SRC_COL[S.active];
+  const n = pr.mean.length, col = SCOL(S.active);
   const pts = logR ? pr.logPts.filter(([r]) => r <= R) : Array.from({length: n}, (_, b) => [(b+0.5)/n*pr.Rm, pr.mean[b]]).filter(([r]) => r <= R);
   if(pts.length){
     x.beginPath(); x.moveTo(X(pts[0][0]), Y(0)); for(const [r, v] of pts) x.lineTo(X(r), Y(v)); x.lineTo(X(pts[pts.length-1][0]), Y(0)); x.closePath();
@@ -1424,12 +1443,12 @@ function drawProf(){
     x.beginPath(); pts.forEach(([r, v], k) => k ? x.lineTo(X(r), Y(v)) : x.moveTo(X(r), Y(v)));
     x.strokeStyle = col; x.lineWidth = 1.5; x.stroke();
   }
-  if(pr.half && pr.half < R){ x.setLineDash([3,3]); x.strokeStyle = '#c9d0e0'; x.lineWidth = 1; x.beginPath(); x.moveTo(X(pr.half)+0.5, pt); x.lineTo(X(pr.half)+0.5, pt+h); x.stroke(); x.setLineDash([]); }
-  x.strokeStyle = '#2a3346'; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
-  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.textBaseline = 'top'; x.fillStyle = '#8790a6';
+  if(pr.half && pr.half < R){ x.setLineDash([3,3]); x.strokeStyle = TH.fg2; x.lineWidth = 1; x.beginPath(); x.moveTo(X(pr.half)+0.5, pt); x.lineTo(X(pr.half)+0.5, pt+h); x.stroke(); x.setLineDash([]); }
+  x.strokeStyle = TH.axis; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
+  x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.textBaseline = 'top'; x.fillStyle = TH.muted;
   x.textAlign = 'left'; x.fillText(logR ? fmt(R0, R0 < 0.01 ? 4 : 3) : '0', pl, pt+h+4); x.textAlign = 'right'; x.fillText(`${fmt(R, R < 0.1 ? 3 : 2)} θE`, pl+w, pt+h+4);
   x.textAlign = 'center'; x.fillText(logR ? 'radius (log)' : 'radius', pl + w/2, pt+h+4);
-  if(pr.half){ const hx = Math.min(X(pr.half), pl+w); x.fillStyle = '#c9d0e0'; x.textBaseline = 'top'; const lab = `half-light ${fmt(pr.half, pr.half < 0.1 ? 3 : 2)} θE`; const right = hx > pl + w*0.6; x.textAlign = right ? 'right' : 'left'; x.fillText(lab, hx + (right ? -5 : 5), pt + 2); }
+  if(pr.half){ const hx = Math.min(X(pr.half), pl+w); x.fillStyle = TH.fg2; x.textBaseline = 'top'; const lab = `half-light ${fmt(pr.half, pr.half < 0.1 ? 3 : 2)} θE`; const right = hx > pl + w*0.6; x.textAlign = right ? 'right' : 'left'; x.fillText(lab, hx + (right ? -5 : 5), pt + 2); }
 }
 function showSize(){ showDisk(); drawProf(); $('srcSizeOut').textContent = S.srcMode === 'disk' && S.noDisk ? '0 (none)' : fmt(S.srcScale, S.srcScale<0.1?3:2) + ' θE'; $('srcSizeLbl').textContent = S.srcMode==='image' ? 'Half-width / 3' : (S.srcMode==='disk' ? 'Disk scale' : 'Size σ'); }
 sizeEl.value = Math.round((Math.log10(S.srcScale)+2)*50); showSize();
@@ -1486,7 +1505,7 @@ $('method').addEventListener('change', e => { S.method = e.target.value; resetMa
 $('quality').addEventListener('change', e => { S.quality = +e.target.value; allocTargets(); fluxDirty = true; });
 for(const id of ['lensMag','showMap','caust','showSrc','showImgs','starsSrc','starsLens','crit','rings','compare','showOrig','showField','showShoot','srcField','srcShoot']) $(id).addEventListener('change', e => { S[id] = e.target.checked; if(id === 'caust') cau.k = 0; viewDirty = true; lcDirty = true; });
 function syncSourceUI(){
-  $('srcSize').closest('.group').style.setProperty('--srcc', SRC_COL[S.active]);
+  $('srcSize').closest('.group').style.setProperty('--srcc', SCOL(S.active));
   document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === S.srcMode));
   document.querySelectorAll('[data-src]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.src === S.active));
   sizeEl.value = S.srcMode === 'disk' && S.noDisk ? 0 : Math.max(1, Math.round((Math.log10(S.srcScale)+2)*50));
@@ -1495,9 +1514,9 @@ function syncSourceUI(){
 }
 function renderTabs(){
   const el = $('srcTabs'); let h = '';
-  for(const i of ACT()) h += `<button data-src="${i}" aria-pressed="${i === S.active}" style="${i === S.active ? 'border-color:' + SRC_COL[i] : ''}"><i class="tabsw" style="background:${SRC_COL[i]}"></i>${S.nSrc > 1 ? SRC_NAMES[i] : 'Source ' + SRC_NAMES[i]}</button>`;
+  for(const i of ACT()) h += `<button data-src="${i}" aria-pressed="${i === S.active}" style="${i === S.active ? 'border-color:' + SCOL(i) : ''}"><i class="tabsw" style="background:${SCOL(i)}"></i>${S.nSrc > 1 ? SRC_NAMES[i] : 'Source ' + SRC_NAMES[i]}</button>`;
   const free = SRC.findIndex(q => !q.on);
-  if(free >= 0) h += `<button class="addsrc" data-act="add" title="Add source ${SRC_NAMES[free]}"><i class="tabsw" style="background:${SRC_COL[free]}"></i>+ Add ${SRC_NAMES[free]}</button>`;
+  if(free >= 0) h += `<button class="addsrc" data-act="add" title="Add source ${SRC_NAMES[free]}"><i class="tabsw" style="background:${SCOL(free)}"></i>+ Add ${SRC_NAMES[free]}</button>`;
   if(S.nSrc > 1) h += `<button class="rmsrc" data-act="rm" title="Remove source ${SRC_NAMES[S.active]}">Remove ${SRC_NAMES[S.active]}</button>`;
   el.innerHTML = h;
 }
@@ -1716,7 +1735,7 @@ function frame(now){
   if(S.playing || fluxDirty){
     computeFlux(); fluxDirty = false;
     if(S.playing) pushLC(); else lcDirty = true;
-    $('muNow').innerHTML = ACT().map(i => `<span style="color:${SRC_COL[i]}">${S.nSrc > 1 ? SRC_NAMES[i] + ' ' : ''}${isFinite(cur.all[i]) ? cur.all[i].toFixed(2) : '–'}</span>`).join(' · ');
+    $('muNow').innerHTML = ACT().map(i => `<span style="color:${SCOL(i)}">${S.nSrc > 1 ? SRC_NAMES[i] + ' ' : ''}${isFinite(cur.all[i]) ? cur.all[i].toFixed(2) : '–'}</span>`).join(' · ');
     $('tNow').textContent = (S.viewT != null ? S.viewT : S.t).toFixed(1);
     updateTimeBadges();
     updateParams();
@@ -1734,9 +1753,21 @@ for(let i=0;i<MAX_SRC;i++) buildSource(i);
 genStars();
 resize();
 if(document.fonts) document.fonts.ready.then(() => { drawColorbar(); lcDirty = true; });
+// page theme: Lab (dark) or Daylight (light); remembered in this browser
+function setTheme(t){
+  if(t !== 'daylight') t = 'lab';
+  TH = t === 'daylight' ? TH_DAY : TH_LAB;
+  if(t === 'daylight') document.documentElement.dataset.theme = 'daylight'; else delete document.documentElement.dataset.theme;
+  $('themeSel').value = t;
+  try{ localStorage.setItem('qml-theme', t); }catch(e){}
+  renderTabs(); syncSourceUI(); drawColorbar(); drawMF(); drawProf(); lcDirty = true;
+}
+$('themeSel').addEventListener('change', e => setTheme(e.target.value));
+try{ if(localStorage.getItem('qml-theme') === 'daylight') setTheme('daylight'); }catch(e){}
 requestAnimationFrame(frame);
 
 })();
 </script>
+
 </body>
 </html>
