@@ -82,17 +82,27 @@ Positions are uniform in the circle. Scroll to zoom into either plane, or use **
 
 ## Stellar mass function
 
-- **Equal:** every star has $`m = 1\,M_\odot`$.
-- **Salpeter:** $`dN/dm \propto m^{-2.35}`$, between $`0.1`$ and $`1\,M_\odot`$ ($`\langle m \rangle \approx 0.22\,M_\odot`$) or $`0.1`$ and $`10\,M_\odot`$ ($`\langle m \rangle \approx 0.31\,M_\odot`$).
-- **Chabrier:** the Chabrier (2003) single-star function, log-normal below $`1\,M_\odot`$ and a power law above, joined smoothly at $`1\,M_\odot`$, between $`0.1`$ and $`1\,M_\odot`$ ($`\langle m \rangle \approx 0.31\,M_\odot`$) or $`0.1`$ and $`10\,M_\odot`$ ($`\langle m \rangle \approx 0.54\,M_\odot`$). The $`0.1`$–$`1\,M_\odot`$ range suits the old stellar populations of typical lens galaxies, where heavier stars have already burned out:
+Every mass function except equal mass is drawn between a lowest and a highest mass, set with the two handles of the mass-range slider (log scale, $`0.01`$ to $`100\,M_\odot`$). The default range is $`0.1`$–$`1\,M_\odot`$, which suits the old stellar populations of typical lens galaxies, where heavier stars have already burned out.
+
+- **Equal:** every star has the same mass, $`1\,M_\odot`$ by default (the slider then has one handle).
+- **Salpeter:** $`dN/dm \propto m^{-2.35}`$ ($`\langle m \rangle \approx 0.22\,M_\odot`$ for $`0.1`$–$`1\,M_\odot`$).
+- **Chabrier:** the Chabrier (2003) single-star function, log-normal below $`1\,M_\odot`$ and a power law above, joined smoothly at $`1\,M_\odot`$ ($`\langle m \rangle \approx 0.31\,M_\odot`$ for $`0.1`$–$`1\,M_\odot`$):
 
 ```math
 \frac{dN}{d\log m} \propto \begin{cases} \exp\!\left[-\dfrac{(\log m - \log 0.079)^2}{2\,(0.69)^2}\right], & m \le 1\,M_\odot \\[6pt] m^{-1.3}, & m > 1\,M_\odot \end{cases}
 ```
 
-- **Log-uniform:** $`dN/d\log m = \text{constant}`$ between $`0.1`$ and $`10\,M_\odot`$ ($`\langle m \rangle \approx 2.15\,M_\odot`$).
+- **Kroupa:** the Kroupa (2001) broken power law, continuous at both breaks ($`\langle m \rangle \approx 0.32\,M_\odot`$ for $`0.1`$–$`1\,M_\odot`$):
 
-The small plot under the menu compares the stars drawn in this field with the expected distribution, with the mean $`\langle m \rangle`$ and standard deviation $`\sigma`$ of both.
+```math
+\frac{dN}{dm} \propto \begin{cases} m^{-0.3}, & m < 0.08\,M_\odot \\[2pt] m^{-1.3}, & 0.08 \le m < 0.5\,M_\odot \\[2pt] m^{-2.3}, & m \ge 0.5\,M_\odot \end{cases}
+```
+
+- **Log-uniform:** $`dN/d\log m = \text{constant}`$ (choosing it from a range that tops out at $`1\,M_\odot`$ switches to $`0.1`$–$`10\,M_\odot`$, $`\langle m \rangle \approx 2.15\,M_\odot`$).
+
+Salpeter masses come from the exact inverse of its cumulative distribution and the others from a finely tabulated one in $`\log m`$, with one random number per star, so the same seed gives the same field. The number of stars is $`N = \kappa_\star R_\star^2 / \langle m \rangle`$, up to 512; a very low lowest mass can hit that cap, and the app then warns that $`\kappa_\star`$ is below the set value.
+
+The small plot under the mass range compares the stars drawn in this field with the expected distribution, with the mean $`\langle m \rangle`$ and standard deviation $`\sigma`$ of both.
 
 ## Motion
 
@@ -108,13 +118,41 @@ where $`\mathbf{u}_i`$ is drawn from a 2D unit Gaussian. Velocities are in $`\th
 
 **Gaussian:** $`I(r) \propto \exp\left(-r^2/2\sigma^2\right)`$, with half-light radius $`r_{1/2} = \sqrt{2\ln 2}\,\sigma \approx 1.18\,\sigma`$.
 
-**Accretion disk:** a face-on thin disk at a single wavelength,
+**Accretion disk:** a thin disk at a single wavelength,
 
 ```math
 I(r) \propto \frac{1}{e^{\xi}-1},\qquad \xi = \left(\frac{r}{s}\right)^{3/4}\left(1-\sqrt{\frac{r_{\rm in}}{r}}\right)^{-1/4},
 ```
 
-where $`s`$ is the disk scale and $`r_{\rm in}`$ is the ISCO radius; there is no light inside the ISCO. Setting the disk scale to $`0`$ removes the disk.
+where $`s`$ is the disk scale and $`r_{\rm in}`$ is the **inner edge** (the ISCO); there is no light inside it. Setting the disk scale to $`0`$ removes the disk.
+
+The disk is seen at **inclination** $`i`$ (0° is face-on), with its major axis along **orientation** $`\theta`$, measured counter-clockwise from the $`+x`$ axis of the source plane. Without GR, $`\theta`$ and $`\theta + 180^\circ`$ look the same, so $`\theta`$ runs 0–179°; with GR on it runs 0–360° and points to the side moving toward us. A point $`(x, y)`$ on the source plane maps to the disk plane as
+
+```math
+u = x\cos\theta + y\sin\theta, \qquad v = \frac{-x\sin\theta + y\cos\theta}{\cos i}, \qquad r = \sqrt{u^2 + v^2}.
+```
+
+**GR effects** (as in Caustic Crossing) add the Doppler boost and gravitational redshift of a disk on circular orbits around a black hole of spin $`a`$. In units of the gravitational radius $`r_g = GM/c^2`$, with $`R = r/r_g`$ and $`U = u/r_g`$, the orbital angular velocity and time component of the 4-velocity are
+
+```math
+\Omega = \frac{1}{R^{3/2} + a}, \qquad u^t = \frac{R^{3/2} + a}{R^{3/4}\sqrt{R^{3/2} - 3R^{1/2} + 2a}},
+```
+
+and light from each point is shifted by
+
+```math
+g = \frac{\nu_{\rm obs}}{\nu_{\rm em}} = \frac{1}{u^t\,(1 - \Omega \sin i \; U)}, \qquad I \propto \frac{g^3}{\exp(\xi/g) - 1}.
+```
+
+The side at $`\theta`$ moves toward us, so it is brighter and bluer.
+
+**This app uses $`a = 0`$** (a non-spinning black hole). The app measures sizes in $`\theta_E`$ and has no black-hole mass, so it takes the inner edge to be the ISCO of a non-spinning hole, $`r_{\rm in} = 6\,r_g`$, which sets $`r_g = r_{\rm in}/6`$. The formulas then reduce to
+
+```math
+\Omega = R^{-3/2}, \qquad u^t = \frac{1}{\sqrt{1 - 3/R}}, \qquad g = \frac{\sqrt{1 - 3/R}}{1 - \sin i\,\cos\phi/\sqrt{R}},
+```
+
+where $`\phi`$ is the angle around the disk from $`\theta`$. At a given radius, spin changes $`g`$ only slightly (under about 7% at $`6\,r_g`$, under 1% at $`12\,r_g`$); its main effect is to let the disk reach inside $`6\,r_g`$ (down to $`1.24\,r_g`$ for $`a = 0.998`$), where the effects are much stronger. Light is assumed to travel in straight lines (no light bending), which is accurate far from the black hole and approximate within a few $`r_g`$. GR effects need an inner edge; with $`r_{\rm in} = 0`$ they are off. The BLR ring lies in the same plane as the disk, so it is inclined too.
 
 **Broad-line region (BLR):** a ring at radius $`R_{\rm BLR}`$, with a Gaussian cross-section of width $`0.15\,R_{\rm BLR}`$ and peak brightness $`0.28`$ of the disk's peak. Setting $`R_{\rm BLR}`$ to $`0`$ removes it.
 

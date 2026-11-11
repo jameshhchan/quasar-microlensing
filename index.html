@@ -173,6 +173,35 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .lcnote{margin:0;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 .mfstats{display:flex;justify-content:space-between;gap:12px;margin:4px 0 0;font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .mfstats b{font-weight:500;margin-left:4px}
+.mfstats{flex-wrap:wrap}
+/* disk controls: pairs of half-width sliders, a small heading for the viewing angle, GR on one line */
+#diskCtl .pair{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+#diskCtl .pair .row label{font-size:12.5px;white-space:nowrap}
+#diskCtl .pair .row output{font-size:11px}
+#diskCtl .pair .row .top{gap:4px}
+#diskCtl .pair .row label .sym{margin-left:3px}
+#diskCtl .subhead{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;padding-top:8px;border-top:1px solid var(--line)}
+#diskCtl .grrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#diskCtl .grrow label{font-size:13px}
+#diskCtl .grrow .sym{font-family:var(--body);font-style:normal;font-size:11.5px;color:var(--muted);margin-left:6px}
+#diskCtl .grseg button{padding:3px 12px;font-size:12px}
+#diskCtl .grinfo{margin:-4px 0 0;font-family:var(--mono);font-size:11px;color:var(--amber);min-height:0}
+#diskCtl .grinfo output:empty{display:none}
+#diskCtl .grassume{margin:-4px 0 0;font-size:11.5px;line-height:1.45;color:var(--muted)}
+/* two-thumb range: two range inputs share one track; only the thumbs take the pointer */
+.dual{position:relative;height:20px;margin:2px 0}
+.dual .dtrack,.dual .dfill{position:absolute;top:8px;height:4px;border-radius:2px;pointer-events:none}
+.dual .dtrack{left:0;right:0;background:var(--line)}
+.dual .dfill{background:var(--amber)}
+.dual input{position:absolute;inset:0;width:100%;height:20px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;pointer-events:none}
+.dual input::-webkit-slider-runnable-track{background:transparent;height:20px}
+.dual input::-moz-range-track{background:transparent}
+.dual input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;pointer-events:auto;width:16px;height:16px;margin-top:2px;border-radius:50%;background:var(--amber);border:2px solid var(--panel);box-shadow:0 0 0 1px var(--amber);cursor:pointer}
+.dual input::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--amber);border:2px solid var(--panel);box-shadow:0 0 0 1px var(--amber);cursor:pointer}
+.dual input:focus-visible{outline:none}
+.dual input:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--amber)}
+.dual input:focus-visible::-moz-range-thumb{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--amber)}
+.mfstats .mfcap{flex-basis:100%;color:var(--rose);font-family:var(--body);font-size:11.5px}
 .mfstats b.f{color:var(--amber)}
 .mfstats b.e{color:var(--fg)}
 .srcgrp input[type=range]{accent-color:var(--srcc,var(--amber))}
@@ -352,11 +381,22 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <p id="upMsg" class="upmsg" hidden role="status"></p>
         <div class="row"><div class="top"><label for="srcSize" id="srcSizeLbl">Size σ</label><output id="srcSizeOut"></output></div>
           <input type="range" id="srcSize" min="0" max="100" step="1" value="50"></div>
-        <div id="diskCtl" hidden style="display:flex;flex-direction:column;gap:10px">
-          <div class="row"><div class="top"><label for="isco">ISCO radius</label><output id="iscoOut"></output></div>
+        <div id="diskCtl" hidden style="display:flex;flex-direction:column;gap:8px">
+          <div class="row"><div class="top"><label for="isco" title="Inner edge of the disk (the ISCO)">Inner edge<span class="sym">r_in</span></label><output id="iscoOut"></output></div>
             <input type="range" id="isco" min="0" max="100" step="1"></div>
           <div class="row"><div class="top"><label for="blr">BLR radius</label><output id="blrOut"></output></div>
             <input type="range" id="blr" min="0" max="100" step="1"></div>
+          <div class="subhead">Viewing angle</div>
+          <div class="pair">
+            <div class="row"><div class="top"><label for="inc">Inclination<span class="sym">i</span></label><output id="incOut"></output></div>
+              <input type="range" id="inc" min="0" max="80" step="1"></div>
+            <div class="row"><div class="top"><label for="pa">Orientation<span class="sym">θ</span></label><output id="paOut"></output></div>
+              <input type="range" id="pa" min="0" max="179" step="1" title="With GR on, θ runs 0–360°: it also points to the approaching side"></div>
+          </div>
+          <div class="grrow"><label title="Doppler boost and gravitational redshift for a non-spinning black hole (a = 0), inner edge at its ISCO (r_g = r_in / 6), no light bending. With GR on, θ points to the side moving toward us.">GR effects<span class="sym">a = 0</span></label>
+            <div class="seg grseg" role="group" aria-label="GR effects; the side at θ moves toward us">
+              <button data-g="0" aria-pressed="true">Off</button><button data-g="1" aria-pressed="false">On</button></div></div>
+                    <p class="upmsg" id="grNote" hidden>GR effects need an inner edge r_in.</p>
         </div>
         <div class="profbar"><span>Light profile</span><div class="seg profseg" role="group" aria-label="Radius axis"><button data-pscale="lin" aria-pressed="true">lin</button><button data-pscale="log" aria-pressed="false">log</button></div></div>
         <canvas id="profCv" title="Dashed line: half-light radius, the radius that encloses half of the source’s light" aria-label="Radial light profile of the selected source"></canvas>
@@ -372,7 +412,12 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <div class="row"><div class="top"><label for="fstar">Fraction in stars<span class="sym">κ⋆/κ</span></label><output id="fstarOut"></output></div>
           <input type="range" id="fstar" min="0" max="1" step="0.01" value="0.3"></div>
         <div class="row"><label for="massFn">Stellar masses</label>
-          <select id="massFn"><option value="equal">Equal, 1 M☉</option><option value="salpeter">Salpeter, 0.1–1 M☉</option><option value="salpeter10">Salpeter, 0.1–10 M☉</option><option value="chabrier">Chabrier, 0.1–1 M☉</option><option value="chabrier10">Chabrier, 0.1–10 M☉</option><option value="log10">Log-uniform, 0.1–10 M☉</option></select>
+          <select id="massFn"><option value="equal">Equal mass</option><option value="salpeter">Salpeter</option><option value="chabrier">Chabrier</option><option value="kroupa">Kroupa</option><option value="log10">Log-uniform</option></select></div>
+        <div class="row"><div class="top"><label for="mMin" id="mRangeLbl">Mass range</label><output id="mRangeOut"></output></div>
+          <div class="dual" id="mDual"><span class="dtrack"></span><span class="dfill" id="mFill"></span>
+            <input type="range" id="mMin" min="0" max="100" step="1" aria-label="Lowest stellar mass">
+            <input type="range" id="mMax" min="0" max="100" step="1" aria-label="Highest stellar mass"></div></div>
+        <div class="row">
           <div class="profbar mfbar"><span>Mass distribution</span><div class="seg profseg" role="group" aria-label="Count axis"><button data-mscale="lin" aria-pressed="true">lin</button><button data-mscale="log" aria-pressed="false">log</button></div></div>
           <canvas id="mfCv" aria-label="Histogram of stellar masses in the current star field"></canvas>
           <p class="mfstats" id="mfStats"></p></div>
@@ -435,7 +480,7 @@ const QUAL = [
 const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const S = {
-  kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal',
+  kappa:0.45, gamma:0.4, fstar:0.3, massFn:'equal', mMin:0.1, mMax:1, mEq:1,
   vdisp:0.3, drift:0.4, driftAng:90, rate:1,
   seed:Math.floor(Math.random()*1000000), active:0,
   Ls:1.5, Lv:5, quality:1, method:'irs', lcZoom:null, viewT:null, vs:0, vc:[0,0], lc:[0,0], lensMag:false, profLog:false, mfLog:false, edge:'elastic', showMap:true, caust:false, showSrc:true, showImgs:true, showOrig:false, showField:false, showShoot:false, srcField:false, srcShoot:false, crit:true, rings:false, starsSrc:false, starsLens:true, compare:false, yMode:'mu',
@@ -451,12 +496,12 @@ const MAX_SRC = 5, SRC_NAMES = 'ABCDE', SRC_COL = ['#f2b45a', '#7ee07a', '#ff6b5
 // each source's colour on the planes: [edge, core] RGB, matching SRC_COL
 const SRC_PAL = [[[1,0.54,0.24],[1,0.96,0.86]], [[0.38,0.9,0.35],[0.88,1,0.85]], [[1,0.32,0.26],[1,0.88,0.84]], [[0.74,0.77,0.84],[1,1,1]], [[0.25,0.5,1],[0.84,0.92,1]]];
 const SRC_POS = [[0,0],[0.6,0.5],[-0.6,0.5],[0,-0.6],[0.6,-0.5]];
-function freshSrc(i){ return {on:false, srcMode:'gauss', srcScale:i ? 0.2 : 0.1, isco:0.035, blr:0.26, sx:SRC_POS[i][0], sy:SRC_POS[i][1], img:null, imgName:'', noDisk:false, srcH:0.4, flux:1, tex:null}; }
+function freshSrc(i){ return {on:false, srcMode:'gauss', srcScale:i ? 0.2 : 0.1, isco:0.035, blr:0.26, inc:0, pa:0, gr:0, sx:SRC_POS[i][0], sy:SRC_POS[i][1], img:null, imgName:'', noDisk:false, srcH:0.4, flux:1, tex:null}; }
 const SRC = [0,1,2,3,4].map(freshSrc); SRC[0].on = true;
 // letters and colours belong to slots, so removing B leaves C and D unchanged
 const ACT = () => SRC.map((q, i) => q.on ? i : -1).filter(i => i >= 0);
 Object.defineProperty(S, 'nSrc', {get(){ return ACT().length; }});
-for(const k of ['srcMode','srcScale','isco','blr','sx','sy','img','imgName','noDisk'])
+for(const k of ['srcMode','srcScale','isco','blr','inc','pa','gr','sx','sy','img','imgName','noDisk'])
   Object.defineProperty(S, k, {get(){ return SRC[S.active][k]; }, set(v){ SRC[S.active][k] = v; }, enumerable:true});
 
 // ---------- WebGL setup ----------
@@ -789,28 +834,37 @@ let N = 0, ux = new Float32Array(NMAX), uy = new Float32Array(NMAX);
 const qa = new Float32Array(NMAX).fill(1), qb = new Float32Array(NMAX), qc = new Float32Array(NMAX), qd = new Float32Array(NMAX).fill(1);
 function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 let rnd = Math.random;
-function salpeterSample(m1=1){ const a=-1.35, m0=0.1; const u=rnd(); return Math.pow(Math.pow(m0,a)+u*(Math.pow(m1,a)-Math.pow(m0,a)), 1/a); }
-// Chabrier (2003) single-star IMF per log mass: log-normal below 1 M☉, power law dN/dlog m ∝ m^-1.3 above, continuous at 1 M☉
+// Mass functions, all written as dN/dlog m; the range [mMin, mMax] is set by the sliders (equal mass uses mEq)
+// Chabrier (2003) single-star IMF: log-normal below 1 M☉ (peak 0.079 M☉, σ = 0.69 dex), dN/dlog m ∝ m^-1.3 above, continuous at 1 M☉
 const CHAB_C = Math.exp(-(Math.log10(1/0.079)**2)/(2*0.69*0.69));
 function chabrierLog(m){ return m <= 1 ? Math.exp(-((Math.log10(m) - Math.log10(0.079))**2)/(2*0.69*0.69)) : CHAB_C*Math.pow(m, -1.3); }
-function chabrierSample(m1){ const pmax = chabrierLog(0.1), l1 = Math.log10(m1) + 1; for(;;){ const m = 10**(rnd()*l1 - 1); if(rnd()*pmax <= chabrierLog(m)) return m; } }
-// expected dN/dlog m and mass range for each mass function (equal is a single mass)
-const MF_PDF = {
-  salpeter: [m => Math.pow(m, -1.35), 1],
-  salpeter10: [m => Math.pow(m, -1.35), 10],
-  chabrier: [chabrierLog, 1],
-  chabrier10: [chabrierLog, 10],
-  log10: [() => 1, 10],
-};
-const MASS_FN = {
-  equal: () => 1,
-  salpeter: () => salpeterSample(1),
-  salpeter10: () => salpeterSample(10),
-  chabrier: () => chabrierSample(1),
-  chabrier10: () => chabrierSample(10),
-  log10: () => 10**(rnd()*2 - 1),
-};
-const MASS_MEAN = Object.fromEntries(Object.entries(MASS_FN).map(([k,f]) => { let s=0; for(let i=0;i<40000;i++) s+=f(); return [k, s/40000]; }));
+// Kroupa (2001): dN/dm ∝ m^-0.3 below 0.08, m^-1.3 to 0.5, m^-2.3 above; continuous at both breaks (here per log m)
+function kroupaLog(m){ return m < 0.08 ? Math.pow(m, 0.7) : m < 0.5 ? 0.08*Math.pow(m, -0.3) : 0.04*Math.pow(m, -1.3); }
+const MF_PDF = { salpeter: m => Math.pow(m, -1.35), chabrier: chabrierLog, kroupa: kroupaLog, log10: () => 1 };
+const MF_NAME = { equal:'equal', salpeter:'Salpeter', chabrier:'Chabrier', kroupa:'Kroupa', log10:'log-uniform' };
+const M_LO = -2, M_HI = 2;   // slider range: 0.01 to 100 M☉
+// tabulated CDF in log m, so any range samples exactly with one random number per star
+let MF_TAB = null;
+function mfTable(){
+  const key = S.massFn + '|' + S.mMin + '|' + S.mMax;
+  if(MF_TAB && MF_TAB.key === key) return MF_TAB;
+  const n = 2048, a = Math.log10(S.mMin), b = Math.log10(S.mMax), f = MF_PDF[S.massFn], lm = new Float64Array(n+1), cdf = new Float64Array(n+1);
+  let w0 = 0, w1 = 0, w2 = 0;
+  for(let k=0;k<=n;k++) lm[k] = a + (b - a)*k/n;
+  for(let k=1;k<=n;k++){ const l = 0.5*(lm[k-1] + lm[k]), m = 10**l, p = f(m)*(lm[k] - lm[k-1]); cdf[k] = cdf[k-1] + p; w0 += p; w1 += p*m; w2 += p*m*m; }
+  const mean = w1/w0;
+  return MF_TAB = {key, lm, cdf, tot:cdf[n], mean, std:Math.sqrt(Math.max(0, w2/w0 - mean*mean))};
+}
+function sampleMass(){
+  if(S.massFn === 'equal') return S.mEq;
+  if(S.massFn === 'salpeter'){ const al = -1.35, u = rnd(); return Math.pow(Math.pow(S.mMin, al) + u*(Math.pow(S.mMax, al) - Math.pow(S.mMin, al)), 1/al); }
+  const T = mfTable(), u = rnd()*T.tot; let lo = 0, hi = T.cdf.length - 1;
+  while(hi - lo > 1){ const mid = (lo + hi) >> 1; if(T.cdf[mid] < u) lo = mid; else hi = mid; }
+  const fr = (u - T.cdf[lo])/((T.cdf[hi] - T.cdf[lo]) || 1);
+  return 10**(T.lm[lo] + fr*(T.lm[hi] - T.lm[lo]));
+}
+const massMean = () => S.massFn === 'equal' ? S.mEq : mfTable().mean;
+const fmtM = m => m >= 10 ? m.toFixed(0) : m >= 1 ? (Math.round(m*10)/10).toString() : m >= 0.1 ? (Math.round(m*100)/100).toString() : (Math.round(m*1000)/1000).toString();
 function gauss(){ let u=0,v=0; while(!u) u=rnd(); while(!v) v=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
 
 function computeGeometry(){
@@ -826,14 +880,16 @@ function computeGeometry(){
   G.type = (1-k-g > 0 && 1-k+g > 0) ? 'minimum' : (d < 0 ? 'saddle' : 'maximum');
 }
 function genStars(){
+  if(!(S.massFn in MF_NAME)) setMassFn(S.massFn);
   computeGeometry();
   rnd = mulberry32(S.seed*2654435761 >>> 0);
   const area = Math.PI*G.FR*G.FR;
-  const mMean = MASS_MEAN[S.massFn];
-  N = Math.min(NMAX, Math.round(G.kstarTarget*area/(Math.PI*mMean)));
+  const mMean = massMean();
+  const nWant = Math.round(G.kstarTarget*area/(Math.PI*mMean));
+  G.capped = nWant > NMAX; N = Math.min(NMAX, nWant);
   let msum = 0;
   for(let i=0;i<N;i++){
-    const m = MASS_FN[S.massFn]();
+    const m = sampleMass();
     const rr = G.FR*Math.sqrt(rnd()), ph = 2*Math.PI*rnd();
     starData[i*4] = rr*Math.cos(ph);
     starData[i*4+1] = rr*Math.sin(ph);
@@ -898,6 +954,22 @@ const work = document.createElement('canvas'); work.width = work.height = SRC_RE
 const wctx = work.getContext('2d', {willReadFrequently:true});
 // thin disk at one wavelength: r in θE, s = disk scale, q = ISCO radius
 function diskRaw(r, s, q){ if(r <= q) return 0; const xi = Math.pow(r/s, 0.75)*Math.pow(1 - Math.sqrt(q/r), -0.25); return 1/(Math.exp(xi) - 1); }
+// thin disk seen at inclination i, its major axis at orientation θ (counter-clockwise from +x on the source plane).
+// GR (as in Caustic Crossing): Doppler and gravitational shift g for a non-spinning hole, r_g = ISCO/6;
+// the side that moves toward us (at θ, or at θ+180°) is boosted by g³ and the temperature shifted by g.
+function diskPrep(s, q, inc, pa, gr){
+  const ci = Math.cos(inc*Math.PI/180), si = Math.sin(inc*Math.PI/180), cp = Math.cos(pa*Math.PI/180), sp = Math.sin(pa*Math.PI/180);
+  return {s, q, ci, si, cp, sp, gr: q > 0 ? gr : 0, rg: q/6};
+}
+function diskSky(x, y, d){
+  const u = x*d.cp + y*d.sp, v = (-x*d.sp + y*d.cp)/d.ci, r = Math.hypot(u, v);
+  if(r <= d.q) return [0, r];
+  const xi = Math.pow(r/d.s, 0.75)*Math.pow(1 - Math.sqrt(d.q/r), -0.25);
+  if(!d.gr) return [1/Math.expm1(xi), r];
+  const R = r/d.rg, sr = Math.sqrt(R), den = R*sr - 3*sr; if(den <= 0) return [0, r];
+  const ut = R*sr/(Math.pow(R, 0.75)*Math.sqrt(den)), Om = 1/(R*sr), g = 1/(ut*(1 - d.gr*Om*d.si*(u/d.rg)));
+  return [g*g*g/Math.expm1(xi/g), r];
+}
 function diskMax(s, q){ let m = 0; const r1 = Math.max(6*s, 3*q); for(let i=1;i<=4000;i++){ const r = q + (r1-q)*i/4000; m = Math.max(m, diskRaw(r, s, q)); } return m || 1; }
 function buildSource(idx = S.active){
   const keep = S.active; S.active = idx;
@@ -917,18 +989,22 @@ function buildSource(idx = S.active){
     }
   } else {
     const disk = S.srcMode === 'disk', noDisk = disk && S.noDisk;
-    src.srcH = disk ? Math.max(noDisk ? 0 : 12*s, 1.5*S.blr, 1.3*S.isco, 0.05) : 4*s;
+    src.srcH = disk ? Math.max(noDisk ? 0 : Math.max(12*s, 2*S.isco + 6*s), 1.5*S.blr, 1.3*S.isco, 0.05) : 4*s;
     const h = src.srcH, bw = 0.15*S.blr;
     // normalise the disk to its brightest pixel (without an ISCO the thin-disk profile keeps rising toward r = 0)
     let dmax = 1;
-    if(disk && !noDisk){ dmax = 0; for(let j=0;j<n;j++) for(let i=0;i<n;i++){ const r = Math.hypot(((i+0.5)/n*2-1)*h, ((j+0.5)/n*2-1)*h); dmax = Math.max(dmax, diskRaw(r, s, S.isco)); } dmax = dmax || 1; }
+    const dp = diskPrep(s, S.isco, S.inc || 0, S.pa || 0, S.gr || 0);
+    // the texture is uploaded flipped, so row j is at height +y = (1 - 2(j+0.5)/n)·h
+    const sky = (i, j) => diskSky(((i+0.5)/n*2-1)*h, (1-(j+0.5)/n*2)*h, dp);
+    if(disk && !noDisk){ dmax = 0; for(let j=0;j<n;j++) for(let i=0;i<n;i++) dmax = Math.max(dmax, sky(i, j)[0]); dmax = dmax || 1; }
     for(let j=0;j<n;j++) for(let i=0;i<n;i++){
       const x = ((i+0.5)/n*2-1)*h, y = ((j+0.5)/n*2-1)*h, r = Math.hypot(x,y);
       let R,Gc,B,A;
       if(S.srcMode === 'disk'){
-        // thin disk seen face-on at one wavelength, with an empty hole inside the ISCO
-        const ad = noDisk ? 0 : diskRaw(r, s, S.isco)/dmax;
-        const ar = S.blr > 0 ? 0.28*Math.exp(-((r-S.blr)**2)/(2*bw*bw)) : 0;
+        // thin disk at one wavelength, with an empty hole inside the ISCO; the BLR ring lies in the disk plane
+        const [Ir, rd] = sky(i, j);
+        const ad = noDisk ? 0 : Ir/dmax;
+        const ar = S.blr > 0 ? 0.28*Math.exp(-((rd-S.blr)**2)/(2*bw*bw)) : 0;
         A = Math.min(1, ad+ar);
         const w = ad*ad, [e, k] = SRC_PAL[idx];
         R = ad*(e[0] + (k[0]-e[0])*w) + 1.00*ar; Gc = ad*(e[1] + (k[1]-e[1])*w) + 0.36*ar; B = ad*(e[2] + (k[2]-e[2])*w) + 0.45*ar;
@@ -1290,31 +1366,33 @@ function updateScalebars(){
 // ---------- Readouts & sizing ----------
 function fmt(v, d=2){ return Number(v).toFixed(d); }
 // ---------- Mass function plot ----------
-const MF_LO = -1.05, MF_W = 0.1, MF_NB = 21;
+let MF_LO = -1.05, MF_W = 0.1, MF_NB = 21;
+function mfAxis(){
+  // the histogram spans the chosen range with a little margin; about 20 bins
+  const a = S.massFn === 'equal' ? Math.log10(S.mEq) - 1 : Math.log10(S.mMin), b = S.massFn === 'equal' ? Math.log10(S.mEq) + 1 : Math.log10(S.mMax);
+  const span = Math.max(b - a, 0.3); MF_NB = 20; MF_W = span/(MF_NB - 1); MF_LO = a - MF_W/2;
+}
 function mfModel(){
   // expected fraction of stars per log-mass bin
   const out = new Array(MF_NB).fill(0);
-  if(S.massFn === 'equal'){ out[Math.round((0 - MF_LO)/MF_W - 0.5)] = 1; return out; }
-  const [f, m1] = MF_PDF[S.massFn];
-  const pdf = lm => { const m = 10**lm; return (m < 0.1 || m > m1) ? 0 : f(m); };
+  if(S.massFn === 'equal'){ out[Math.max(0, Math.min(MF_NB-1, Math.floor((Math.log10(S.mEq) - MF_LO)/MF_W)))] = 1; return out; }
+  const f = MF_PDF[S.massFn], lo = Math.log10(S.mMin), hi = Math.log10(S.mMax);
+  const pdf = lm => (lm < lo || lm > hi) ? 0 : f(10**lm);
   let tot = 0;
   for(let b=0;b<MF_NB;b++){ let s = 0; for(let k=0;k<40;k++){ s += pdf(MF_LO + (b + (k+0.5)/40)*MF_W); } out[b] = s; tot += s; }
   return out.map(v => v/tot);
 }
 function mfMoments(){
   // expected mean and standard deviation of m for the chosen mass function
-  if(S.massFn === 'equal') return [1, 0];
-  const [f, m1] = MF_PDF[S.massFn];
-  let w0 = 0, w1 = 0, w2 = 0; const n = 4000, a = Math.log(0.1), bnd = Math.log(m1);
-  for(let i=0;i<n;i++){ const lm = a + (bnd - a)*(i + 0.5)/n, m = Math.exp(lm), p = f(m); w0 += p; w1 += p*m; w2 += p*m*m; }
-  const mean = w1/w0; return [mean, Math.sqrt(Math.max(0, w2/w0 - mean*mean))];
+  if(S.massFn === 'equal') return [S.mEq, 0];
+  const T = mfTable(); return [T.mean, T.std];
 }
 function mfStats(){
   const el = $('mfStats'); if(!el) return;
   const [em, es] = mfMoments();
   let s1 = 0, s2 = 0; for(let i=0;i<N;i++){ const m = starData[i*4+2]; s1 += m; s2 += m*m; }
   const fm = N ? s1/N : 0, fs = N ? Math.sqrt(Math.max(0, s2/N - fm*fm)) : 0;
-  el.innerHTML = `<span>⟨m⟩ <b class="f">${fmt(fm)}</b> <b class="e">${fmt(em)}</b></span><span>σ <b class="f">${fmt(fs)}</b> <b class="e">${fmt(es)}</b> M☉</span>`;
+  el.innerHTML = `<span>⟨m⟩ <b class="f">${fmt(fm)}</b> <b class="e">${fmt(em)}</b></span><span>σ <b class="f">${fmt(fs)}</b> <b class="e">${fmt(es)}</b> M☉</span>${G.capped ? `<span class="mfcap">Capped at ${NMAX} stars, so κ⋆ is below the set value. Raise the lowest mass.</span>` : ''}`;
   el.title = `This field: mean ${fmt(fm)}, std ${fmt(fs)} M☉. Expected: mean ${fmt(em)}, std ${fmt(es)} M☉.`;
 }
 function drawMF(){
@@ -1325,6 +1403,7 @@ function drawMF(){
   c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
   const x = c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
   const pl = 4, pr = 4, pt = 16, pb = 16, w = W-pl-pr, h = H-pt-pb;
+  mfAxis();
   const counts = new Array(MF_NB).fill(0);
   for(let i=0;i<N;i++){ const b = Math.floor((Math.log10(starData[i*4+2]) - MF_LO)/MF_W); if(b >= 0 && b < MF_NB) counts[b]++; }
   const model = mfModel().map(v => v*N);
@@ -1341,7 +1420,14 @@ function drawMF(){
   x.lineTo(X(MF_LO + MF_NB*MF_W), Y(0)); x.stroke();
   x.strokeStyle = TH.axis; x.beginPath(); x.moveTo(pl, pt+h+0.5); x.lineTo(pl+w, pt+h+0.5); x.stroke();
   x.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; x.fillStyle = TH.muted; x.textBaseline = 'top';
-  for(const [lm, lab] of [[-1,'0.1'],[0,'1'],[1,'10 M☉']]){ const px = X(lm); x.fillRect(Math.round(px), pt+h, 1, 3); x.textAlign = lm < 0 ? 'left' : (lm > 0 ? 'right' : 'center'); x.fillText(lab, lm < 0 ? px - 2 : (lm > 0 ? px + 4 : px), pt+h+4); }
+  { // ticks at the decades inside the axis, labelled in M☉
+    const l0 = MF_LO, l1 = MF_LO + MF_NB*MF_W, ticks = [];
+    for(let d = Math.ceil(l0); d <= Math.floor(l1); d++) ticks.push(d);
+    if(ticks.length < 2){ ticks.length = 0; ticks.push(l0 + MF_W/2, l1 - MF_W/2); }
+    ticks.forEach((lm, k) => { const px = X(lm), first = k === 0, last = k === ticks.length - 1;
+      x.fillRect(Math.round(px), pt+h, 1, 3); x.textAlign = first ? 'left' : (last ? 'right' : 'center');
+      const v = fmtM(10**lm); x.fillText(last ? v + ' M☉' : v, first ? Math.max(pl, px - 2) : (last ? Math.min(pl + w, px + 4) : px), pt+h+4); });
+  }
   x.textBaseline = 'top'; x.textAlign = 'left'; x.fillStyle = TH.muted;
   x.fillText(`${N} stars`, pl, 1);
   x.textAlign = 'right'; x.fillStyle = TH.fg2; x.fillText('— expected', pl+w, 1);
@@ -1350,14 +1436,14 @@ function drawMF(){
   x.fillStyle = TH.muted; x.fillText(dl, dx, 1);
   x.fillStyle = 'rgba(242,180,90,0.8)'; x.fillRect(dx - dw - 13, 3, 8, 8);
 }
-const MASS_LABEL = {equal:'equal, 1 M☉', salpeter:'Salpeter 0.1–1 M☉', salpeter10:'Salpeter 0.1–10 M☉', chabrier:'Chabrier 0.1–1 M☉', chabrier10:'Chabrier 0.1–10 M☉', log10:'log-uniform 0.1–10 M☉'};
+const massLabel = () => S.massFn === 'equal' ? `equal, ${fmtM(S.mEq)} M☉` : `${MF_NAME[S.massFn]} ${fmtM(S.mMin)}–${fmtM(S.mMax)} M☉`;
 function srcLabel(i){ const q = SRC[i]; return q.srcMode==='image'&&q.img ? (q.imgName||'image') : (q.srcMode==='disk' ? (q.noDisk ? 'BLR only' : `disk + BLR, s = ${q.srcScale.toFixed(2)}`) : `Gaussian σ = ${q.srcScale.toFixed(2)}`); }
 function srcSummary(i = 0){
   const keep = S.active; S.active = i; const out = srcSummaryRaw(); S.active = keep; return out;
 }
 function srcSummaryRaw(){
   if(S.srcMode === 'image' && S.img) return `${S.imgName || 'image'}, ${fmt(2*SRC[S.active].srcH, 2)} θE wide`;
-  if(S.srcMode === 'disk') return `${S.noDisk ? 'no disk' : 'disk ' + fmt(S.srcScale, 2) + ' θE'}, ${S.isco > 0 ? 'ISCO ' + fmt(S.isco, 3) : 'no ISCO'}, ${S.blr > 0 ? 'BLR ' + fmt(S.blr, 2) : 'no BLR'}`;
+  if(S.srcMode === 'disk') return `${S.noDisk ? 'no disk' : 'disk ' + fmt(S.srcScale, 2) + ' θE'}, ${S.isco > 0 ? 'r_in ' + fmt(S.isco, 3) : 'no inner edge'}, ${S.blr > 0 ? 'BLR ' + fmt(S.blr, 2) : 'no BLR'}`;
   return `Gaussian σ = ${fmt(S.srcScale, S.srcScale < 0.1 ? 3 : 2)} θE`;
 }
 function updateParams(){
@@ -1370,7 +1456,7 @@ function updateParams(){
   const le = $('lensParams');
   if(le) le.innerHTML = html([
     ['Lens', `κ ${fmt(S.kappa)} · γ ${fmt(S.gamma)} · ${Math.round(S.fstar*100)}% in stars`],
-    ['Stars', `${N} · ${MASS_LABEL[S.massFn]}${$('showSeed').getAttribute('aria-expanded') === 'true' ? ' · seed ' + S.seed : ''}`],
+    ['Stars', `${N} · ${massLabel()}${$('showSeed').getAttribute('aria-expanded') === 'true' ? ' · seed ' + S.seed : ''}`],
   ]);
 }
 function updateReadouts(){
@@ -1420,7 +1506,20 @@ const logSlider = (v, a, b) => v <= 0 ? 0 : 10**(a + (b-a)*(v-1)/99);
 const toSlider = (x, a, b) => x <= 0 ? 0 : Math.max(1, Math.round((Math.log10(x)-a)/(b-a)*99 + 1));
 const ISCO_R = [-3, 0], BLR_R = [-1.7, 0.5];
 const iscoEl = $('isco'), blrEl = $('blr');
-function showDisk(){ $('iscoOut').textContent = S.isco > 0 ? fmt(S.isco, S.isco<0.1?3:2) + ' θE' : '0 (none)'; $('blrOut').textContent = S.blr > 0 ? fmt(S.blr, S.blr<0.1?3:2) + ' θE' : '0 (none)'; $('diskCtl').hidden = S.srcMode !== 'disk'; }
+function showGeom(){
+  $('incOut').textContent = (S.inc||0) + '°'; $('paOut').textContent = (S.pa||0) + '°';
+  $('inc').value = S.inc||0; $('pa').value = S.pa||0;
+  const g = S.gr||0, noIsco = !(S.isco > 0);
+  document.querySelectorAll('.grseg button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.g === (g ? 1 : 0)));
+  // as in Caustic Crossing: θ covers 0–179° (an ellipse looks the same turned by 180°), 0–359° once GR picks out the approaching side
+  $('pa').max = g ? 359 : 179;
+  if(!g && (S.pa||0) > 179){ S.pa -= 180; $('pa').value = S.pa; $('paOut').textContent = S.pa + '°'; }
+  $('grNote').hidden = !(g && noIsco);
+}
+$('inc').addEventListener('input', e => { S.inc = +e.target.value; showGeom(); buildSource(); lcDirty = true; });
+$('pa').addEventListener('input', e => { S.pa = +e.target.value; showGeom(); buildSource(); lcDirty = true; });
+document.querySelectorAll('.grseg button').forEach(b => b.addEventListener('click', () => { S.gr = +b.dataset.g; showGeom(); buildSource(); lcDirty = true; }));
+function showDisk(){ showGeom(); $('iscoOut').textContent = S.isco > 0 ? fmt(S.isco, S.isco<0.1?3:2) + ' θE' : 'none'; $('blrOut').textContent = S.blr > 0 ? fmt(S.blr, S.blr<0.1?3:2) + ' θE' : 'none'; $('diskCtl').hidden = S.srcMode !== 'disk'; }
 iscoEl.value = toSlider(S.isco, ...ISCO_R); blrEl.value = toSlider(S.blr, ...BLR_R);
 iscoEl.addEventListener('input', () => { S.isco = logSlider(+iscoEl.value, ...ISCO_R); showDisk(); buildSource(); lcDirty = true; });
 blrEl.addEventListener('input', () => { S.blr = logSlider(+blrEl.value, ...BLR_R); showDisk(); buildSource(); lcDirty = true; });
@@ -1495,7 +1594,43 @@ $('lensCmap').addEventListener('change', e => { LSTOPS = CMAPS[e.target.value]; 
 $('cmapSel').addEventListener('change', e => { STOPS = CMAPS[e.target.value]; drawColorbar(); mapSwatch(); viewDirty = true; });
 mapSwatch();
 $('edge').addEventListener('change', e => { S.edge = e.target.value; $('edgeNote').textContent = {free: 'Stars keep going and leave the field, so the field slowly empties. Restart or change the seed to refill it.', elastic: 'A star reflects off the edge like a ball off a wall: same speed, angle out equals angle in.', wrap: 'A star leaving the edge reappears on the opposite side.'}[S.edge]; });
-$('massFn').addEventListener('change', e => { S.massFn = e.target.value; genStars(); });
+// mass range sliders: log scale, 0.01 to 100 M☉, snapped to 1–2–5 steps would be coarse, so use 2 significant figures
+const mSlide = v => { const m = 10**(M_LO + (M_HI - M_LO)*v/100); return Number(m.toPrecision(2)); };
+const mToSlide = m => Math.round((Math.log10(m) - M_LO)/(M_HI - M_LO)*100);
+function syncMassUI(){
+  const eq = S.massFn === 'equal';
+  $('massFn').value = S.massFn;
+  const a = mToSlide(eq ? S.mEq : S.mMin), b = mToSlide(S.mMax);
+  $('mMax').style.display = eq ? 'none' : '';
+  $('mMin').setAttribute('aria-label', eq ? 'Mass of each star' : 'Lowest stellar mass');
+  $('mRangeLbl').textContent = eq ? 'Mass of each star' : 'Mass range';
+  $('mMin').value = a; $('mMax').value = b;
+  $('mRangeOut').textContent = eq ? fmtM(S.mEq) + ' M☉' : `${fmtM(S.mMin)}–${fmtM(S.mMax)} M☉`;
+  // fill between the thumbs (from the left edge to the thumb for equal mass); thumb centres sit 8px in from each end
+  const fx = v => `calc(8px + (100% - 16px)*${v/100})`;
+  $('mFill').style.left = eq ? '0' : fx(a); $('mFill').style.right = `calc(100% - ${fx(eq ? a : b)})`;
+  // when the thumbs meet, keep the one that can still move on top
+  $('mMin').style.zIndex = a > 90 ? 2 : 1;
+}
+function setMassFn(v){
+  // older names (fixed ranges) still work: salpeter10 → Salpeter 0.1–10, etc.
+  if(/10$/.test(v) && v !== 'log10'){ v = v.slice(0, -2); S.mMin = 0.1; S.mMax = 10; }
+  if(v === 'log10' && S.massFn !== 'log10' && S.mMax <= 1){ S.mMin = 0.1; S.mMax = 10; }
+  S.massFn = v; syncMassUI();
+}
+$('massFn').addEventListener('change', e => { setMassFn(e.target.value); genStars(); });
+$('mMin').addEventListener('input', e => {
+  const m = mSlide(+e.target.value);
+  if(S.massFn === 'equal') S.mEq = m;
+  else { S.mMin = m; if(S.mMax < m*1.25){ S.mMax = Math.min(100, mSlide(mToSlide(m) + 5)); } }
+  syncMassUI(); genStars();
+});
+$('mMax').addEventListener('input', e => {
+  const m = mSlide(+e.target.value); S.mMax = m;
+  if(S.mMin > m/1.25){ S.mMin = Math.max(0.01, mSlide(mToSlide(m) - 5)); }
+  syncMassUI(); genStars();
+});
+syncMassUI();
 $('showSeed').addEventListener('click', e => { const open = $('seedBox').hidden; $('seedBox').hidden = !open; e.currentTarget.setAttribute('aria-expanded', open); updateParams(); });
 const seedEl = $('seed');
 seedEl.value = S.seed;
@@ -1686,7 +1821,7 @@ const TOUR = [
   {el: () => $('lensCv').closest('.panel').querySelector('.opts.cols'), t: 'Lens plane layers', d: 'Show or hide lensed images, the magnification, critical curves and Einstein radii. On the right: stars, the star field, the ray region (the ray-shooting region) and the source field, and Whole field to zoom out to the whole star field.'},
   {el: () => document.querySelector('.lc'), t: 'Light curve', d: 'Brightness over time for every source, in matching colours. Compare Gaussian sizes adds reference sources; Δmag shows the change in magnitudes; Restart replays the same run.'},
   {el: () => $('lcCv'), t: 'Explore a moment', d: 'Pause, then click any time to see both planes at that moment, and drag the grey time line to move through time. Drag across the plot to zoom, use the slider below to look further back, and press Latest to return.'},
-  {el: () => $('srcTabs').closest('.group'), t: 'Sources', d: 'Add up to five sources, each with its own colour and light curve. For each, choose a Gaussian, an accretion disk (with ISCO and broad-line region) or an image, set its size, and check its light profile and half-light radius r½.'},
+  {el: () => $('srcTabs').closest('.group'), t: 'Sources', d: 'Add up to five sources, each with its own colour and light curve. For each, choose a Gaussian, an accretion disk (with an inner edge r_in and a broad-line region) or an image, set its size, and check its light profile and half-light radius r½.'},
   {el: () => $('kappa').closest('.group'), t: 'Lens model', d: 'Convergence κ, shear γ and the fraction of mass in stars set the caustic pattern. The mass plot compares this field with the chosen mass function. Random star field draws a new field; Seed lets you bring one back.'},
   {el: () => $('vdisp').closest('.group'), t: 'Motion', d: 'Set the stars\u2019 random speeds, a common drift and what happens at the edge of the star field, then press Play above the light curve to watch the caustics sweep across the sources.'},
   {el: () => $('Ls').closest('.group'), t: 'View', d: 'Set the size of the magnification map, check the star field radius R\u22c6, choose how the map is made (ray shooting, or polygon mapping for a smoother map), and trade speed for detail with the ray-shooting setting. Fast suits slower computers.'},
