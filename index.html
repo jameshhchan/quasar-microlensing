@@ -40,6 +40,8 @@
 .themesel{font-size:12px}
 .themesel select{font-size:12px;padding:4px 6px}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+#diskCtl{display:flex;flex-direction:column;gap:8px}
 body{background:var(--ink);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.5;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 32px}
 .wrap{max-width:1380px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
@@ -381,7 +383,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
         <p id="upMsg" class="upmsg" hidden role="status"></p>
         <div class="row"><div class="top"><label for="srcSize" id="srcSizeLbl">Size σ</label><output id="srcSizeOut"></output></div>
           <input type="range" id="srcSize" min="0" max="100" step="1" value="50"></div>
-        <div id="diskCtl" hidden style="display:flex;flex-direction:column;gap:8px">
+        <div id="diskCtl" hidden>
           <div class="row"><div class="top"><label for="isco" title="Inner edge of the disk (the ISCO)">Inner edge<span class="sym">r_in</span></label><output id="iscoOut"></output></div>
             <input type="range" id="isco" min="0" max="100" step="1"></div>
           <div class="row"><div class="top"><label for="blr">BLR radius</label><output id="blrOut"></output></div>
