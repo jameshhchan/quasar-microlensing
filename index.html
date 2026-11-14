@@ -150,8 +150,6 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .seg button{border:0;border-radius:0;background:transparent;color:var(--muted);padding:5px 10px}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--raise);color:var(--fg)}
-.savegrp button{color:var(--fg);font-size:12px;padding:5px 9px}
-.savegrp button:hover{background:var(--raise)}
 aside.controls{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 14px 14px;display:flex;flex-direction:column}
 .group{display:flex;flex-direction:column;gap:10px;padding-block:14px;border-bottom:1px solid var(--line)}
 .group:last-child{border-bottom:0}
@@ -358,7 +356,7 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
               <button data-y="mag" aria-pressed="false">Δmag</button>
             </div>
             <button id="zoomOut" hidden>Zoom out</button>
-            <div class="seg savegrp" role="group" aria-label="Save the light curves"><button id="saveCsv" title="Save every light curve so far as a CSV table, with the settings in its header">CSV ↓</button><button id="savePng" title="Save the plot as it looks now as a PNG image">PNG ↓</button></div>
+            <button id="saveCsv" title="Save every light curve so far as a CSV table, with the settings in its header">Save CSV ↓</button>
             <button id="clearBtn" title="Return the stars to their starting positions, reset time to 0 and clear the light curve">Restart</button>
             <button id="playBtn" class="primary">Pause</button>
           </div>
@@ -1928,7 +1926,7 @@ function setTheme(t){
 }
 $('themeSel').addEventListener('change', e => setTheme(e.target.value));
 try{ if(localStorage.getItem('qml-theme') === 'daylight') setTheme('daylight'); }catch(e){}
-// ---- save the light curves: CSV of the whole history, or PNG of the plot as shown ----
+// ---- save the light curves: the whole history as a CSV table ----
 // inside claude.ai the page asks the viewer through the downloads capability; elsewhere (e.g. GitHub Pages) a plain browser download
 let DL = null;
 try{ if(window.claude && claude.use) claude.use('downloads').then(d => { DL = d; }).catch(() => {}); }catch(e){}
@@ -1979,21 +1977,6 @@ const stamp = () => { const d = new Date(), z = n => String(n).padStart(2, '0');
 $('saveCsv').addEventListener('click', () => {
   if(!lc.length){ alertMsg('No light curve yet: press Play first.'); return; }
   saveFile(`light-curves-${stamp()}.csv`, lightCurveCSV());
-});
-$('savePng').addEventListener('click', () => {
-  drawLC();
-  // the plot on the page background, with the legend written above it
-  const dpr = devicePixelRatio || 1, W = lcCv.width, H = lcCv.height, top = Math.round(30*dpr);
-  const cv = document.createElement('canvas'); cv.width = W; cv.height = H + top;
-  const c = cv.getContext('2d'), css = getComputedStyle(document.documentElement);
-  c.fillStyle = css.getPropertyValue('--panel').trim() || '#0d111a'; c.fillRect(0, 0, cv.width, cv.height);
-  c.drawImage(lcCv, 0, top);
-  c.font = `${11.5*dpr}px "IBM Plex Mono", ui-monospace, monospace`; c.textBaseline = 'middle';
-  let x = 52*dpr; const y = top/2;
-  const items = ACT().map(i => [SCOL(i), (S.nSrc > 1 ? SRC_NAMES[i] + ': ' : '') + srcLabel(i)]);
-  if(S.compare) CMP_SIG.forEach((g, k) => items.push([CMP_COL[k], `σ = ${g}`]));
-  for(const [col, lab] of items){ c.fillStyle = col; c.fillRect(x, y - 1.5*dpr, 18*dpr, 3*dpr); x += 24*dpr; c.fillStyle = css.getPropertyValue('--fg2').trim() || '#c9d0e0'; c.fillText(lab, x, y); x += c.measureText(lab).width + 18*dpr; }
-  cv.toBlob(b => { if(b) saveFile(`light-curves-${stamp()}.png`, b); }, 'image/png');
 });
 requestAnimationFrame(frame);
 

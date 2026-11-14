@@ -17,7 +17,7 @@ New here? Click **Take the tour** at the top of the page for a guided walk-throu
 - **Lens model:** set the convergence κ, shear γ, fraction of mass in stars and stellar mass function (equal, Salpeter, Chabrier, Kroupa or log-uniform) with any mass range from 0.01 to 100 M☉. Compare the stars drawn with the expected mass distribution, and use a seed to bring back a star field.
 - **Light curve:** follow each source's magnification over time, in μ or in Δm = −2.5 log(μ/μ₀), with reference curves for Gaussian sources of different sizes.
 - **Explore a moment:** pause, then click any time on the light curve to see both planes at that moment, or drag the time line to move through time. Drag across the plot to zoom in and use the slider to look further back.
-- **Save the light curves:** download every light curve so far as a CSV table (time, μ and Δmag for each source, with the settings in its header), or the plot as a PNG image.
+- **Save the light curves:** download every light curve so far as a CSV table, with time, μ and Δmag for each source and the settings in its header.
 
 ## How it works
 
