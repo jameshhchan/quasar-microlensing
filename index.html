@@ -41,7 +41,7 @@
 .themesel select{font-size:12px;padding:4px 6px}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-#diskCtl{display:flex;flex-direction:column;gap:8px}
+#diskCtl,.srcsub{display:flex;flex-direction:column;gap:8px}
 body{background:var(--ink);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.5;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 32px}
 .wrap{max-width:1380px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
@@ -150,6 +150,8 @@ button.primary{background:var(--amber);color:#1a1205;border-color:var(--amber);f
 .seg button{border:0;border-radius:0;background:transparent;color:var(--muted);padding:5px 10px}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--raise);color:var(--fg)}
+.savegrp button{color:var(--fg);font-size:12px;padding:5px 9px}
+.savegrp button:hover{background:var(--raise)}
 aside.controls{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 14px 14px;display:flex;flex-direction:column}
 .group{display:flex;flex-direction:column;gap:10px;padding-block:14px;border-bottom:1px solid var(--line)}
 .group:last-child{border-bottom:0}
@@ -177,16 +179,16 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
 .mfstats b{font-weight:500;margin-left:4px}
 .mfstats{flex-wrap:wrap}
 /* disk controls: pairs of half-width sliders, a small heading for the viewing angle, GR on one line */
-#diskCtl .pair{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
-#diskCtl .pair .row label{font-size:12.5px;white-space:nowrap}
-#diskCtl .pair .row output{font-size:11px}
-#diskCtl .pair .row .top{gap:4px}
-#diskCtl .pair .row label .sym{margin-left:3px}
-#diskCtl .subhead{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;padding-top:8px;border-top:1px solid var(--line)}
-#diskCtl .grrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
-#diskCtl .grrow label{font-size:13px}
-#diskCtl .grrow .sym{font-family:var(--body);font-style:normal;font-size:11.5px;color:var(--muted);margin-left:6px}
-#diskCtl .grseg button{padding:3px 12px;font-size:12px}
+.srcgrp .pair{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.srcgrp .pair .row label{font-size:12.5px;white-space:nowrap}
+.srcgrp .pair .row output{font-size:11px}
+.srcgrp .pair .row .top{gap:4px}
+.srcgrp .pair .row label .sym{margin-left:3px}
+.srcgrp .subhead{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;padding-top:8px;border-top:1px solid var(--line)}
+.srcgrp .grrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.srcgrp .grrow label{font-size:13px}
+.srcgrp .grrow .sym{font-family:var(--body);font-style:normal;font-size:11.5px;color:var(--muted);margin-left:6px}
+.srcgrp .grseg button{padding:3px 12px;font-size:12px}
 #diskCtl .grinfo{margin:-4px 0 0;font-family:var(--mono);font-size:11px;color:var(--amber);min-height:0}
 #diskCtl .grinfo output:empty{display:none}
 #diskCtl .grassume{margin:-4px 0 0;font-size:11.5px;line-height:1.45;color:var(--muted)}
@@ -356,11 +358,13 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
               <button data-y="mag" aria-pressed="false">Δmag</button>
             </div>
             <button id="zoomOut" hidden>Zoom out</button>
+            <div class="seg savegrp" role="group" aria-label="Save the light curves"><button id="saveCsv" title="Save every light curve so far as a CSV table, with the settings in its header">CSV ↓</button><button id="savePng" title="Save the plot as it looks now as a PNG image">PNG ↓</button></div>
             <button id="clearBtn" title="Return the stars to their starting positions, reset time to 0 and clear the light curve">Restart</button>
             <button id="playBtn" class="primary">Pause</button>
           </div>
         </div>
         <div class="lclegend" id="lcLegend"></div>
+        <p class="upmsg" id="lcSaveMsg" hidden role="status"></p>
         <canvas id="lcCv" aria-label="Magnification versus time"></canvas>
         <div class="lcscroll" id="lcScrollRow" hidden><span>Earlier</span><input type="range" id="lcScroll" step="any" aria-label="Scroll through the light curve history"><span>Latest</span></div>
       </section>
@@ -388,6 +392,14 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
             <input type="range" id="isco" min="0" max="100" step="1"></div>
           <div class="row"><div class="top"><label for="blr">BLR radius</label><output id="blrOut"></output></div>
             <input type="range" id="blr" min="0" max="100" step="1"></div>
+        </div>
+        <div id="grCtl" class="srcsub" hidden>
+          <div class="grrow"><label title="Doppler boost and gravitational redshift for a non-spinning black hole (a = 0), inner edge at its ISCO (r_g = r_in / 6), no light bending. With GR on, θ points to the side moving toward us.">GR effects<span class="sym">a = 0</span></label>
+            <div class="seg grseg" role="group" aria-label="GR effects; the side at θ moves toward us">
+              <button data-g="0" aria-pressed="true">Off</button><button data-g="1" aria-pressed="false">On</button></div></div>
+          <p class="upmsg" id="grNote" hidden>GR effects need an inner edge r_in.</p>
+        </div>
+        <div id="viewCtl" class="srcsub">
           <div class="subhead">Viewing angle</div>
           <div class="pair">
             <div class="row"><div class="top"><label for="inc">Inclination<span class="sym">i</span></label><output id="incOut"></output></div>
@@ -395,10 +407,6 @@ select{font:inherit;font-size:13px;background:var(--raise);color:var(--fg);borde
             <div class="row"><div class="top"><label for="pa">Orientation<span class="sym">θ</span></label><output id="paOut"></output></div>
               <input type="range" id="pa" min="0" max="179" step="1" title="With GR on, θ runs 0–360°: it also points to the approaching side"></div>
           </div>
-          <div class="grrow"><label title="Doppler boost and gravitational redshift for a non-spinning black hole (a = 0), inner edge at its ISCO (r_g = r_in / 6), no light bending. With GR on, θ points to the side moving toward us.">GR effects<span class="sym">a = 0</span></label>
-            <div class="seg grseg" role="group" aria-label="GR effects; the side at θ moves toward us">
-              <button data-g="0" aria-pressed="true">Off</button><button data-g="1" aria-pressed="false">On</button></div></div>
-                    <p class="upmsg" id="grNote" hidden>GR effects need an inner edge r_in.</p>
         </div>
         <div class="profbar"><span>Light profile</span><div class="seg profseg" role="group" aria-label="Radius axis"><button data-pscale="lin" aria-pressed="true">lin</button><button data-pscale="log" aria-pressed="false">log</button></div></div>
         <canvas id="profCv" title="Dashed line: half-light radius, the radius that encloses half of the source’s light" aria-label="Radial light profile of the selected source"></canvas>
@@ -983,11 +991,25 @@ function buildSource(idx = S.active){
     const iw = S.img.naturalWidth, ih = S.img.naturalHeight, sc = Math.max(n/iw, n/ih);
     wctx.drawImage(S.img, (n-iw*sc)/2, (n-ih*sc)/2, iw*sc, ih*sc);
     const d = wctx.getImageData(0,0,n,n).data;
-    for(let i=0;i<n*n;i++){
-      const al = d[i*4+3]/255;
-      const r = d[i*4]*al, g = d[i*4+1]*al, b = d[i*4+2]*al;
-      srcPix[i*4]=r; srcPix[i*4+1]=g; srcPix[i*4+2]=b;
-      srcPix[i*4+3] = 0.2126*r + 0.7152*g + 0.0722*b;
+    // the picture lies flat, rotated by θ and tilted by i: each sky pixel looks up the face-on picture (bilinear)
+    const ci = Math.cos((S.inc||0)*Math.PI/180), ct = Math.cos((S.pa||0)*Math.PI/180), st = Math.sin((S.pa||0)*Math.PI/180);
+    const plain = !(S.inc||0) && !(S.pa||0);
+    for(let j=0;j<n;j++) for(let i=0;i<n;i++){
+      const o = (j*n+i)*4;
+      let r, g, b, al;
+      if(plain){ al = d[o+3]/255; r = d[o]; g = d[o+1]; b = d[o+2]; }
+      else {
+        const x = (i+0.5)/n*2-1, y = 1-(j+0.5)/n*2, u = x*ct + y*st, v = (-x*st + y*ct)/ci;
+        const fi = (u+1)/2*n - 0.5, fj = (1-v)/2*n - 0.5;
+        if(fi < -0.5 || fj < -0.5 || fi > n-0.5 || fj > n-0.5){ srcPix[o]=srcPix[o+1]=srcPix[o+2]=srcPix[o+3]=0; continue; }
+        const i0 = Math.max(0, Math.min(n-2, Math.floor(fi))), j0 = Math.max(0, Math.min(n-2, Math.floor(fj))), ax = Math.min(1, Math.max(0, fi-i0)), ay = Math.min(1, Math.max(0, fj-j0));
+        const at = c => { const p00 = d[(j0*n+i0)*4+c], p10 = d[(j0*n+i0+1)*4+c], p01 = d[((j0+1)*n+i0)*4+c], p11 = d[((j0+1)*n+i0+1)*4+c];
+          return (p00*(1-ax) + p10*ax)*(1-ay) + (p01*(1-ax) + p11*ax)*ay; };
+        al = at(3)/255; r = at(0); g = at(1); b = at(2);
+      }
+      r *= al; g *= al; b *= al;
+      srcPix[o]=r; srcPix[o+1]=g; srcPix[o+2]=b;
+      srcPix[o+3] = 0.2126*r + 0.7152*g + 0.0722*b;
     }
   } else {
     const disk = S.srcMode === 'disk', noDisk = disk && S.noDisk;
@@ -1012,7 +1034,10 @@ function buildSource(idx = S.active){
         R = ad*(e[0] + (k[0]-e[0])*w) + 1.00*ar; Gc = ad*(e[1] + (k[1]-e[1])*w) + 0.36*ar; B = ad*(e[2] + (k[2]-e[2])*w) + 0.45*ar;
         const mx = Math.max(R,Gc,B); if(mx > 1){ R/=mx; Gc/=mx; B/=mx; }
       } else {
-        A = Math.exp(-r*r/(2*s*s));
+        // a flat Gaussian disk seen at inclination i: width σ along θ, σ cos i across (texture rows run top-down, so y flips)
+        const yt = -y, ci = Math.cos((S.inc||0)*Math.PI/180), ct = Math.cos((S.pa||0)*Math.PI/180), st = Math.sin((S.pa||0)*Math.PI/180);
+        const gu = x*ct + yt*st, gv = (-x*st + yt*ct)/ci;
+        A = Math.exp(-(gu*gu + gv*gv)/(2*s*s));
         const w = A*A, [e, k] = SRC_PAL[idx];
         R = A*(e[0] + (k[0]-e[0])*w); Gc = A*(e[1] + (k[1]-e[1])*w); B = A*(e[2] + (k[2]-e[2])*w);
       }
@@ -1514,14 +1539,16 @@ function showGeom(){
   const g = S.gr||0, noIsco = !(S.isco > 0);
   document.querySelectorAll('.grseg button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.g === (g ? 1 : 0)));
   // as in Caustic Crossing: θ covers 0–179° (an ellipse looks the same turned by 180°), 0–359° once GR picks out the approaching side
-  $('pa').max = g ? 359 : 179;
-  if(!g && (S.pa||0) > 179){ S.pa -= 180; $('pa').value = S.pa; $('paOut').textContent = S.pa + '°'; }
+  const full = S.srcMode === 'image' || (S.srcMode === 'disk' && g);
+  $('pa').max = full ? 359 : 179;
+  if(!full && (S.pa||0) > 179){ S.pa -= 180; $('pa').value = S.pa; $('paOut').textContent = S.pa + '°'; }
+  $('pa').title = S.srcMode === 'image' ? 'Rotation of the image, counter-clockwise' : 'Direction of the long axis, counter-clockwise from +x' + (S.srcMode === 'disk' ? '. With GR on, θ runs 0–360° and points to the side moving toward us' : '');
   $('grNote').hidden = !(g && noIsco);
 }
 $('inc').addEventListener('input', e => { S.inc = +e.target.value; showGeom(); buildSource(); lcDirty = true; });
 $('pa').addEventListener('input', e => { S.pa = +e.target.value; showGeom(); buildSource(); lcDirty = true; });
 document.querySelectorAll('.grseg button').forEach(b => b.addEventListener('click', () => { S.gr = +b.dataset.g; showGeom(); buildSource(); lcDirty = true; }));
-function showDisk(){ showGeom(); $('iscoOut').textContent = S.isco > 0 ? fmt(S.isco, S.isco<0.1?3:2) + ' θE' : 'none'; $('blrOut').textContent = S.blr > 0 ? fmt(S.blr, S.blr<0.1?3:2) + ' θE' : 'none'; $('diskCtl').hidden = S.srcMode !== 'disk'; }
+function showDisk(){ showGeom(); $('iscoOut').textContent = S.isco > 0 ? fmt(S.isco, S.isco<0.1?3:2) + ' θE' : 'none'; $('blrOut').textContent = S.blr > 0 ? fmt(S.blr, S.blr<0.1?3:2) + ' θE' : 'none'; $('diskCtl').hidden = S.srcMode !== 'disk'; $('grCtl').hidden = S.srcMode !== 'disk'; }
 iscoEl.value = toSlider(S.isco, ...ISCO_R); blrEl.value = toSlider(S.blr, ...BLR_R);
 iscoEl.addEventListener('input', () => { S.isco = logSlider(+iscoEl.value, ...ISCO_R); showDisk(); buildSource(); lcDirty = true; });
 blrEl.addEventListener('input', () => { S.blr = logSlider(+blrEl.value, ...BLR_R); showDisk(); buildSource(); lcDirty = true; });
@@ -1901,6 +1928,73 @@ function setTheme(t){
 }
 $('themeSel').addEventListener('change', e => setTheme(e.target.value));
 try{ if(localStorage.getItem('qml-theme') === 'daylight') setTheme('daylight'); }catch(e){}
+// ---- save the light curves: CSV of the whole history, or PNG of the plot as shown ----
+// inside claude.ai the page asks the viewer through the downloads capability; elsewhere (e.g. GitHub Pages) a plain browser download
+let DL = null;
+try{ if(window.claude && claude.use) claude.use('downloads').then(d => { DL = d; }).catch(() => {}); }catch(e){}
+async function saveFile(filename, data){
+  if(DL){
+    try{ await DL.save({filename, data}); }
+    catch(e){ if(e && e.code === 'declined') return; if(e && e.code === 'rate_limited'){ alertMsg('A save is already waiting for your answer.'); return; } alertMsg('Saving is not available here.'); }
+    return;
+  }
+  const blob = data instanceof Blob ? data : new Blob([data], {type: filename.endsWith('.csv') ? 'text/csv' : 'application/octet-stream'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+function alertMsg(t){ const m = $('lcSaveMsg'); if(!m) return; m.textContent = t; m.hidden = false; clearTimeout(alertMsg.h); alertMsg.h = setTimeout(() => { m.hidden = true; }, 4000); }
+function srcDesc(i){
+  const q = SRC[i], geo = `inclination ${q.inc||0} deg, orientation ${q.pa||0} deg`;
+  if(q.srcMode === 'image' && q.img) return `image "${q.imgName||'image'}", size ${q.srcScale.toFixed(3)} thetaE, ${geo}`;
+  if(q.srcMode === 'disk') return `disk scale ${q.noDisk ? 0 : q.srcScale.toFixed(3)} thetaE, inner edge r_in ${q.isco.toFixed(3)} thetaE, BLR ${q.blr.toFixed(3)} thetaE, ${geo}, GR ${q.gr ? 'on (a = 0)' : 'off'}`;
+  return `Gaussian sigma ${q.srcScale.toFixed(3)} thetaE, ${geo}`;
+}
+function lightCurveCSV(){
+  const act = ACT(), mu0 = G.muMac, f = v => isFinite(v) ? (+v.toPrecision(7)).toString() : '';
+  const head = [
+    '# Quasar Microlensing Lab: light curves',
+    '# https://jameshhchan.github.io/quasar-microlensing/',
+    `# kappa = ${S.kappa}, gamma = ${S.gamma}, kappa_star/kappa = ${S.fstar}, smooth kappa_s = ${(S.kappa*(1-S.fstar)).toFixed(4)}`,
+    `# stellar masses: ${massLabel().replace('M☉','Msun')}, ${N} stars, seed ${S.seed}`,
+    `# random velocities sigma_v = ${S.vdisp}, bulk drift v = ${S.drift} at ${S.driftAng} deg, edge: ${S.edge}`,
+    `# map: ${S.method.toUpperCase()}, half-width ${S.Ls} thetaE; lengths in thetaE (Einstein radius of a 1 Msun star)`,
+    `# macro magnification mu0 = ${f(mu0)}; dmag = -2.5 log10(mu / mu0), negative is brighter`,
+    ...act.map(i => `# source ${SRC_NAMES[i]}: ${srcDesc(i)}, position (${SRC[i].sx.toFixed(3)}, ${SRC[i].sy.toFixed(3)})`),
+    ...(S.compare ? [`# comparison Gaussians at source ${SRC_NAMES[act[0]]}'s position: sigma = ${CMP_SIG.join(', ')} thetaE`] : []),
+  ];
+  const cols = ['t'];
+  for(const i of act) cols.push(`mu_${SRC_NAMES[i]}`, `dmag_${SRC_NAMES[i]}`);
+  if(S.compare) for(const g of CMP_SIG) cols.push(`mu_gauss_${g}`, `dmag_gauss_${g}`);
+  const rows = [cols.join(',')];
+  const dm = m => -2.5*Math.log10(Math.max(m, 1e-9)/mu0);
+  for(const p of lc){
+    const r = [f(p.t)];
+    for(const i of act) r.push(f(p.s[i]), f(dm(p.s[i])));
+    if(S.compare) CMP_SIG.forEach((g, k) => r.push(f(p.g[k]), f(dm(p.g[k]))));
+    rows.push(r.join(','));
+  }
+  return head.join('\n') + '\n' + rows.join('\n') + '\n';
+}
+const stamp = () => { const d = new Date(), z = n => String(n).padStart(2, '0'); return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`; };
+$('saveCsv').addEventListener('click', () => {
+  if(!lc.length){ alertMsg('No light curve yet: press Play first.'); return; }
+  saveFile(`light-curves-${stamp()}.csv`, lightCurveCSV());
+});
+$('savePng').addEventListener('click', () => {
+  drawLC();
+  // the plot on the page background, with the legend written above it
+  const dpr = devicePixelRatio || 1, W = lcCv.width, H = lcCv.height, top = Math.round(30*dpr);
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H + top;
+  const c = cv.getContext('2d'), css = getComputedStyle(document.documentElement);
+  c.fillStyle = css.getPropertyValue('--panel').trim() || '#0d111a'; c.fillRect(0, 0, cv.width, cv.height);
+  c.drawImage(lcCv, 0, top);
+  c.font = `${11.5*dpr}px "IBM Plex Mono", ui-monospace, monospace`; c.textBaseline = 'middle';
+  let x = 52*dpr; const y = top/2;
+  const items = ACT().map(i => [SCOL(i), (S.nSrc > 1 ? SRC_NAMES[i] + ': ' : '') + srcLabel(i)]);
+  if(S.compare) CMP_SIG.forEach((g, k) => items.push([CMP_COL[k], `σ = ${g}`]));
+  for(const [col, lab] of items){ c.fillStyle = col; c.fillRect(x, y - 1.5*dpr, 18*dpr, 3*dpr); x += 24*dpr; c.fillStyle = css.getPropertyValue('--fg2').trim() || '#c9d0e0'; c.fillText(lab, x, y); x += c.measureText(lab).width + 18*dpr; }
+  cv.toBlob(b => { if(b) saveFile(`light-curves-${stamp()}.png`, b); }, 'image/png');
+});
 requestAnimationFrame(frame);
 
 })();
